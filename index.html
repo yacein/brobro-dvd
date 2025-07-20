@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro DVD Menu</title>
+    <!-- Google Fonts: Press Start 2P for a pixelated, retro feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- New Google Fonts for Title and Buttons (Bangers for title) -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        /* Basic CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling: Full screen, retro font, dark background */
+        body {
+            font-family: 'Press Start 2P', cursive; /* Apply the pixelated font as fallback */
+            color: #ffffff; /* White text for contrast */
+            background-color: #000000; /* Black background as fallback */
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            overflow: hidden; /* Crucial: Hides any overflow from the oversized video background or sliding screens */
+            position: relative; /* Needed for z-index of children like modal */
+        }
+
+        /* Video Background Styling (now applies to iframe) */
+        .video-background-iframe {
+            position: fixed; /* Fixes element to the viewport */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            /* These dimensions are key for the "cover" effect.
+               They ensure the iframe is always large enough to cover the viewport
+               while maintaining a 16:9 aspect ratio (16/9 = 1.777..., 9/16 = 0.5625). */
+            width: 177.77777778vh; /* 16/9 of viewport height */
+            height: 56.25vw; /* 9/16 of viewport width */
+            min-width: 100%; /* Ensure it's at least 100% wide */
+            min-height: 100%; /* Ensure it's at least 100% tall */
+            transform: translate(-50%, -50%); /* Use transform to truly center and cover */
+            z-index: -2; /* Place behind all other content */
+            pointer-events: none; /* Allows clicks to pass through to elements behind it */
+        }
+
+        /* Overlay for better text readability over video */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent black overlay */
+            z-index: -1; /* Between video/iframe and content */
+        }
+
+        /* Screen Container: Holds all main screens side-by-side for sliding */
+        #screenContainer {
+            display: flex; /* Arranges children (screens) horizontally */
+            width: 300vw; /* Three viewport widths wide (special features + main + scene) */
+            height: 100vh; /* Full viewport height */
+            position: absolute; /* Crucial: Position absolutely from top-left of viewport */
+            top: 0;
+            left: 0;
+            /* Changed transition duration to 1s */
+            transition: transform 1s ease-in-out; /* Smooth transition for sliding */
+            z-index: 0; /* Ensure it's above the background but below modals */
+        }
+
+        /* Classes to slide the screen container left to specific pages */
+        #screenContainer.slide-to-special-features {
+            transform: translateX(0vw); /* Special Features is the first screen */
+        }
+        #screenContainer.slide-to-main {
+            transform: translateX(-100vw); /* Main Menu is the second screen */
+        }
+        #screenContainer.slide-to-scene {
+            transform: translateX(-200vw); /* Scene Selection is the third screen */
+        }
+
+        /* Base styling for all screen wrappers (main, scene, special features) */
+        .screen-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes header to top, footer to bottom, main in between */
+            align-items: center; /* Default center alignment for content */
+            min-height: 100vh;
+            width: 100vw; /* Each screen takes one full viewport width */
+            flex-shrink: 0; /* Prevents shrinking */
+            position: relative; /* For back button positioning */
+            z-index: 1; /* Ensure its content is visible */
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in width/height */
+            background-size: cover; /* Ensure background images cover the area */
+            background-position: center; /* Center background images */
+            background-repeat: no-repeat; /* Do not repeat background images */
+        }
+
+        /* Main Menu Screen specific alignment */
+        #mainMenuScreen {
+            align-items: flex-end; /* Align content to the right for main menu */
+            padding: 20px 50px; /* Add more padding on the right for alignment */
+        }
+
+        /* Main Title Styling (general for all headers) */
+        header {
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            z-index: 1; /* Ensure title is above video and overlay */
+            margin-top: 5vh; /* Push title down a bit from the top */
+            /* Add perspective to the header for 3D effect on h1 */
+            perspective: 600px; /* Changed perspective to 400px */
+            transform-style: preserve-3d; /* Preserve 3D transformations for children */
+        }
+
+        /* Specific font for the main title */
+        #mainMenuScreen h1 {
+            font-family: 'Bangers', cursive; /* Comic book font */
+            font-size: clamp(3rem, 12vw, 8rem); /* Larger and more responsive */
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.9), /* Original shadow */
+                         0 0 20px rgba(255, 215, 0, 0.5), /* Subtle gold glow */
+                         -2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black; /* Outline with text-shadow */
+            color: #FFD700; /* Gold color for the title */
+            text-align: center; /* Keep title centered */
+            width: 100%; /* Ensure it spans full width for centering */
+            /* Apply 3D transform for perspective effect */
+            transform: rotateX(-10deg) rotateY(15deg) translateZ(-0px); /* Changed transform properties */
+            /*transform-origin: center bottom; /* Pivot from the bottom center */
+            /* Removed text-stroke as we are using text-shadow for outline */
+            letter-spacing: 1px; /* Added letter spacing for wider look */
+        }
+
+        /* Hide the original h1 title on the Special Features screen */
+        #specialFeaturesScreen header h1 {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Make it unclickable */
+            /* Ensure it takes up space for layout consistency */
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Main content area within screen-wrapper */
+        main {
+            flex-grow: 1; /* Allows main content to take available space */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Pushes its content (button-container) to the bottom */
+            width: 100%; /* Take full width of parent */
+            align-items: flex-end; /* Align main content to the right */
+        }
+
+        /* Specific styling for special features screen's main content to center its buttons */
+        #specialFeaturesScreen main {
+            justify-content: center; /* Center buttons vertically */
+            align-items: center; /* Center buttons horizontally */
+        }
+
+        /* Button Container Styling */
+        .button-container {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 20px; /* Space between buttons */
+            width: fit-content; /* Adjust width to content */
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.3); /* Slightly transparent background for button block */
+            border-radius: 8px; /* Rounded corners */
+        }
+
+        /* Specific styling for main menu button container */
+        #mainMenuScreen .button-container {
+            gap: 10px; /* Reduced gap between items */
+            background-color: transparent; /* Remove background */
+            padding: 0; /* Remove padding from the container itself */
+        }
+
+        /* Specific styling for special features menu button container (revert background/padding) */
+        #specialFeaturesScreen .button-container {
+            gap: 20px; /* Original gap */
+            background-color: rgba(0, 0, 0, 0.3); /* Original background */
+            padding: 20px; /* Original padding */
+        }
+
+        /* Individual Button Styling */
+        .menu-button {
+            text-decoration: none; /* Remove underline from links */
+            color: #ffffff; /* Default white text */
+            font-size: clamp(1rem, 3vw, 1.8rem); /* Responsive font size */
+            padding: 10px 20px;
+            text-align: center;
+            transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out; /* Smooth transition for hover effect and opacity */
+            white-space: nowrap; /* Prevent text wrapping */
+            cursor: pointer; /* Indicate clickable element */
+
+            /* New: Button Font and Gradient */
+            font-family: 'Bebas Neue', sans-serif; /* Bold, condensed font */
+            font-size: clamp(1.5rem, 4vw, 2.5rem); /* Slightly larger for emphasis */
+            background-image: linear-gradient(to bottom, #ffff00, #ff8c00); /* Vertical gradient: yellow to dark orange */
+            -webkit-background-clip: text; /* Clip background to text shape */
+            background-clip: text; /* Standard property */
+            color: transparent; /* Make text transparent to show gradient */
+        }
+
+        /* Specific styling for main menu buttons */
+        #mainMenuScreen .menu-button {
+            text-align: right; /* Right align text within buttons */
+            padding: 10px 0; /* Adjust padding as container padding is removed */
+        }
+
+        /* Specific styling for special features menu buttons (revert font/style) */
+        #specialFeaturesScreen .menu-button {
+            font-family: 'Press Start 2P', cursive;
+            background-image: none; /* Remove gradient */
+            color: #ffffff; /* Ensure white text */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Keep original shadow */
+            font-size: clamp(1rem, 3vw, 1.8rem); /* Revert to original size */
+            padding: 10px 20px; /* Revert to original padding */
+            text-align: center; /* Explicitly center text for special features buttons */
+        }
+        /* Ensure hover for special features buttons still works */
+        #specialFeaturesScreen .menu-button:hover {
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00;
+        }
+
+
+        /* Button Hover Effect */
+        .menu-button:hover {
+            color: #ffff00; /* Change to solid yellow on hover (overrides gradient) */
+            text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00; /* Add a subtle glow */
+            background-image: none; /* Remove gradient on hover for solid color */
+        }
+
+        /* Footer Styling */
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            font-size: clamp(0.5rem, 1.5vw, 0.8rem); /* Much smaller responsive font size */
+            color: rgba(255, 255, 255, 0.7); /* Slightly dimmed white for footer */
+            z-index: 1; /* Ensure footer is above video and overlay */
+        }
+
+        /* Video Modal Styling */
+        .video-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9); /* Darker overlay for modal */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* High z-index to be on top */
+            opacity: 0; /* Initially hidden */
+            visibility: hidden; /* Hidden from screen readers and interactions */
+            transform: scale(0.1); /* Start tiny */
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0.5s;
+        }
+
+        .video-modal.show-modal {
+            opacity: 1; /* Fade in */
+            visibility: visible; /* Make visible */
+            transform: scale(1); /* Expand to full size */
+        }
+
+        .video-modal-content {
+            position: relative;
+            width: 90%; /* Max width of the video */
+            max-width: 1280px; /* Max width for larger screens */
+            padding-bottom: 56.25%; /* 16:9 aspect ratio (height / width * 100) */
+            height: 0;
+            overflow: hidden;
+            background-color: #000; /* Black background for video area */
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .video-modal-content iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            color: #ffffff;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 101; /* Above the video content */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            transition: color 0.2s ease-in-out;
+        }
+
+        .close-modal:hover {
+            color: #ffff00;
+        }
+
+        /* Scene Selection specific styling */
+        .scene-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid for larger screens */
+            gap: 25px;
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+            margin: auto;
+            flex-grow: 1; /* Allow grid to take available space */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chapter-video-item {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Drop shadow */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .chapter-video-item:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 8px 20px rgba(255, 255, 0, 0.7); /* Yellow glow on hover */
+        }
+
+        .chapter-video-item .video-thumbnail {
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio for thumbnail */
+            position: relative;
+            background-color: #333; /* Placeholder background */
+        }
+
+        .chapter-video-item .video-thumbnail img { /* Styling for the new GIF images */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensure images cover the area */
+        }
+
+        .chapter-video-item .chapter-title {
+            padding: 10px;
+            font-size: clamp(0.8rem, 2vw, 1.2rem);
+            color: #ffffff;
+            white-space: normal; /* Allow title to wrap */
+        }
+
+        /* Back button for scene selection and special features */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            color: #ffffff;
+            font-size: 1.5rem;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 2; /* Ensure it's above other content on the screen */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            transition: color 0.2s ease-in-out;
+        }
+
+        .back-button:hover {
+            color: #ffff00;
+        }
+
+        /* Specific styling for the back button on the left (Scene Selection) */
+        #backToMainMenuFromScenes {
+            left: 20px;
+        }
+
+        /* Specific styling for the back button on the right (Special Features) */
+        #backToMainMenuFromFeatures {
+            right: 20px;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .button-container {
+                gap: 15px;
+            }
+            .menu-button {
+                padding: 8px 15px;
+            }
+            /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
+            .scene-selection-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px; /* Adjust gap for smaller screens */
+                padding: 10px;
+            }
+            #mainMenuScreen {
+                padding: 20px 30px; /* Adjust padding for smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) { /* Stack to 1 column on very small phones */
+            .scene-selection-grid {
+                grid-template-columns: 1fr;
+            }
+            #mainMenuScreen {
+                padding: 20px 20px; /* Further adjust padding for very small screens */
+            }
+        }
+
+        /* Special Features Clone Styling */
+        #specialFeaturesClone {
+            position: fixed; /* Fixed position to stay in place during slide */
+            opacity: 0; /* Initially hidden */
+            visibility: hidden; /* Hidden from interactions */
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+            z-index: 95; /* Higher than screenContainer, lower than modal */
+            color: #ffffff; /* Match original button color */
+            font-family: 'Bebas Neue', sans-serif; /* Changed to Bebas Neue */
+            text-align: center;
+            white-space: nowrap;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Add text shadow */
+            /* Transitions for the animation: opacity, transform, color, and top (now 2s) */
+            transition: opacity 2s ease-out, transform 2s ease-out, color 2s ease-out, top 2s ease-out;
+            transform-origin: center center; /* Important for scaling from its center */
+            transform: scale(1); /* Initial state for scale animation */
+        }
+
+        /* Class to show and animate the clone */
+        #specialFeaturesClone.show-clone {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: none; /* Keep it non-interactive during animation */
+            /* Only transform here, top is set by JS */
+            transform: scale(2);
+            color: #ffff00; /* Turn yellow */
+        }
+    </style>
+</head>
+<body>
+    <!-- Full-screen looping muted video background using Vimeo iframe -->
+    <iframe
+        id="mainBackgroundVideo"
+        class="video-background-iframe"
+        src=""
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+    ></iframe>
+
+    <!-- Overlay for better text readability -->
+    <div class="overlay"></div>
+
+    <!-- Screen Container: Holds all main screens and slides them -->
+    <div id="screenContainer">
+        <!-- Special Features Screen (now the first screen) -->
+        <div class="screen-wrapper" id="specialFeaturesScreen">
+            <a href="#" class="back-button" id="backToMainMenuFromFeatures">BACK TO MENU &gt;</a>
+            <header>
+                <h1 id="specialFeaturesTitle">SPECIAL FEATURES</h1>
+            </header>
+            <main>
+                <div class="button-container">
+                    <!-- Example content for special features, can be customized later -->
+                    <a href="#" class="menu-button">BEHIND THE SCENES</a>
+                    <a href="#" class="menu-button">DELETED SCENES</a>
+                    <a href="#" class="menu-button">COMMENTARY</a>
+                    <a href="#" class="menu-button">EASTER EGGS</a>
+                </div>
+            </main>
+            <footer>
+                <p>&copy; 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.</p>
+            </footer>
+        </div>
+
+        <!-- Main Menu Screen (now the second screen) -->
+        <div class="screen-wrapper" id="mainMenuScreen">
+            <!-- Main Title Section -->
+            <header>
+                <h1>BROTHER BROTHER</h1>
+            </header>
+
+            <!-- Main Content Area: Buttons -->
+            <main>
+                <div class="button-container">
+                    <a href="#" class="menu-button" id="playReelButton">Play Reel</a>
+                    <a href="#" class="menu-button" id="sceneSelectionButton">Scene Selection</a>
+                    <a href="#" class="menu-button" id="specialFeaturesButton">Special Features</a>
+                    <a href="#" class="menu-button">Contact</a>
+                </div>
+            </main>
+
+            <!-- Copyright Footer -->
+            <footer>
+                <p>&copy; 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.</p>
+            </footer>
+        </div>
+
+        <!-- Scene Selection Screen (now the third screen) -->
+        <div class="screen-wrapper" id="sceneSelectionScreen">
+            <a href="#" class="back-button" id="backToMainMenuFromScenes">&lt; BACK TO MENU</a>
+            <header>
+                <h1>SCENE SELECTION</h1>
+            </header>
+            <div class="scene-selection-grid" id="sceneSelectionGrid">
+                <!-- Chapter videos will be dynamically loaded here by JavaScript -->
+            </div>
+            <footer>
+                <p>&copy; 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Special Features Clone Element -->
+    <div id="specialFeaturesClone"></div>
+
+    <!-- Video Modal for "PLAY REEL" -->
+    <div class="video-modal" id="videoModal">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <div class="video-modal-content">
+            <iframe id="videoModalIframe" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA DEFINITION ---
+        const videoData = {
+            mainBackgroundVimeoId: '292109430',
+            sceneBackgroundVimeoId: '292109430',
+            // specialFeaturesBackgroundVimeoId: '292109430', // No longer used for video background
+            mainReelVimeoId: '292109430',
+            specialFeaturesBackgroundImage: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/d56856ff-5d6d-4d98-acfe-1ed609ef3d75/RUTH+|+festival+preview-high1.gif',
+            chapters: [
+                { title: 'CHAPTER 1: THE BEGINNING', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/1030ca68-958a-42c1-842f-882228239462/Son+%26+Park+Campaign+Teaser+2-low.gif?content-type=image%2Fgif' },
+                { title: 'CHAPTER 2: THE CONFLICT', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/035fa440-ae95-48c4-98dc-17844488b069/RUTH+|+festival+preview-low3.gif' },
+                { title: 'CHAPTER 3: THE CLIMAX', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/30eb84ab-fdd4-4304-b360-e3d6ac1700d8/An+Admin+Worker+At+The+End+Of+The+World+-+trailer-high.gif?content-type=image%2Fgif' },
+                { title: 'CHAPTER 4: THE RESOLUTION', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/ad2a4236-30d9-4261-9af8-5b6166575282/Brother+Brother+Reel+2020-3-high.gif?content-type=image%2Fgif' }
+            ]
+        };
+        // --- END DATA DEFINITION ---
+
+
+        // Get references to DOM elements
+        const mainBackgroundVideo = document.getElementById('mainBackgroundVideo');
+        const playReelButton = document.getElementById('playReelButton');
+        const sceneSelectionButton = document.getElementById('sceneSelectionButton');
+        const specialFeaturesButton = document.getElementById('specialFeaturesButton'); // Original button
+        const specialFeaturesClone = document.getElementById('specialFeaturesClone'); // Clone element
+        const videoModal = document.getElementById('videoModal');
+        const videoModalIframe = document.getElementById('videoModalIframe');
+        const closeModalButton = document.getElementById('closeModal');
+        const screenContainer = document.getElementById('screenContainer');
+        const mainMenuScreen = document.getElementById('mainMenuScreen');
+        const sceneSelectionScreen = document.getElementById('sceneSelectionScreen');
+        const specialFeaturesScreen = document.getElementById('specialFeaturesScreen'); // Get reference to special features screen
+        const backToMainMenuFromScenes = document.getElementById('backToMainMenuFromScenes');
+        const backToMainMenuFromFeatures = document.getElementById('backToMainMenuFromFeatures');
+        const menuButtons = document.querySelectorAll('.menu-button');
+        const sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
+
+        // Placeholder for sound effect
+        const bloopSound = new Audio('https://www.soundjay.com/buttons/button-1.mp3');
+
+        // Function to play sound effect
+        function playBloopSound() {
+            bloopSound.currentTime = 0;
+            bloopSound.play().catch(e => console.error("Error playing sound:", e));
+        }
+
+        // Add hover sound to all menu buttons
+        menuButtons.forEach(button => {
+            button.addEventListener('mouseenter', playBloopSound);
+        });
+
+        // Function to dynamically load chapter videos
+        function loadChapterVideos() {
+            sceneSelectionGrid.innerHTML = ''; // Clear existing content
+            videoData.chapters.forEach(chapter => {
+                const chapterItem = document.createElement('div');
+                chapterItem.classList.add('chapter-video-item');
+
+                const videoThumbnail = document.createElement('div');
+                videoThumbnail.classList.add('video-thumbnail');
+
+                const thumbnailImg = document.createElement('img');
+                thumbnailImg.src = chapter.thumbnailUrl;
+                thumbnailImg.alt = `Thumbnail for ${chapter.title}`;
+                // No need for explicit width/height/position styles here, as .video-thumbnail img CSS handles it.
+
+                videoThumbnail.appendChild(thumbnailImg);
+
+                const chapterTitle = document.createElement('div');
+                chapterTitle.classList.add('chapter-title');
+                chapterTitle.textContent = chapter.title;
+
+                chapterItem.appendChild(videoThumbnail);
+                chapterItem.appendChild(chapterTitle);
+
+                // Add click listener to open modal for chapter video
+                chapterItem.addEventListener('click', () => {
+                    videoModalIframe.src = `https://player.vimeo.com/video/${chapter.vimeoId}?autoplay=1&loop=0&autopause=1&muted=0`;
+                    videoModal.classList.add('show-modal');
+                });
+
+                sceneSelectionGrid.appendChild(chapterItem);
+            });
+        }
+
+        // Function to manage screen transitions and background videos
+        function goToScreen(screenName) {
+            // Reset clone visibility by simply removing the class.
+            specialFeaturesClone.classList.remove('show-clone');
+            // Clear inline 'top' style to allow it to be set dynamically again
+            specialFeaturesClone.style.top = '';
+
+            // Ensure original special features button is visible when returning to main
+            if (screenName === 'main') {
+                specialFeaturesButton.style.opacity = '1';
+                specialFeaturesButton.style.pointerEvents = 'auto';
+                // Clear special features screen background when returning to main
+                specialFeaturesScreen.style.backgroundImage = '';
+            }
+
+            let targetBackgroundId = videoData.mainBackgroundVimeoId; // Default to main background
+
+            if (screenName === 'main') {
+                screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
+                screenContainer.classList.add('slide-to-main');
+                targetBackgroundId = videoData.mainBackgroundVimeoId;
+            } else if (screenName === 'scene') {
+                screenContainer.classList.remove('slide-to-special-features', 'slide-to-main');
+                screenContainer.classList.add('slide-to-scene');
+                targetBackgroundId = videoData.sceneBackgroundVimeoId;
+                loadChapterVideos(); // Ensure chapters are loaded
+                // Clear special features screen background when going to scene
+                specialFeaturesScreen.style.backgroundImage = '';
+            } else if (screenName === 'specialFeatures') {
+                // Get the position of the original button
+                const rect = specialFeaturesButton.getBoundingClientRect();
+
+                // Hide the original button immediately
+                specialFeaturesButton.style.opacity = '0';
+                specialFeaturesButton.style.pointerEvents = 'none';
+
+                // Set clone's initial position and content
+                specialFeaturesClone.textContent = specialFeaturesButton.textContent;
+                specialFeaturesClone.style.top = `${rect.top}px`; // Set initial top for animation
+                specialFeaturesClone.style.left = `${rect.left}px`;
+                specialFeaturesClone.style.width = `${rect.width}px`;
+                specialFeaturesClone.style.height = `${rect.height}px`;
+                specialFeaturesClone.style.fontSize = window.getComputedStyle(specialFeaturesButton).fontSize;
+                specialFeaturesClone.style.padding = window.getComputedStyle(specialFeaturesButton).padding;
+                specialFeaturesClone.style.lineHeight = window.getComputedStyle(specialFeaturesButton).lineHeight;
+                specialFeaturesClone.style.textShadow = window.getComputedStyle(specialFeaturesButton).textShadow;
+
+                // Show the clone and trigger its animation
+                // Use requestAnimationFrame to ensure styles are applied before transition starts
+                requestAnimationFrame(() => {
+                    specialFeaturesClone.classList.add('show-clone');
+                    // In the next animation frame, set the final 'top' position to trigger the transition
+                    requestAnimationFrame(() => {
+                        specialFeaturesClone.style.top = '100px'; // Final target position
+                    });
+                });
+
+                // Set the background image for the special features screen
+                specialFeaturesScreen.style.backgroundImage = `url('${videoData.specialFeaturesBackgroundImage}')`;
+                specialFeaturesScreen.style.backgroundSize = 'cover';
+                specialFeaturesScreen.style.backgroundPosition = 'center';
+
+
+                // Delay the screen slide by 1 second (clone animation is 2s, slide is 1s, so they end together)
+                setTimeout(() => {
+                    screenContainer.classList.remove('slide-to-main', 'slide-to-scene');
+                    screenContainer.classList.add('slide-to-special-features');
+                    // No need to update mainBackgroundVideo.src here, as specialFeaturesScreen has its own background
+                }, 1000); // 1 second delay before slide
+            }
+
+            // Update main background video only if not going to special features (which has its own background)
+            if (screenName !== 'specialFeatures') {
+                const currentBackgroundSrc = mainBackgroundVideo.src;
+                const newBackgroundSrc = `https://player.vimeo.com/video/${targetBackgroundId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
+                if (currentBackgroundSrc !== newBackgroundSrc) {
+                    mainBackgroundVideo.src = newBackgroundSrc;
+                }
+            }
+        }
+
+
+        // PLAY REEL button functionality
+        playReelButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            videoModalIframe.src = `https://player.vimeo.com/video/${videoData.mainReelVimeoId}?autoplay=1&loop=0&autopause=1&muted=0`;
+            videoModal.classList.add('show-modal');
+        });
+
+        // Close modal functionality
+        closeModalButton.addEventListener('click', () => {
+            videoModal.classList.remove('show-modal');
+            videoModalIframe.src = '';
+        });
+
+        // Close modal if clicked outside
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                videoModal.classList.remove('show-modal');
+                videoModalIframe.src = '';
+            }
+        });
+
+        // SCENE SELECTION button functionality
+        sceneSelectionButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToScreen('scene');
+        });
+
+        // SPECIAL FEATURES button functionality
+        specialFeaturesButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToScreen('specialFeatures');
+        });
+
+        // BACK TO MENU button functionality from Scene Selection screen
+        backToMainMenuFromScenes.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToScreen('main');
+        });
+
+        // BACK TO MENU button functionality from Special Features screen
+        backToMainMenuFromFeatures.addEventListener('click', (e) => {
+            e.preventDefault();
+            goToScreen('main');
+        });
+
+        // Initial setup when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            goToScreen('main'); // Start on the main screen
+        });
+    </script>
+</body>
+</html>
