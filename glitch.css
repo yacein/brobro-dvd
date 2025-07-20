@@ -466,8 +466,7 @@
     font 7s step-end infinite, movement 8s step-end infinite;
 }
 
-.hero-container {
+.hhero-container {
   position: relative;
-  padding: 200px 0;
   text-align: center;
 }

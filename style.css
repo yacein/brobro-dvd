@@ -1,0 +1,497 @@
+/* Basic CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling: Full screen, retro font, dark background */
+body {
+    font-family: 'Press Start 2P', cursive; /* Apply the pixelated font as fallback */
+    color: #ffffff; /* White text for contrast */
+    background-color: #000000; /* Black background as fallback */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+    overflow: hidden; /* Crucial: Hides any overflow from the oversized video background or sliding screens */
+    position: relative; /* Needed for z-index of children like modal */
+}
+
+/* Video Background Styling (now applies to iframe) */
+.video-background-iframe {
+    position: fixed; /* Fixes element to the viewport */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    /* These dimensions are key for the "cover" effect.
+       They ensure the iframe is always large enough to cover the viewport
+       while maintaining a 16:9 aspect ratio (16/9 = 1.777..., 9/16 = 0.5625). */
+    width: 177.77777778vh; /* 16/9 of viewport height */
+    height: 56.25vw; /* 9/16 of viewport width */
+    min-width: 100%; /* Ensure it's at least 100% wide */
+    min-height: 100%; /* Ensure it's at least 100% tall */
+    transform: translate(-50%, -50%); /* Use transform to truly center and cover */
+    z-index: -2; /* Place behind all other content */
+    pointer-events: none; /* Allows clicks to pass through to elements behind it */
+}
+
+/* Overlay for better text readability over video */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent black overlay */
+    z-index: -1; /* Between video/iframe and content */
+}
+
+/* Screen Container: Holds all main screens side-by-side for sliding */
+#screenContainer {
+    display: flex; /* Arranges children (screens) horizontally */
+    width: 300vw; /* Three viewport widths wide (special features + main + scene) */
+    height: 100vh; /* Full viewport height */
+    position: absolute; /* Crucial: Position absolutely from top-left of viewport */
+    top: 0;
+    left: 0;
+    /* Changed transition duration to 1s */
+    transition: transform 1s ease-in-out; /* Smooth transition for sliding */
+    z-index: 0; /* Ensure it's above the background but below modals */
+    transform: translateX(-100vw); /* Start on the main menu by default */
+}
+
+/* Classes to slide the screen container left to specific pages */
+#screenContainer.slide-to-special-features {
+    transform: translateX(0vw); /* Special Features is the first screen */
+}
+#screenContainer.slide-to-main {
+    transform: translateX(-100vw); /* Main Menu is the second screen */
+}
+#screenContainer.slide-to-scene {
+    transform: translateX(-200vw); /* Scene Selection is the third screen */
+}
+
+/* Base styling for all screen wrappers (main, scene, special features) */
+.screen-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes header to top, footer to bottom, main in between */
+    align-items: center; /* Default center alignment for content */
+    min-height: 100vh;
+    width: 100vw; /* Each screen takes one full viewport width */
+    flex-shrink: 0; /* Prevents shrinking */
+    position: relative; /* For back button positioning */
+    z-index: 1; /* Ensure its content is visible */
+    padding: 20px;
+    box-sizing: border-box; /* Include padding in width/height */
+    background-size: cover; /* Ensure background images cover the area */
+    background-position: center; /* Center background images */
+    background-repeat: no-repeat; /* Do not repeat background images */
+}
+
+/* Main Menu Screen specific alignment */
+#mainMenuScreen {
+    align-items: flex-end; /* Align content to the right for main menu */
+    padding: 20px 50px; /* Add more padding on the right for alignment */
+}
+
+/* Main Title Styling (general for all headers) */
+header {
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    z-index: 1; /* Ensure title is above video and overlay */
+    margin-top: 5vh; /* Push title down a bit from the top */
+    /* Add perspective to the header for 3D effect on h1 */
+    perspective: 600px; /* Changed perspective to 400px */
+    transform-style: preserve-3d; /* Preserve 3D transformations for children */
+}
+
+/* Specific font for the main title */
+#mainMenuScreen h1 {
+    font-family: 'Bangers', cursive; /* Comic book font */
+    font-size: clamp(3rem, 12vw, 8rem); /* Larger and more responsive */
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.9), /* Original shadow */
+                 0 0 20px rgba(255, 215, 0, 0.5), /* Subtle gold glow */
+                 -2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black; /* Outline with text-shadow */
+    color: #FFD700; /* Gold color for the title */
+    text-align: center; /* Keep title centered */
+    width: 100%; /* Ensure it spans full width for centering */
+    /* Apply 3D transform for perspective effect */
+    transform: rotateX(-10deg) rotateY(15deg) translateZ(-0px); /* Changed transform properties */
+    /*transform-origin: center bottom; /* Pivot from the bottom center */
+    /* Removed text-stroke as we are using text-shadow for outline */
+    letter-spacing: 1px; /* Added letter spacing for wider look */
+}
+
+/* Hide the original h1 title on the Special Features screen */
+#specialFeaturesScreen header h1 {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Make it unclickable */
+    /* Ensure it takes up space for layout consistency */
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+/* Main content area within screen-wrapper */
+main {
+    flex-grow: 1; /* Allows main content to take available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Pushes its content (button-container) to the bottom */
+    width: 100%; /* Take full width of parent */
+    align-items: flex-end; /* Align main content to the right */
+}
+
+/* Specific styling for special features screen's main content to center its buttons */
+#specialFeaturesScreen main {
+    justify-content: center; /* Center buttons vertically */
+    align-items: center; /* Center buttons horizontally */
+}
+
+/* Button Container Styling */
+.button-container {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 20px; /* Space between buttons */
+    width: fit-content; /* Adjust width to content */
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.3); /* Slightly transparent background for button block */
+    border-radius: 8px; /* Rounded corners */
+}
+
+/* Specific styling for main menu button container */
+#mainMenuScreen .button-container {
+    gap: 10px; /* Reduced gap between items */
+    background-color: transparent; /* Remove background */
+    padding: 0; /* Remove padding from the container itself */
+}
+
+/* Specific styling for special features menu button container (revert background/padding) */
+#specialFeaturesScreen .button-container {
+    gap: 20px; /* Original gap */
+    background-color: rgba(0, 0, 0, 0.3); /* Original background */
+    padding: 20px; /* Original padding */
+}
+
+/* Individual Button Styling */
+.menu-button {
+    text-decoration: none; /* Remove underline from links */
+    color: #ffffff; /* Default white text */
+    font-size: clamp(1rem, 3vw, 1.8rem); /* Responsive font size */
+    padding: 10px 20px;
+    text-align: center;
+    transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out; /* Smooth transition for hover effect and opacity */
+    white-space: nowrap; /* Prevent text wrapping */
+    cursor: pointer; /* Indicate clickable element */
+
+    /* New: Button Font and Gradient */
+    font-family: 'Bebas Neue', sans-serif; /* Bold, condensed font */
+    font-size: clamp(1.5rem, 4vw, 2.5rem); /* Slightly larger for emphasis */
+    background-image: linear-gradient(to bottom, #ffff00, #ff8c00); /* Vertical gradient: yellow to dark orange */
+    -webkit-background-clip: text; /* Clip background to text shape */
+    background-clip: text; /* Standard property */
+    color: transparent; /* Make text transparent to show gradient */
+}
+
+/* Specific styling for main menu buttons */
+#mainMenuScreen .menu-button {
+    /* Changed to flexbox for precise icon alignment */
+    display: flex;
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center; /* Vertically center */
+    padding: 10px 0; /* Adjusted padding as flex handles spacing */
+    gap: 5px; /* Space between icon and text */
+    /* Removed text-align: right; as flexbox handles alignment */
+    position: relative; /* Keep for general positioning if needed */
+    transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out, background-image 0.2s ease-in-out;
+}
+
+/* Pixelated circle for main menu hovered items */
+#mainMenuScreen .menu-button::before {
+    content: '»'; /* Changed icon to right-pointing guillemet */
+    font-family: 'Press Start 2P', cursive; /* Force pixelated font for the dot */
+    order: -1; /* Place before the text content in flex order */
+    color: white; /* White dot */
+    font-size: clamp(1.5rem, 3vw, 2.5rem); /* Increased size */
+    text-shadow: 1px 1px 0 black; /* Subtle shadow for definition */
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.2s ease-in-out; /* Only opacity transition, no transform */
+}
+
+#mainMenuScreen .menu-button:hover::before {
+    opacity: 1; /* Just appear */
+    transform: none; /* Ensure no lingering transform */
+}
+
+/* Specific styling for special features menu buttons (revert font/style) */
+#specialFeaturesScreen .menu-button {
+    font-family: 'Press Start 2P', cursive;
+    background-image: none; /* Remove gradient */
+    color: #ffffff; /* Ensure white text */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Keep original shadow */
+    font-size: clamp(1rem, 3vw, 1.8rem); /* Revert to original size */
+    padding: 10px 20px; /* Revert to original padding */
+    text-align: center; /* Explicitly center text for special features buttons */
+}
+/* Ensure hover for special features buttons still works */
+#specialFeaturesScreen .menu-button:hover {
+    color: #ffff00;
+    text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00;
+}
+
+
+/* Button Hover Effect */
+.menu-button:hover {
+    color: #ffff00; /* Change to solid yellow on hover (overrides gradient) */
+    text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00; /* Add a subtle glow */
+    background-image: none; /* Remove gradient on hover for solid color */
+}
+/* Override for main menu hover to be white */
+#mainMenuScreen .menu-button:hover {
+    color: white; /* Make text white on hover */
+    text-shadow: 0 0 10px white, 0 0 20px white; /* White glow */
+}
+
+
+/* Footer Styling */
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 15px 0;
+    font-size: clamp(0.5rem, 1.5vw, 0.8rem); /* Much smaller responsive font size */
+    color: rgba(255, 255, 255, 0.7); /* Slightly dimmed white for footer */
+    z-index: 1; /* Ensure footer is above video and overlay */
+}
+
+/* Video Modal Styling */
+.video-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black; /* Fully opaque */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100; /* High z-index to be on top */
+    opacity: 0; /* Initially hidden */
+    visibility: hidden; /* Hidden from screen readers and interactions */
+    transform: scale(0.1); /* Start tiny */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0.5s;
+}
+
+.video-modal.show-modal {
+    opacity: 1; /* Fade in */
+    visibility: visible; /* Make visible */
+    transform: scale(1); /* Expand to full size */
+}
+
+.video-modal-content {
+    position: relative;
+    width: 100%; /* Full width */
+    max-width: 100%; /* Full width */
+    /* No padding-bottom or height here, handled by aspect-ratio div */
+    background-color: #000; /* Black background for video area */
+    border-radius: 0; /* No rounded corners for black bars */
+    box-shadow: none; /* No shadow for black bars */
+    display: flex; /* Use flex to center the aspect ratio div */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.video-modal-aspect-ratio { /* New class for aspect ratio container */
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    position: relative;
+    height: 0;
+    overflow: hidden;
+}
+
+.video-modal-content iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    color: #ffffff;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 101; /* Above the video content */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    transition: color 0.2s ease-in-out;
+}
+
+.close-modal:hover {
+    color: #ffff00;
+}
+
+/* Scene Selection specific styling */
+.scene-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Force 4 columns for larger screens */
+    gap: 25px;
+    padding: 20px;
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
+    flex-grow: 1; /* Allow grid to take available space */
+    align-items: center;
+    justify-content: center;
+}
+
+.chapter-video-item {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Drop shadow */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.chapter-video-item:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 8px 20px rgba(255, 255, 0, 0.7); /* Yellow glow on hover */
+}
+
+.chapter-video-item .video-thumbnail {
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio for thumbnail */
+    position: relative;
+    background-color: #333; /* Placeholder background */
+}
+
+.chapter-video-item .video-thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure images cover the area */
+}
+
+.chapter-video-item .chapter-title {
+    padding: 10px;
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    color: #ffffff;
+    white-space: normal; /* Allow title to wrap */
+}
+
+/* Back button for scene selection and special features */
+.back-button {
+    position: absolute;
+    top: 20px;
+    color: #ffffff;
+    font-size: 1.5rem;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 2; /* Ensure it's above other content on the screen */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    transition: color 0.2s ease-in-out;
+}
+
+.back-button:hover {
+    color: #ffff00;
+}
+
+/* Specific styling for the back button on the left (Scene Selection) */
+#backToMainMenuFromScenes {
+    left: 20px;
+}
+
+/* Specific styling for the back button on the right (Special Features) */
+#backToMainMenuFromFeatures {
+    right: 20px; /* Keeping original placement as requested */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .button-container {
+        gap: 15px;
+    }
+    .menu-button {
+        padding: 8px 15px;
+    }
+    /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
+    .scene-selection-grid {
+        grid-template-columns: repeat(2, 1fr); /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
+        gap: 15px; /* Adjust gap for smaller screens */
+        padding: 10px;
+    }
+    #mainMenuScreen {
+        padding: 20px 30px; /* Adjust padding for smaller screens */
+    }
+}
+
+@media (max-width: 480px) { /* Stack to 1 column on very small phones */
+    .scene-selection-grid {
+        grid-template-columns: 1fr;
+    }
+    #mainMenuScreen {
+        padding: 20px 20px; /* Further adjust padding for very small screens */
+    }
+}
+
+/* Special Features Clone Styling */
+#specialFeaturesClone {
+    position: fixed; /* Fixed position to stay in place during slide */
+    opacity: 0; /* Initially hidden */
+    visibility: hidden; /* Hidden from interactions */
+    pointer-events: none; /* Allows clicks to pass through when hidden */
+    z-index: 95; /* Higher than screenContainer, lower than modal */
+    color: #ffffff; /* Match original button color */
+    font-family: 'Bebas Neue', sans-serif; /* Changed to Bebas Neue */
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Add text shadow */
+    /* Transitions for the animation: opacity, transform, color, top, and left (now 2s) */
+    transition: opacity 2s ease-out, transform 2s ease-out, color 2s ease-out, top 2s ease-out, left 2s ease-out, font-size 2s ease-out, letter-spacing 2s ease-out; /* Added font-size and letter-spacing to transition */
+    transform-origin: center center; /* Important for scaling from its center */
+    transform: scale(1); /* Initial state for scale animation */
+    letter-spacing: 0px; /* Initial letter spacing */
+}
+
+/* Class to show and animate the clone */
+#specialFeaturesClone.show-clone {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: none; /* Keep it non-interactive during animation */
+    /* Final horizontal position and scale */
+    /* transform: translateX(-50%) scale(2); // This will be set by JS now */
+    color: #ffff00; /* Turn yellow */
+    font-size: clamp(1.8rem, 5vw, 3rem); /* Smaller final font size */
+    letter-spacing: 5px; /* Tighter final letter spacing */
+}
+
+/* Black transition overlay */
+.transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('assets/The_Swing_car_away.gif'); /* Changed from background-color */
+    background-size: cover; /* Ensure it covers the area */
+    background-position: center; /* Center the image */
+    z-index: 99; /* Higher than screenContainer, lower than modal */
+    opacity: 0;
+    visibility: hidden;
+    transform: none; /* Always full size, no scaling */
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out; /* For fade in/out */
+}
+
+.transition-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
