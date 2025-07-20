@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <!-- New Google Fonts for Title and Buttons (Bangers for title) -->
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href='glitch.css' rel="stylesheet">
     <style>
         /* Basic CSS Reset */
         * {
@@ -65,6 +66,7 @@
             /* Changed transition duration to 1s */
             transition: transform 1s ease-in-out; /* Smooth transition for sliding */
             z-index: 0; /* Ensure it's above the background but below modals */
+            transform: translateX(-100vw); /* Start on the main menu by default */
         }
 
         /* Classes to slide the screen container left to specific pages */
@@ -206,7 +208,30 @@
         /* Specific styling for main menu buttons */
         #mainMenuScreen .menu-button {
             text-align: right; /* Right align text within buttons */
-            padding: 10px 0; /* Adjust padding as container padding is removed */
+            padding: 10px 0 10px 25px; /* Adjust padding to make space for the dot */
+            position: relative; /* Needed for pseudo-element positioning */
+            /* Add transition for pseudo-element */
+            transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out, background-image 0.2s ease-in-out;
+        }
+
+        /* Pixelated circle for main menu hovered items */
+        #mainMenuScreen .menu-button::before {
+            content: '\0424'; /* Ф symbol */
+            font-family: 'Press Start 2P', cursive; /* Force pixelated font for the dot */
+            position: absolute;
+            left: 0; /* Start at the left edge of the padding box */
+            top: 50%;
+            transform: translateY(-50%) translateX(-100%); /* Initially push it completely to the left, outside the button */
+            color: white; /* White dot */
+            font-size: clamp(0.8rem, 2vw, 1.2rem); /* Size of the dot */
+            text-shadow: 1px 1px 0 black; /* Subtle shadow for definition */
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; /* Animate opacity and transform */
+        }
+
+        #mainMenuScreen .menu-button:hover::before {
+            opacity: 1; /* Show on hover */
+            transform: translateY(-50%) translateX(0); /* Slide into view */
         }
 
         /* Specific styling for special features menu buttons (revert font/style) */
@@ -232,6 +257,12 @@
             text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00; /* Add a subtle glow */
             background-image: none; /* Remove gradient on hover for solid color */
         }
+        /* Override for main menu hover to be white */
+        #mainMenuScreen .menu-button:hover {
+            color: white; /* Make text white on hover */
+            text-shadow: 0 0 10px white, 0 0 20px white; /* White glow */
+        }
+
 
         /* Footer Styling */
         footer {
@@ -250,7 +281,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(0, 0, 0, 0.9); /* Darker overlay for modal */
+            background-color: black; /* Fully opaque */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -269,14 +300,23 @@
 
         .video-modal-content {
             position: relative;
-            width: 90%; /* Max width of the video */
-            max-width: 1280px; /* Max width for larger screens */
-            padding-bottom: 56.25%; /* 16:9 aspect ratio (height / width * 100) */
+            width: 100%; /* Full width */
+            max-width: 100%; /* Full width */
+            /* No padding-bottom or height here, handled by aspect-ratio div */
+            background-color: #000; /* Black background for video area */
+            border-radius: 0; /* No rounded corners for black bars */
+            box-shadow: none; /* No shadow for black bars */
+            display: flex; /* Use flex to center the aspect ratio div */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+        }
+
+        .video-modal-aspect-ratio { /* New class for aspect ratio container */
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            position: relative;
             height: 0;
             overflow: hidden;
-            background-color: #000; /* Black background for video area */
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
         }
 
         .video-modal-content iframe {
@@ -307,7 +347,7 @@
         /* Scene Selection specific styling */
         .scene-selection-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid for larger screens */
+            grid-template-columns: repeat(4, 1fr); /* Force 4 columns for larger screens */
             gap: 25px;
             padding: 20px;
             max-width: 1200px;
@@ -383,7 +423,7 @@
 
         /* Specific styling for the back button on the right (Special Features) */
         #backToMainMenuFromFeatures {
-            right: 20px;
+            right: 20px; /* Keeping original placement as requested */
         }
 
         /* Responsive adjustments for smaller screens */
@@ -396,7 +436,7 @@
             }
             /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
             .scene-selection-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr); /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
                 gap: 15px; /* Adjust gap for smaller screens */
                 padding: 10px;
             }
@@ -426,10 +466,11 @@
             text-align: center;
             white-space: nowrap;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Add text shadow */
-            /* Transitions for the animation: opacity, transform, color, and top (now 2s) */
-            transition: opacity 2s ease-out, transform 2s ease-out, color 2s ease-out, top 2s ease-out;
+            /* Transitions for the animation: opacity, transform, color, top, and left (now 2s) */
+            transition: opacity 2s ease-out, transform 2s ease-out, color 2s ease-out, top 2s ease-out, left 2s ease-out, font-size 2s ease-out, letter-spacing 2s ease-out; /* Added font-size and letter-spacing to transition */
             transform-origin: center center; /* Important for scaling from its center */
             transform: scale(1); /* Initial state for scale animation */
+            letter-spacing: 0px; /* Initial letter spacing */
         }
 
         /* Class to show and animate the clone */
@@ -437,9 +478,42 @@
             opacity: 1;
             visibility: visible;
             pointer-events: none; /* Keep it non-interactive during animation */
-            /* Only transform here, top is set by JS */
-            transform: scale(2);
+            /* Final horizontal position and scale */
+            /* transform: translateX(-50%) scale(2); // This will be set by JS now */
             color: #ffff00; /* Turn yellow */
+            font-size: clamp(1.8rem, 5vw, 3rem); /* Smaller final font size */
+            letter-spacing: 5px; /* Tighter final letter spacing */
+        }
+
+        /* Black transition overlay */
+        .transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 99; /* Higher than screenContainer, lower than modal */
+            opacity: 0;
+            visibility: hidden;
+            transform: none; /* Always full size, no scaling */
+            /* Added static background and animation */
+            background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 2px 2px; /* Adjust size for pixelated static effect */
+            animation: static-flicker 0.1s infinite; /* Fast flicker animation */
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out; /* For fade in/out */
+        }
+
+        .transition-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Keyframes for static flicker effect */
+        @keyframes static-flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.95; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
@@ -457,7 +531,7 @@
     <!-- Overlay for better text readability -->
     <div class="overlay"></div>
 
-    <!-- Screen Container: Holds all main screens and slides them -->
+    <!-- Screen Container: Holds all main screens side-by-side for sliding -->
     <div id="screenContainer">
         <!-- Special Features Screen (now the first screen) -->
         <div class="screen-wrapper" id="specialFeaturesScreen">
@@ -483,16 +557,19 @@
         <div class="screen-wrapper" id="mainMenuScreen">
             <!-- Main Title Section -->
             <header>
-                <h1>BROTHER BROTHER</h1>
+                <div class="hero-container">
+                    <h1 class="hero glitch layers" data-text="YAZ and HAZ">
+                        <span>BROTHER BROTHER</span
+                    </h1>
+                </div>
             </header>
 
             <!-- Main Content Area: Buttons -->
             <main>
                 <div class="button-container">
                     <a href="#" class="menu-button" id="playReelButton">Play Reel</a>
-                    <a href="#" class="menu-button" id="sceneSelectionButton">Scene Selection</a>
+                    <a href="#" class="menu-button" id="sceneSelectionButton">Video Selection</a>
                     <a href="#" class="menu-button" id="specialFeaturesButton">Special Features</a>
-                    <a href="#" class="menu-button">Contact</a>
                 </div>
             </main>
 
@@ -506,7 +583,7 @@
         <div class="screen-wrapper" id="sceneSelectionScreen">
             <a href="#" class="back-button" id="backToMainMenuFromScenes">&lt; BACK TO MENU</a>
             <header>
-                <h1>SCENE SELECTION</h1>
+                <h1>VIDEO SELECTION</h1>
             </header>
             <div class="scene-selection-grid" id="sceneSelectionGrid">
                 <!-- Chapter videos will be dynamically loaded here by JavaScript -->
@@ -524,16 +601,20 @@
     <div class="video-modal" id="videoModal">
         <span class="close-modal" id="closeModal">&times;</span>
         <div class="video-modal-content">
-            <iframe id="videoModalIframe" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullscreen></iframe>
+            <div class="video-modal-aspect-ratio"> <!-- New wrapper for aspect ratio -->
+                <iframe id="videoModalIframe" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullscreen></iframe>
+            </div>
         </div>
     </div>
+
+    <!-- Black transition overlay -->
+    <div id="transitionOverlay" class="transition-overlay"></div>
 
     <script>
         // --- DATA DEFINITION ---
         const videoData = {
             mainBackgroundVimeoId: '292109430',
             sceneBackgroundVimeoId: '292109430',
-            // specialFeaturesBackgroundVimeoId: '292109430', // No longer used for video background
             mainReelVimeoId: '292109430',
             specialFeaturesBackgroundImage: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/d56856ff-5d6d-4d98-acfe-1ed609ef3d75/RUTH+|+festival+preview-high1.gif',
             chapters: [
@@ -563,6 +644,7 @@
         const backToMainMenuFromFeatures = document.getElementById('backToMainMenuFromFeatures');
         const menuButtons = document.querySelectorAll('.menu-button');
         const sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
+        const transitionOverlay = document.getElementById('transitionOverlay'); // New: Transition Overlay
 
         // Placeholder for sound effect
         const bloopSound = new Audio('https://www.soundjay.com/buttons/button-1.mp3');
@@ -591,7 +673,6 @@
                 const thumbnailImg = document.createElement('img');
                 thumbnailImg.src = chapter.thumbnailUrl;
                 thumbnailImg.alt = `Thumbnail for ${chapter.title}`;
-                // No need for explicit width/height/position styles here, as .video-thumbnail img CSS handles it.
 
                 videoThumbnail.appendChild(thumbnailImg);
 
@@ -614,32 +695,77 @@
 
         // Function to manage screen transitions and background videos
         function goToScreen(screenName) {
-            // Reset clone visibility by simply removing the class.
+            // Determine if we are coming from the special features screen
+            const isComingFromSpecialFeatures = screenContainer.classList.contains('slide-to-special-features');
+
+            // Universal reset for special features clone's inline styles
+            // This prepares it for either a new animation or to be hidden by CSS.
             specialFeaturesClone.classList.remove('show-clone');
-            // Clear inline 'top' style to allow it to be set dynamically again
             specialFeaturesClone.style.top = '';
+            specialFeaturesClone.style.left = '';
+            specialFeaturesClone.style.transform = '';
+            specialFeaturesClone.style.fontSize = '';
+            specialFeaturesClone.style.letterSpacing = '';
 
-            // Ensure original special features button is visible when returning to main
+            // Reset transition overlay: ONLY remove the 'show' class.
+            // The base CSS for .transition-overlay handles opacity:0 and visibility:hidden.
+            transitionOverlay.classList.remove('show');
+            transitionOverlay.style.transform = 'none'; // Ensure it's full size
+            transitionOverlay.style.transition = 'opacity 0.5s ease-out, visibility 0.5s ease-out'; // Reset transition for next use
+
+
+            // Handle navigation to 'main' screen
             if (screenName === 'main') {
-                specialFeaturesButton.style.opacity = '1';
-                specialFeaturesButton.style.pointerEvents = 'auto';
-                // Clear special features screen background when returning to main
-                specialFeaturesScreen.style.backgroundImage = '';
-            }
+                // Only trigger the black box transition if coming from special features
+                if (isComingFromSpecialFeatures) {
+                    // Step 1: Overlay Fades In (0.5s)
+                    transitionOverlay.classList.add('show');
 
-            let targetBackgroundId = videoData.mainBackgroundVimeoId; // Default to main background
+                    // Step 2: After overlay is fully opaque (0.5s), trigger the screen slide and other changes
+                    setTimeout(() => {
+                        // Perform screen slide
+                        screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
+                        screenContainer.classList.add('slide-to-main');
 
-            if (screenName === 'main') {
-                screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
-                screenContainer.classList.add('slide-to-main');
-                targetBackgroundId = videoData.mainBackgroundVimeoId;
+                        // Make original special features button visible
+                        specialFeaturesButton.style.opacity = '1';
+                        specialFeaturesButton.style.pointerEvents = 'auto';
+
+                        // Clear special features screen background
+                        specialFeaturesScreen.style.backgroundImage = '';
+
+                        // Update main background video
+                        const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
+                        if (mainBackgroundVideo.src !== newBackgroundSrc) {
+                            mainBackgroundVideo.src = newBackgroundSrc;
+                        }
+
+                        // Step 3: Wait for the screen slide to complete (1s), then hold briefly and fade out.
+                        setTimeout(() => {
+                            transitionOverlay.classList.remove('show'); // Start fading out
+                        }, 1000 + 300); // Wait for 1s slide + 300ms hold
+                    }, 500); // Wait 0.5s for overlay to become fully opaque
+                } else {
+                    // If not coming from special features (e.g., initial load or from scene),
+                    // just perform the screen slide directly without black box.
+                    screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
+                    screenContainer.classList.add('slide-to-main');
+                    // Update main background video
+                    const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
+                    if (mainBackgroundVideo.src !== newBackgroundSrc) {
+                        mainBackgroundVideo.src = newBackgroundSrc;
+                    }
+                }
             } else if (screenName === 'scene') {
                 screenContainer.classList.remove('slide-to-special-features', 'slide-to-main');
                 screenContainer.classList.add('slide-to-scene');
-                targetBackgroundId = videoData.sceneBackgroundVimeoId;
+                // Use videoData.sceneBackgroundVimeoId directly
+                const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.sceneBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
+                if (mainBackgroundVideo.src !== newBackgroundSrc) {
+                    mainBackgroundVideo.src = newBackgroundSrc;
+                }
                 loadChapterVideos(); // Ensure chapters are loaded
-                // Clear special features screen background when going to scene
-                specialFeaturesScreen.style.backgroundImage = '';
+                specialFeaturesScreen.style.backgroundImage = ''; // Clear special features background
             } else if (screenName === 'specialFeatures') {
                 // Get the position of the original button
                 const rect = specialFeaturesButton.getBoundingClientRect();
@@ -651,21 +777,26 @@
                 // Set clone's initial position and content
                 specialFeaturesClone.textContent = specialFeaturesButton.textContent;
                 specialFeaturesClone.style.top = `${rect.top}px`; // Set initial top for animation
-                specialFeaturesClone.style.left = `${rect.left}px`;
-                specialFeaturesClone.style.width = `${rect.width}px`;
-                specialFeaturesClone.style.height = `${rect.height}px`;
+                specialFeaturesClone.style.left = `${rect.left}px`; // Set initial left for animation
                 specialFeaturesClone.style.fontSize = window.getComputedStyle(specialFeaturesButton).fontSize;
                 specialFeaturesClone.style.padding = window.getComputedStyle(specialFeaturesButton).padding;
                 specialFeaturesClone.style.lineHeight = window.getComputedStyle(specialFeaturesButton).lineHeight;
                 specialFeaturesClone.style.textShadow = window.getComputedStyle(specialFeaturesButton).textShadow;
+                specialFeaturesClone.style.letterSpacing = window.getComputedStyle(specialFeaturesButton).letterSpacing; // Set initial letter spacing
+                specialFeaturesClone.style.transform = 'scale(1)'; // Set initial transform for animation
+
 
                 // Show the clone and trigger its animation
                 // Use requestAnimationFrame to ensure styles are applied before transition starts
                 requestAnimationFrame(() => {
                     specialFeaturesClone.classList.add('show-clone');
-                    // In the next animation frame, set the final 'top' position to trigger the transition
+                    // In the next animation frame, set the final 'top', 'left', and 'transform' to trigger the transition
                     requestAnimationFrame(() => {
-                        specialFeaturesClone.style.top = '100px'; // Final target position
+                        specialFeaturesClone.style.top = '100px'; // Final vertical target position
+                        specialFeaturesClone.style.left = '50%'; // Final horizontal target position
+                        specialFeaturesClone.style.transform = 'translateX(-50%) scale(2)'; // Apply final transform for centering and scaling
+                        specialFeaturesClone.style.fontSize = 'clamp(1.8rem, 5vw, 3rem)'; // Smaller final font size
+                        specialFeaturesClone.style.letterSpacing = '5px'; // Tighter final letter spacing
                     });
                 });
 
@@ -674,22 +805,12 @@
                 specialFeaturesScreen.style.backgroundSize = 'cover';
                 specialFeaturesScreen.style.backgroundPosition = 'center';
 
-
                 // Delay the screen slide by 1 second (clone animation is 2s, slide is 1s, so they end together)
                 setTimeout(() => {
                     screenContainer.classList.remove('slide-to-main', 'slide-to-scene');
                     screenContainer.classList.add('slide-to-special-features');
-                    // No need to update mainBackgroundVideo.src here, as specialFeaturesScreen has its own background
+                    // Removed redundant mainBackgroundVideo.src update here as per request.
                 }, 1000); // 1 second delay before slide
-            }
-
-            // Update main background video only if not going to special features (which has its own background)
-            if (screenName !== 'specialFeatures') {
-                const currentBackgroundSrc = mainBackgroundVideo.src;
-                const newBackgroundSrc = `https://player.vimeo.com/video/${targetBackgroundId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
-                if (currentBackgroundSrc !== newBackgroundSrc) {
-                    mainBackgroundVideo.src = newBackgroundSrc;
-                }
             }
         }
 
@@ -741,7 +862,9 @@
 
         // Initial setup when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            goToScreen('main'); // Start on the main screen
+            // Start on the main screen. The screenContainer is initially positioned
+            // so that the 'mainMenuScreen' (the second screen) is visible.
+            goToScreen('main');
         });
     </script>
 </body>
