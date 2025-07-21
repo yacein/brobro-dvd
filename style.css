@@ -107,7 +107,7 @@ header {
 /* Specific font for the main title */
 #mainMenuScreen h1 {
     font-family: 'Bangers', cursive; /* Comic book font */
-    font-size: clamp(3rem, 12vw, 8rem); /* Larger and more responsive */
+    font-size: clamp(3rem, 14vw, 16rem); /* Larger and more responsive */
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.9), /* Original shadow */
                  0 0 20px rgba(255, 215, 0, 0.5), /* Subtle gold glow */
                  -2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black; /* Outline with text-shadow */
@@ -120,6 +120,33 @@ header {
     /* Removed text-stroke as we are using text-shadow for outline */
     letter-spacing: 1px; /* Added letter spacing for wider look */
 }
+
+/* New: Subtitle styling for 'THE SHOWREEL' */
+.subtitle-showreel {
+    font-family: 'Press Start 2P', cursive; /* Pixelated font */
+    font-size: clamp(0.8rem, 2.5vw, 2rem); /* Responsive size, smaller than main title */
+    color: #00ff00; /* Green for a "Matrix" feel */
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.7), /* Green glow */
+                 0 0 10px rgba(0, 255, 0, 0.5);
+    letter-spacing: 3px; /* Wider spacing */
+    margin-top: 10px; /* Space from main title */
+    filter: blur(0.5px); /* Subtle blur for a digital effect */
+}
+
+/* Style for individual characters in the subtitle, controlled by JS */
+.subtitle-showreel span {
+    display: inline-block; /* Allows transform and animation on each character */
+    /* Initial state for JS animation - these are the *final* styles, but with opacity 0 */
+    opacity: 0;
+    filter: blur(0); /* Start with no blur, animation will add it */
+    transform: translateY(0); /* Start at final Y position */
+    color: #00ff00; /* Start with final color, animation will change it */
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.7), 0 0 10px rgba(0, 255, 0, 0.5);
+    
+    /* Transition for the reveal to final state after cycling */
+    transition: opacity 0.2s ease-out, filter 0.2s ease-out, transform 0.2s ease-out, color 0.2s ease-out, text-shadow 0.2s ease-out;
+}
+
 
 /* Hide the original h1 title on the Special Features screen */
 #specialFeaturesScreen header h1 {
@@ -282,27 +309,27 @@ footer {
 }
 
 .video-modal.show-modal {
-    opacity: 1; /* Fade in */
-    visibility: visible; /* Make visible */
-    transform: scale(1); /* Expand to full size */
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
 }
 
 .video-modal-content {
     position: relative;
-    width: 100%; /* Full width */
-    max-width: 100%; /* Full width */
+    width: 100%;
+    max-width: 100%;
     /* No padding-bottom or height here, handled by aspect-ratio div */
-    background-color: #000; /* Black background for video area */
-    border-radius: 0; /* No rounded corners for black bars */
-    box-shadow: none; /* No shadow for black bars */
-    display: flex; /* Use flex to center the aspect ratio div */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    background-color: #000;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .video-modal-aspect-ratio { /* New class for aspect ratio container */
     width: 100%;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 56.25%;
     position: relative;
     height: 0;
     overflow: hidden;
@@ -324,7 +351,7 @@ footer {
     color: #ffffff;
     font-size: 2rem;
     cursor: pointer;
-    z-index: 101; /* Above the video content */
+    z-index: 101;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     transition: color 0.2s ease-in-out;
 }
@@ -336,13 +363,13 @@ footer {
 /* Scene Selection specific styling */
 .scene-selection-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Force 4 columns for larger screens */
+    grid-template-columns: repeat(4, 1fr);
     gap: 25px;
     padding: 20px;
     max-width: 1200px;
     width: 100%;
     margin: auto;
-    flex-grow: 1; /* Allow grid to take available space */
+    flex-grow: 1;
     align-items: center;
     justify-content: center;
 }
@@ -351,7 +378,7 @@ footer {
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Drop shadow */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     cursor: pointer;
     display: flex;
@@ -361,15 +388,15 @@ footer {
 }
 
 .chapter-video-item:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-    box-shadow: 0 8px 20px rgba(255, 255, 0, 0.7); /* Yellow glow on hover */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255, 255, 0, 0.7);
 }
 
 .chapter-video-item .video-thumbnail {
     width: 100%;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio for thumbnail */
+    padding-bottom: 56.25%;
     position: relative;
-    background-color: #333; /* Placeholder background */
+    background-color: #333;
 }
 
 .chapter-video-item .video-thumbnail img {
@@ -378,14 +405,14 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensure images cover the area */
+    object-fit: cover;
 }
 
 .chapter-video-item .chapter-title {
     padding: 10px;
     font-size: clamp(0.8rem, 2vw, 1.2rem);
     color: #ffffff;
-    white-space: normal; /* Allow title to wrap */
+    white-space: normal;
 }
 
 /* Back button for scene selection and special features */
@@ -396,7 +423,7 @@ footer {
     font-size: 1.5rem;
     text-decoration: none;
     cursor: pointer;
-    z-index: 2; /* Ensure it's above other content on the screen */
+    z-index: 2;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     transition: color 0.2s ease-in-out;
 }
@@ -412,7 +439,7 @@ footer {
 
 /* Specific styling for the back button on the right (Special Features) */
 #backToMainMenuFromFeatures {
-    right: 20px; /* Keeping original placement as requested */
+    right: 20px;
 }
 
 /* Responsive adjustments for smaller screens */
@@ -425,12 +452,12 @@ footer {
     }
     /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
     .scene-selection-grid {
-        grid-template-columns: repeat(2, 1fr); /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
-        gap: 15px; /* Adjust gap for smaller screens */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
         padding: 10px;
     }
     #mainMenuScreen {
-        padding: 20px 30px; /* Adjust padding for smaller screens */
+        padding: 20px 30px;
     }
 }
 
@@ -439,25 +466,28 @@ footer {
         grid-template-columns: 1fr;
     }
     #mainMenuScreen {
-        padding: 20px 20px; /* Further adjust padding for very small screens */
+        padding: 20px 20px;
     }
 }
 
 /* Special Features Clone Styling */
 #specialFeaturesClone {
-    position: fixed; /* Fixed position to stay in place during slide */
-    opacity: 0; /* Initially hidden */
-    visibility: hidden; /* Hidden from interactions */
-    pointer-events: none; /* Allows clicks to pass through when hidden */
-    z-index: 95; /* Higher than screenContainer, lower than modal */
-    color: #ffffff; /* Match original button color */
-    font-family: 'Bebas Neue', sans-serif; /* Changed to Bebas Neue */
+    position: fixed;
+    /* Removed width and height from CSS, will be set by JS */
+    /* width: 100vw; */
+    /* height: 100vh; */
+    box-sizing: border-box; /* Added for consistent sizing */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 95;
+    color: #ffffff;
+    font-family: 'Bebas Neue', sans-serif;
     text-align: center;
     white-space: nowrap;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Add text shadow */
-    /* Transitions for the animation: opacity, transform, color, top, and left (now 2s) */
-    transition: opacity 2s ease-out, transform 2s ease-out, color 2s ease-out, top 2s ease-out, left 2s ease-out, font-size 2s ease-out, letter-spacing 2s ease-out; /* Added font-size and letter-spacing to transition */
-    transform-origin: center center; /* Important for scaling from its center */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    transition: opacity 2s ease-out, transform 2s ease-out, color 2s ease-out, top 2s ease-out, left 2s ease-out, font-size 2s ease-out, letter-spacing 2s ease-out;
+    transform-origin: center center;
     transform: scale(1); /* Initial state for scale animation */
     letter-spacing: 0px; /* Initial letter spacing */
 }
@@ -466,12 +496,10 @@ footer {
 #specialFeaturesClone.show-clone {
     opacity: 1;
     visibility: visible;
-    pointer-events: none; /* Keep it non-interactive during animation */
-    /* Final horizontal position and scale */
-    /* transform: translateX(-50%) scale(2); // This will be set by JS now */
-    color: #ffff00; /* Turn yellow */
-    font-size: clamp(1.8rem, 5vw, 3rem); /* Smaller final font size */
-    letter-spacing: 5px; /* Tighter final letter spacing */
+    pointer-events: none;
+    color: #ffff00;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    letter-spacing: 5px;
 }
 
 /* Black transition overlay */
@@ -481,14 +509,14 @@ footer {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url('assets/The_Swing_car_away.gif'); /* Changed from background-color */
-    background-size: cover; /* Ensure it covers the area */
-    background-position: center; /* Center the image */
-    z-index: 99; /* Higher than screenContainer, lower than modal */
+    background-image: url('assets/The_Swing_car_away.gif');
+    background-size: cover;
+    background-position: center;
+    z-index: 99;
     opacity: 0;
     visibility: hidden;
-    transform: none; /* Always full size, no scaling */
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out; /* For fade in/out */
+    transform: none;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
 
 .transition-overlay.show {

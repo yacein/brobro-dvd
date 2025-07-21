@@ -1,7 +1,6 @@
 // --- DATA DEFINITION ---
 const videoData = {
     mainBackgroundVimeoId: '292109430',
-    // Removed sceneBackgroundVimeoId as it's replaced by an image
     mainReelVimeoId: '431751544', // Updated showreel video ID
     specialFeaturesBackgroundImage: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/d56856ff-5d6d-4d98-acfe-1ed609ef3d75/RUTH+|+festival+preview-high1.gif',
     sceneBackgroundImage: 'assets/MakeItCount-bucket.jpg', // New background image for scene selection
@@ -33,6 +32,7 @@ const backToMainMenuFromFeatures = document.getElementById('backToMainMenuFromFe
 const menuButtons = document.querySelectorAll('.menu-button');
 const sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
 const transitionOverlay = document.getElementById('transitionOverlay'); // New: Transition Overlay
+const subtitleShowreelElement = document.querySelector('.subtitle-showreel'); // Reference to the subtitle element
 
 // Placeholder for sound effect
 const bloopSound = new Audio('https://www.soundjay.com/buttons/button-1.mp3');
@@ -81,6 +81,81 @@ function loadChapterVideos() {
     });
 }
 
+/**
+ * Animates text character by character with a digital reveal effect.
+ * Each character cycles through random symbols before settling on its final form.
+ * @param {HTMLElement} element The HTML element to animate (e.g., an <h2>).
+ * @param {string} finalText The final text string to display.
+ * @param {number[]} charCycleCounts An array specifying how many "incorrect" characters each final character should cycle through.
+ * The length of this array should match the length of `finalText`.
+ */
+function animateSubtitle(element, finalText, charCycleCounts) {
+    element.innerHTML = ''; // Clear any existing content
+    // Expanded pool of random chars, including common Latin, numbers, and some Cyrillic
+    const characterPool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>/?`~АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'; 
+
+    finalText.split('').forEach((finalChar, index) => {
+        const charSpan = document.createElement('span');
+        // For spaces, set textContent to '_' to maintain width, but keep it invisible
+        charSpan.textContent = (finalChar === ' ') ? '_' : finalChar;
+        element.appendChild(charSpan);
+
+        // Initial state for ALL spans (including spaces)
+        charSpan.style.opacity = '0'; // Start invisible
+        charSpan.style.filter = 'blur(5px)';
+        charSpan.style.transform = 'translateY(0px)'; // Start at final Y position
+        charSpan.style.color = 'rgba(0, 255, 0, 0.3)'; // Faint green
+
+        // Delay the start of this character's animation/reveal
+        setTimeout(() => {
+            // If it's a space, just make it occupy space invisibly and return
+            if (finalChar === ' ') {
+                charSpan.style.opacity = '0'; // Explicitly keep invisible
+                charSpan.style.filter = 'none'; // No blur
+                charSpan.style.transform = 'translateY(0)'; // No jiggle
+                charSpan.style.color = '#00ff00'; // Final color (though invisible)
+                return; // Skip cycling for spaces
+            }
+
+            // For non-space characters, apply the final visible styles and start cycling
+            charSpan.style.opacity = '1';
+            charSpan.style.filter = 'none';
+            charSpan.style.transform = 'translateY(0)';
+            charSpan.style.color = '#00ff00';
+            charSpan.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7), 0 0 10px rgba(0, 255, 0, 0.5)';
+
+            const numIncorrectCycles = charCycleCounts[index] !== undefined ? charCycleCounts[index] : 0;
+            let currentCycle = 0;
+            let originalContent = finalChar; // Store the correct character
+
+            const intervalId = setInterval(() => {
+                if (currentCycle < numIncorrectCycles) {
+                    // Display a random character
+                    charSpan.textContent = characterPool[Math.floor(Math.random() * characterPool.length)];
+                    
+                    // Apply temporary "jiggle" and "flicker" styles
+                    charSpan.style.opacity = Math.random() * 0.5 + 0.3; // Random opacity between 0.3 and 0.8
+                    charSpan.style.filter = `blur(${Math.random() * 2}px)`; // Random blur up to 2px
+                    charSpan.style.transform = `translateY(${Math.random() * 6 - 3}px)`; // Random vertical jiggle between -3px and 3px
+                    charSpan.style.color = `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`; // Random color flash
+
+                    currentCycle++;
+                } else {
+                    clearInterval(intervalId); // Stop random cycling
+                    charSpan.textContent = originalContent; // Revert to correct character
+                    // Ensure final styles are applied after cycling stops (CSS transition handles smoothness)
+                    charSpan.style.opacity = '1';
+                    charSpan.style.filter = 'none';
+                    charSpan.style.transform = 'translateY(0)';
+                    charSpan.style.color = '#00ff00';
+                    charSpan.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7), 0 0 10px rgba(0, 255, 0, 0.5)';
+                }
+            }, 100); // 0.1 seconds per incorrect character
+        }, index * 150); // 0.15 seconds delay for each character's animation start
+    });
+}
+
+
 // Function to manage screen transitions and background videos
 function goToScreen(screenName) {
     // Determine if we are coming from the special features screen
@@ -91,7 +166,7 @@ function goToScreen(screenName) {
     specialFeaturesClone.classList.remove('show-clone');
     specialFeaturesClone.style.top = '';
     specialFeaturesClone.style.left = '';
-    specialFeaturesClone.style.transform = '';
+    // Removed: specialFeaturesClone.style.transform = ''; // This line was problematic
     specialFeaturesClone.style.fontSize = '';
     specialFeaturesClone.style.letterSpacing = '';
 
@@ -129,6 +204,13 @@ function goToScreen(screenName) {
                     mainBackgroundVideo.src = newBackgroundSrc;
                 }
 
+                // Subtitle animation is now handled only on DOMContentLoaded, not on subsequent returns to main.
+                // Re-animate the subtitle when returning to main menu
+                // const finalSubtitleText = subtitleShowreelElement.dataset.text;
+                // const charCounts = [8, 8, 7, 0, 7, 6, 6, 5, 4, 8, 2, 2]; 
+                // animateSubtitle(subtitleShowreelElement, finalSubtitleText, charCounts);
+
+
                 // Step 3: Wait for the screen slide to complete (1s), then hold briefly and fade out.
                 setTimeout(() => {
                     transitionOverlay.classList.remove('show'); // Start fading out
@@ -145,6 +227,11 @@ function goToScreen(screenName) {
             if (mainBackgroundVideo.src !== newBackgroundSrc) {
                 mainBackgroundVideo.src = newBackgroundSrc;
             }
+            // Subtitle animation is now handled only on DOMContentLoaded, not on subsequent returns to main.
+            // Animate subtitle on initial load as well
+            // const finalSubtitleText = subtitleShowreelElement.dataset.text;
+            // const charCounts = [8, 8, 7, 0, 7, 6, 6, 5, 4, 8, 2, 2];
+            // animateSubtitle(subtitleShowreelElement, finalSubtitleText, charCounts);
         }
     } else if (screenName === 'scene') {
         screenContainer.classList.remove('slide-to-special-features', 'slide-to-main');
@@ -167,13 +254,13 @@ function goToScreen(screenName) {
         specialFeaturesClone.textContent = specialFeaturesButton.textContent;
         specialFeaturesClone.style.top = `${rect.top}px`;
         specialFeaturesClone.style.left = `${rect.left}px`;
-        specialFeaturesClone.style.transform = ''; // Reset transform for initial position
+        // Removed: specialFeaturesClone.style.transform = ''; // This line was problematic
         specialFeaturesClone.style.fontSize = window.getComputedStyle(specialFeaturesButton).fontSize;
         specialFeaturesClone.style.padding = window.getComputedStyle(specialFeaturesButton).padding;
         specialFeaturesClone.style.lineHeight = window.getComputedStyle(specialFeaturesButton).lineHeight;
         specialFeaturesClone.style.textShadow = window.getComputedStyle(specialFeaturesButton).textShadow;
         specialFeaturesClone.style.letterSpacing = window.getComputedStyle(specialFeaturesButton).letterSpacing;
-        specialFeaturesClone.style.transform = 'scale(1)'; // Set initial transform for animation
+        // Removed: specialFeaturesClone.style.transform = 'scale(1)'; // Rely on CSS for initial state
 
 
         requestAnimationFrame(() => {
@@ -253,4 +340,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start on the main screen. The screenContainer is initially positioned
     // so that the 'mainMenuScreen' (the second screen) is visible.
     goToScreen('main');
+
+    // Animate subtitle ONLY on initial load
+    const finalSubtitleText = subtitleShowreelElement.dataset.text;
+    const charCounts = [8, 8, 7, 0, 7, 6, 6, 5, 4, 8, 2, 2];
+    animateSubtitle(subtitleShowreelElement, finalSubtitleText, charCounts);
 });
