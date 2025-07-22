@@ -6,7 +6,7 @@ const videoData = {
     sceneBackgroundImage: 'assets/MakeItCount-bucket.jpg', // New background image for scene selection
     chapters: [
         { title: 'FASHION FILM: SON AND PARK', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/1030ca68-958a-42c1-842f-882228239462/Son+%26+Park+Campaign+Teaser+2-low.gif?content-type=image%2Fgif' },
-        { title: 'COMMERCIAL: MAKE IT COUNT', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/035fa440-ae95-48c4-98dc-17844488b069/RUTH+|+festival+preview-low3.gif' },
+        { title: 'COMMERCIAL: MAKE IT COUNT', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/aec16f05-ed69-456a-ba1e-14d6e44ae8d1/ALEX+%28Short+film%29+Trailer-high.gif?content-type=image%2Fgif' },
         { title: 'DOCUMENTARY: SOMETHING', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/30eb84ab-fdd4-4304-b360-e3d6ac1700d8/An+Admin+Worker+At+The+End+Of+The+World+-+trailer-high.gif?content-type=image%2Fgif' },
         { title: 'EDUCATION: RHP', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/ad2a4236-30d9-4261-9af8-5b6166575282/Brother+Brother+Reel+2020-3-high.gif?content-type=image%2Fgif' }
     ]
@@ -237,7 +237,10 @@ function goToScreen(screenName) {
         screenContainer.classList.remove('slide-to-special-features', 'slide-to-main');
         screenContainer.classList.add('slide-to-scene');
         // Set background image for scene selection screen with a dark overlay
-        sceneSelectionScreen.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${videoData.sceneBackgroundImage}')`;
+        sceneSelectionScreen.style.backgroundImage = `url('${videoData.sceneBackgroundImage}')`;
+        sceneSelectionScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; /* Default background color (dark overlay) */
+        sceneSelectionScreen.style.backgroundBlendMode = 'multiply'; /* Blend mode */
+
         sceneSelectionScreen.style.backgroundSize = 'cover'; // Ensure it covers
         sceneSelectionScreen.style.backgroundPosition = 'center'; // Center the image
         specialFeaturesScreen.style.backgroundImage = ''; // Clear special features background
@@ -345,4 +348,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalSubtitleText = subtitleShowreelElement.dataset.text;
     const charCounts = [8, 8, 7, 0, 7, 6, 6, 5, 4, 8, 2, 2];
     animateSubtitle(subtitleShowreelElement, finalSubtitleText, charCounts);
+
+    // Highlight the "Play Reel" button by default on page load.
+    playReelButton.classList.add('is-active');
+
+    // Get the container for the main menu buttons.
+    const mainMenuButtonContainer = mainMenuScreen.querySelector('.button-container');
+
+    // Add a one-time event listener to the button container.
+    // When the mouse first enters this area, it will remove the default highlight
+    // from the "Play Reel" button, allowing natural hover states to take over.
+    if (mainMenuButtonContainer) {
+        mainMenuButtonContainer.addEventListener('mouseenter', () => {
+            playReelButton.classList.remove('is-active');
+        }, { once: true });
+    }
 });
