@@ -1,5 +1,10 @@
 // --- DATA DEFINITION ---
 const videoData = {
+    siteTitle: 'Brother Brother | The Showreel',
+    mainMenuTitle: 'BROTHER BROTHER',
+    mainMenuGlitchText: 'YAZ and HAZ',
+    mainMenuSubtitle: 'THE SHOWREEL',
+    copyrightText: '© 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.',
     mainBackgroundVimeoId: '292109430',
     mainReelVimeoId: '431751544', // Updated showreel video ID
     specialFeaturesBackgroundImage: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/d56856ff-5d6d-4d98-acfe-1ed609ef3d75/RUTH+|+festival+preview-high1.gif',
@@ -9,12 +14,22 @@ const videoData = {
         { title: 'COMMERCIAL: MAKE IT COUNT', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/aec16f05-ed69-456a-ba1e-14d6e44ae8d1/ALEX+%28Short+film%29+Trailer-high.gif?content-type=image%2Fgif' },
         { title: 'DOCUMENTARY: SOMETHING', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/30eb84ab-fdd4-4304-b360-e3d6ac1700d8/An+Admin+Worker+At+The+End+Of+The+World+-+trailer-high.gif?content-type=image%2Fgif' },
         { title: 'EDUCATION: RHP', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/ad2a4236-30d9-4261-9af8-5b6166575282/Brother+Brother+Reel+2020-3-high.gif?content-type=image%2Fgif' }
+    ],
+    specialFeatures: [
+        { text: 'MAKE CONTACT', url: '#' },
+        { text: 'ABOUT US', url: '#' },
+        { text: 'INSTAGRAM', url: 'https://www.instagram.com/brobrofilm/', target: '_blank' },
+        { text: 'EASTER EGGS', url: '#' }
     ]
 };
 // --- END DATA DEFINITION ---
 
 
 // Get references to DOM elements
+const mainMenuHeroTitle = document.getElementById('mainMenuHeroTitle');
+const mainMenuGlitchText = document.getElementById('mainMenuGlitchText');
+const mainMenuSubtitle = document.getElementById('mainMenuSubtitle');
+const specialFeaturesButtonContainer = document.getElementById('specialFeaturesButtonContainer');
 const mainBackgroundVideo = document.getElementById('mainBackgroundVideo');
 const playReelButton = document.getElementById('playReelButton');
 const sceneSelectionButton = document.getElementById('sceneSelectionButton');
@@ -47,6 +62,37 @@ function playBloopSound() {
 menuButtons.forEach(button => {
     button.addEventListener('mouseenter', playBloopSound);
 });
+
+// Function to populate static data from the videoData object
+function populateStaticData() {
+    // Set page title
+    document.title = videoData.siteTitle;
+
+    // Set main menu title and glitch text
+    mainMenuHeroTitle.textContent = videoData.mainMenuTitle;
+    mainMenuGlitchText.dataset.text = videoData.mainMenuGlitchText;
+    mainMenuSubtitle.dataset.text = videoData.mainMenuSubtitle;
+
+    // Set copyright text in all footers
+    document.querySelectorAll('.copyright-text').forEach(el => {
+        el.innerHTML = videoData.copyrightText;
+    });
+
+    // Populate Special Features buttons
+    specialFeaturesButtonContainer.innerHTML = ''; // Clear existing
+    videoData.specialFeatures.forEach(item => {
+        const button = document.createElement('a');
+        button.href = item.url;
+        button.className = 'menu-button';
+        button.textContent = item.text;
+        if (item.target) {
+            button.target = item.target;
+            button.rel = 'noopener noreferrer'; // Good practice for security
+        }
+        button.addEventListener('mouseenter', playBloopSound); // Add sound effect on hover
+        specialFeaturesButtonContainer.appendChild(button);
+    });
+}
 
 // Function to dynamically load chapter videos
 function loadChapterVideos() {
@@ -155,6 +201,14 @@ function animateSubtitle(element, finalText, charCycleCounts) {
     });
 }
 
+// Helper function to set the main background video if it's not already set
+function updateMainBackgroundVideo() {
+    const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
+    if (mainBackgroundVideo.src !== newBackgroundSrc) {
+        mainBackgroundVideo.src = newBackgroundSrc;
+    }
+}
+
 
 // Function to manage screen transitions and background videos
 function goToScreen(screenName) {
@@ -199,11 +253,7 @@ function goToScreen(screenName) {
                 sceneSelectionScreen.style.backgroundImage = ''; // Ensure scene background is cleared
 
                 // Update main background video
-                const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
-                if (mainBackgroundVideo.src !== newBackgroundSrc) {
-                    mainBackgroundVideo.src = newBackgroundSrc;
-                }
-
+                updateMainBackgroundVideo();
                 // Subtitle animation is now handled only on DOMContentLoaded, not on subsequent returns to main.
                 // Re-animate the subtitle when returning to main menu
                 // const finalSubtitleText = subtitleShowreelElement.dataset.text;
@@ -223,11 +273,7 @@ function goToScreen(screenName) {
             screenContainer.classList.add('slide-to-main');
             sceneSelectionScreen.style.backgroundImage = ''; // Ensure scene background is cleared
             // Update main background video
-            const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
-            if (mainBackgroundVideo.src !== newBackgroundSrc) {
-                mainBackgroundVideo.src = newBackgroundSrc;
-            }
-            // Subtitle animation is now handled only on DOMContentLoaded, not on subsequent returns to main.
+            updateMainBackgroundVideo();            // Subtitle animation is now handled only on DOMContentLoaded, not on subsequent returns to main.
             // Animate subtitle on initial load as well
             // const finalSubtitleText = subtitleShowreelElement.dataset.text;
             // const charCounts = [8, 8, 7, 0, 7, 6, 6, 5, 4, 8, 2, 2];
@@ -244,11 +290,7 @@ function goToScreen(screenName) {
         sceneSelectionScreen.style.backgroundSize = 'cover'; // Ensure it covers
         sceneSelectionScreen.style.backgroundPosition = 'center'; // Center the image
         specialFeaturesScreen.style.backgroundImage = ''; // Clear special features background
-        // Ensure the main background video continues playing behind the new scene background
-        const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
-        if (mainBackgroundVideo.src !== newBackgroundSrc) {
-            mainBackgroundVideo.src = newBackgroundSrc;
-        }
+        updateMainBackgroundVideo();
         loadChapterVideos(); // Ensure chapters are loaded
     } else if (screenName === 'specialFeatures') {
         const rect = specialFeaturesButton.getBoundingClientRect();
@@ -280,11 +322,7 @@ function goToScreen(screenName) {
         specialFeaturesScreen.style.backgroundSize = 'cover';
         specialFeaturesScreen.style.backgroundPosition = 'center';
         sceneSelectionScreen.style.backgroundImage = ''; // Clear scene background
-        // Ensure the main background video continues playing behind the new special features background
-        const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
-        if (mainBackgroundVideo.src !== newBackgroundSrc) {
-            mainBackgroundVideo.src = newBackgroundSrc;
-        }
+        updateMainBackgroundVideo();
         setTimeout(() => {
             screenContainer.classList.remove('slide-to-main', 'slide-to-scene');
             screenContainer.classList.add('slide-to-special-features');
@@ -340,6 +378,10 @@ backToMainMenuFromFeatures.addEventListener('click', (e) => {
 
 // Initial setup when the page loads
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Populate all data-driven content first
+    populateStaticData();
+
     // Start on the main screen. The screenContainer is initially positioned
     // so that the 'mainMenuScreen' (the second screen) is visible.
     goToScreen('main');
