@@ -106,15 +106,14 @@ header {
 
 /* Specific font for the main title */
 #mainMenuScreen h1 {
-    font-family: 'Rubik Glitch', sans-serif; /* New glitch font */
+    font-family: 'Rubik Dirt', sans-serif; /* New textured font */
     font-size: clamp(3rem, 14vw, 16rem); /* Larger and more responsive */
-    /* Simplified shadow to complement the font's built-in effect */
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 0 5px rgba(255, 255, 255, 0.5);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9); /* Dark shadow to enhance texture */
     color: #FFD700; /* Gold color for the title */
     text-align: center; /* Keep title centered */
     width: 100%; /* Ensure it spans full width for centering */
     transform: none; /* Reset 3D transform to let the font stand out */
-    letter-spacing: 5px; /* Increased letter spacing for readability */
+    letter-spacing: 4px; /* Adjusted letter spacing for the new font */
 }
 
 /* New: Subtitle styling for 'THE SHOWREEL' */
