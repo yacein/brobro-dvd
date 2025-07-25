@@ -694,4 +694,128 @@ document.addEventListener('DOMContentLoaded', async () => { // Made async to use
         }, { once: true });
         console.log("mainMenuButtonContainer mouseenter listener added."); // DEBUG
     }
+
+    // --- EASTER EGG: Bouncing DVD Logo ---
+    const dvdLogo = document.getElementById('dvdLogo');
+    let isBouncing = false;
+    // We'll use this to store the event handler so it can be removed later.
+    let bounceHandler;
+    // Store the original parent and sibling to know where to return the logo.
+    const originalParent = dvdLogo.parentElement;
+    const originalNextSibling = dvdLogo.nextElementSibling;
+
+    dvdLogo.addEventListener('click', () => {
+        if (isBouncing) {
+            // --- NEW: Show speech bubble ---
+            const logoRect = dvdLogo.getBoundingClientRect();
+            const bubble = document.createElement('div');
+            bubble.className = 'easter-egg-bubble';
+            bubble.textContent = 'argh you caught me';
+            document.body.appendChild(bubble);
+
+            // Position it above the logo
+            bubble.style.left = `${logoRect.left + logoRect.width / 2}px`;
+            bubble.style.top = `${logoRect.top}px`;
+
+            // Force a reflow to apply initial styles before adding 'show' class for transition
+            void bubble.offsetWidth;
+
+            // Add 'show' class to trigger the animation
+            bubble.classList.add('show');
+
+            // Remove the bubble after a few seconds
+            setTimeout(() => {
+                bubble.classList.remove('show');
+                // Remove from DOM after transition out
+                bubble.addEventListener('transitionend', () => bubble.remove(), { once: true });
+            }, 2000); // Show for 2 seconds
+
+            // Stop bouncing
+            isBouncing = false;
+            // Important: remove the event listener to stop the animation loop
+            dvdLogo.removeEventListener('transitionend', bounceHandler);
+            dvdLogo.classList.remove('bouncing');
+            // Reset inline styles to let CSS take over again.
+            dvdLogo.style.transform = '';
+            dvdLogo.style.backgroundColor = '';
+            dvdLogo.style.transition = ''; // Clear the transition style
+            // Move the logo back to its original position in the DOM.
+            originalParent.insertBefore(dvdLogo, originalNextSibling);
+        } else {
+            // Start bouncing
+            isBouncing = true;
+            // Get the logo's starting position before we move it in the DOM.
+            const startRect = dvdLogo.getBoundingClientRect();
+
+            // The key fix: Move the logo to be a direct child of the body.
+            // This prevents any parent with a `transform` from interfering with `position: fixed`.
+            document.body.appendChild(dvdLogo);
+            dvdLogo.classList.add('bouncing');
+            startBouncing(dvdLogo, startRect); // Call the new CSS-based animation function
+        }
+    });
+
+    /**
+     * Starts the bouncing animation using performant CSS transitions.
+     * Instead of JS calculating every frame, it calculates the next wall collision
+     * and lets CSS handle the smooth animation to that point.
+     * @param {HTMLElement} logoElement The logo element to animate.
+     * @param {DOMRect} startRect The initial position of the logo.
+     */
+    function startBouncing(logoElement, startRect) {
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500'];
+        let colorIndex = Math.floor(Math.random() * colors.length);
+        logoElement.style.backgroundColor = colors[colorIndex];
+
+        const speed = 250; // pixels per second
+        const logoWidth = logoElement.offsetWidth;
+        const logoHeight = logoElement.offsetHeight;
+
+        // Start at its original position from the bottom-left of the screen.
+        let x = startRect.left;
+        let y = startRect.top;
+        logoElement.style.transform = `translate(${x}px, ${y}px)`;
+
+        // Start with a random direction
+        let angle = Math.random() * 2 * Math.PI;
+        let vx = Math.cos(angle); // Direction vector x (-1 to 1)
+        let vy = Math.sin(angle); // Direction vector y (-1 to 1)
+
+        // This is the function that will be called on each bounce
+        bounceHandler = () => {
+            // Calculate time to hit horizontal and vertical walls
+            const timeToHitX = (vx > 0) ? (window.innerWidth - logoWidth - x) / (vx * speed) : -x / (vx * speed);
+            const timeToHitY = (vy > 0) ? (window.innerHeight - logoHeight - y) / (vy * speed) : -y / (vy * speed);
+
+            // Find the shorter time to determine the next collision
+            const timeToCollision = Math.min(timeToHitX, timeToHitY);
+
+            // Update position to the collision point
+            x += vx * speed * timeToCollision;
+            y += vy * speed * timeToCollision;
+
+            // Check which wall was hit and reverse direction
+            // Use a small epsilon for floating point comparison
+            if (Math.abs(timeToCollision - timeToHitX) < 0.001) {
+                vx *= -1;
+            }
+            if (Math.abs(timeToCollision - timeToHitY) < 0.001) {
+                vy *= -1;
+            }
+
+            // Change color on bounce
+            colorIndex = (colorIndex + 1) % colors.length;
+            logoElement.style.backgroundColor = colors[colorIndex];
+
+            // Set the CSS transition and new position
+            logoElement.style.transition = `transform ${timeToCollision}s linear`;
+            logoElement.style.transform = `translate(${x}px, ${y}px)`;
+        };
+
+        // Add the listener that will keep the loop going
+        logoElement.addEventListener('transitionend', bounceHandler);
+
+        // A brief timeout to ensure the initial position is set before the first transition starts
+        setTimeout(bounceHandler, 10);
+    }
 });

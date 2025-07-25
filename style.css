@@ -323,8 +323,9 @@ footer {
     left: 20px;
     width: 60px; /* You can change the size here */
     height: 45px; /* You can change the size here */
-    background-color: rgba(255, 255, 255, 0.7); /* You can change the color here */
-    
+    background-color: rgba(255, 255, 255, 0.7); /* You can change the color here */    
+    cursor: pointer; /* Indicate that it's clickable for the easter egg */
+
     /* Use the SVG as a mask to allow for color changes */
     -webkit-mask-image: url('assets/dvd-logo.svg');
     mask-image: url('assets/dvd-logo.svg');
@@ -332,6 +333,54 @@ footer {
     mask-size: contain;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
+
+    /* Add a smooth transition for color changes */
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* New: Class for when the logo is bouncing */
+#dvdLogo.bouncing {
+    /* Change position to fixed to bounce around the entire viewport */
+    position: fixed;
+    /* Let JS control the position via transform, so unset bottom/left */
+    bottom: auto;
+    left: auto;
+    z-index: 200; /* Ensure it's on top of other content */
+}
+
+/* New: Speech bubble for the easter egg */
+.easter-egg-bubble {
+    position: fixed; /* Position relative to the viewport */
+    background-color: white;
+    color: black;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 201; /* Above the bouncing logo */
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(0.5); /* Position above the click point and start small */
+    transform-origin: bottom center;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    pointer-events: none; /* Don't let it interfere with clicks */
+}
+
+.easter-egg-bubble.show {
+    opacity: 1;
+    transform: translate(-50%, -115%) scale(1); /* Grow to full size and pop up a bit */
+}
+
+/* The little triangle pointer for the bubble */
+.easter-egg-bubble::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
 }
 
 /* Video Modal Styling */
