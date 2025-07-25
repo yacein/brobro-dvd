@@ -88,15 +88,15 @@ body {
 
 /* Main Menu Screen specific alignment */
 #mainMenuScreen {
-    align-items: flex-end; /* Align content to the right for main menu */
-    padding: 20px 50px; /* Add more padding on the right for alignment */
+    align-items: center; /* Align content to the center for main menu */
+    padding: 20px 0; /* Symmetrical vertical padding, no horizontal padding */
 }
 
 /* Main Title Styling (general for all headers) */
 header {
     width: 100%;
     text-align: center;
-    padding: 20px 0;
+    padding: 20px; /* Add horizontal padding back here to keep title constrained */
     z-index: 1; /* Ensure title is above video and overlay */
     margin-top: 5vh; /* Push title down a bit from the top */
     /* Add perspective to the header for 3D effect on h1 */
@@ -106,19 +106,15 @@ header {
 
 /* Specific font for the main title */
 #mainMenuScreen h1 {
-    font-family: 'Bangers', cursive; /* Comic book font */
+    font-family: 'Rubik Glitch', sans-serif; /* New glitch font */
     font-size: clamp(3rem, 14vw, 16rem); /* Larger and more responsive */
-    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.9), /* Original shadow */
-                 0 0 20px rgba(255, 215, 0, 0.5), /* Subtle gold glow */
-                 -2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black; /* Outline with text-shadow */
+    /* Simplified shadow to complement the font's built-in effect */
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 0 5px rgba(255, 255, 255, 0.5);
     color: #FFD700; /* Gold color for the title */
     text-align: center; /* Keep title centered */
     width: 100%; /* Ensure it spans full width for centering */
-    /* Apply 3D transform for perspective effect */
-    transform: rotateX(-10deg) rotateY(15deg) translateZ(-0px); /* Changed transform properties */
-    /*transform-origin: center bottom; /* Pivot from the bottom center */
-    /* Removed text-stroke as we are using text-shadow for outline */
-    letter-spacing: 1px; /* Added letter spacing for wider look */
+    transform: none; /* Reset 3D transform to let the font stand out */
+    letter-spacing: 5px; /* Increased letter spacing for readability */
 }
 
 /* New: Subtitle styling for 'THE SHOWREEL' */
@@ -169,6 +165,13 @@ main {
     align-items: flex-end; /* Align main content to the right */
 }
 
+/* Specific alignment for main menu's main content */
+#mainMenuScreen main {
+    align-items: stretch; /* Stretch the button container to full width */
+    justify-content: flex-end; /* Keep it at the bottom */
+    padding-bottom: 5vh; /* Add some space from the very bottom edge */
+}
+
 /* Specific styling for special features screen's main content to center its buttons */
 #specialFeaturesScreen main {
     justify-content: center; /* Center buttons vertically */
@@ -188,9 +191,13 @@ main {
 
 /* Specific styling for main menu button container */
 #mainMenuScreen .button-container {
-    gap: 10px; /* Reduced gap between items */
-    background-color: transparent; /* Remove background */
-    padding: 0; /* Remove padding from the container itself */
+    flex-direction: row; /* Arrange buttons horizontally */
+    justify-content: center; /* Center the buttons within the full-width strip */
+    gap: 40px; /* Space between horizontal buttons */
+    background-color: rgba(255, 255, 255, 0.15); /* Semi-transparent white background */
+    padding: 15px 40px; /* Padding for the strip */
+    border-radius: 0; /* Remove rounded corners for a full-width strip */
+    width: 100%; /* Ensure the container spans the full width */
 }
 
 /* Specific styling for special features menu button container (revert background/padding) */
@@ -205,14 +212,14 @@ main {
     text-decoration: none; /* Remove underline from links */
     color: #ffffff; /* Default white text */
     font-size: clamp(1rem, 3vw, 1.8rem); /* Responsive font size */
-    padding: 10px 20px;
+    padding: 10px 20px;rgb(254, 254, 178)
     text-align: center;
     transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out; /* Smooth transition for hover effect and opacity */
     white-space: nowrap; /* Prevent text wrapping */
     cursor: pointer; /* Indicate clickable element */
 
     /* New: Button Font and Gradient */
-    font-family: 'Bebas Neue', sans-serif; /* Bold, condensed font */
+    font-family: 'jersey 15', sans-serif;
     font-size: clamp(1.5rem, 4vw, 2.5rem); /* Slightly larger for emphasis */
     background-image: linear-gradient(to bottom, #ffff00, #ff8c00); /* Vertical gradient: yellow to dark orange */
     -webkit-background-clip: text; /* Clip background to text shape */
@@ -224,25 +231,34 @@ main {
 #mainMenuScreen .menu-button {
     /* Changed to flexbox for precise icon alignment */
     display: flex;
-    justify-content: flex-end; /* Align content to the right */
+    justify-content: center; /* Center content horizontally */
     align-items: center; /* Vertically center */
-    padding: 10px 0; /* Adjusted padding as flex handles spacing */
-    gap: 5px; /* Space between icon and text */
+    padding: 10px; /* Symmetrical padding for the button */
+    gap: 10px; /* Increased space between icon and text */
     /* Removed text-align: right; as flexbox handles alignment */
     position: relative; /* Keep for general positioning if needed */
-    transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out, background-image 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out, background-image 0.2s ease-in-out, filter 0.2s ease-in-out;
+    /* New: Add a heavy drop shadow to the entire button (text and icon) */
+    filter: drop-shadow(6px 6px 4px rgba(0, 0, 0, 0.75));
 }
 
 /* Pixelated circle for main menu hovered items */
 #mainMenuScreen .menu-button::before {
-    content: '»'; /* Changed icon to right-pointing guillemet */
+    content: '■'; /* Changed icon to a square */
     font-family: 'Press Start 2P', cursive; /* Force pixelated font for the dot */
     order: -1; /* Place before the text content in flex order */
-    color: white; /* White dot */
-    font-size: clamp(1.5rem, 3vw, 2.5rem); /* Increased size */
+    color: #ffff00; /* Yellow square */
+    font-size: clamp(3rem, 8vw, 5rem);
     text-shadow: 1px 1px 0 black; /* Subtle shadow for definition */
     opacity: 0; /* Initially hidden */
-    transition: opacity 0.2s ease-in-out; /* Only opacity transition, no transform */
+    transition: opacity 0s ease-in-out; /* Only opacity transition, no transform */
+
+    /* This is the key: by setting line-height to 0, the giant icon doesn't add vertical space to the menu item, fixing the spacing issue. */
+    line-height: 0;
+
+    /* --- VERTICAL ALIGNMENT TWEAK --- */
+    position: relative; /* Allows us to nudge the element's position */
+    top: -15px;
 }
 
 #mainMenuScreen .menu-button:hover::before {
@@ -252,7 +268,7 @@ main {
 
 /* Specific styling for special features menu buttons (revert font/style) */
 #specialFeaturesScreen .menu-button {
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'jersey 15', sans-serif;
     background-image: none; /* Remove gradient */
     color: #ffffff; /* Ensure white text */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Keep original shadow */
@@ -295,10 +311,28 @@ main {
 footer {
     width: 100%;
     text-align: center;
-    padding: 15px 0;
+    padding: 15px 20px; /* Add horizontal padding back here to keep footer constrained */
     font-size: clamp(0.5rem, 1.5vw, 0.8rem); /* Much smaller responsive font size */
     color: rgba(255, 255, 255, 0.7); /* Slightly dimmed white for footer */
     z-index: 1; /* Ensure footer is above video and overlay */
+}
+
+/* New: DVD Logo in the bottom left */
+#dvdLogo {
+    position: absolute;
+    bottom: 15px; /* Align with footer padding */
+    left: 20px;
+    width: 60px; /* You can change the size here */
+    height: 45px; /* You can change the size here */
+    background-color: rgba(255, 255, 255, 0.7); /* You can change the color here */
+    
+    /* Use the SVG as a mask to allow for color changes */
+    -webkit-mask-image: url('assets/dvd-logo.svg');
+    mask-image: url('assets/dvd-logo.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
 }
 
 /* Video Modal Styling */
@@ -493,7 +527,7 @@ footer {
     pointer-events: none;
     z-index: 95;
     color: #ffffff;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'jersey 15', sans-serif;
     text-align: center;
     white-space: nowrap;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);

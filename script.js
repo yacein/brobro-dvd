@@ -16,10 +16,10 @@ const videoData = {
         { title: 'EDUCATION: RHP', vimeoId: '292109430', thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/ad2a4236-30d9-4261-9af8-5b6166575282/Brother+Brother+Reel+2020-3-high.gif?content-type=image%2Fgif' }
     ],
     specialFeatures: [
-        { text: 'MAKE CONTACT', url: '#' },
-        { text: 'ABOUT US', url: '#' },
-        { text: 'INSTAGRAM', url: 'https://www.instagram.com/brobrofilm/', target: '_blank' },
-        { text: 'EASTER EGGS', url: '#' }
+        { text: 'Make Contact', url: '#' },
+        { text: 'About Us', url: '#' },
+        { text: 'Instagram', url: 'https://www.instagram.com/brobrofilm/', target: '_blank' },
+        { text: 'Easter Eggs', url: '#' }
     ]
 };
 // --- END DATA DEFINITION ---
