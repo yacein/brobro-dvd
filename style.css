@@ -13,6 +13,7 @@ body {
     min-height: 100vh; /* Ensure body takes full viewport height */
     overflow: hidden; /* Crucial: Hides any overflow from the oversized video background or sliding screens */
     position: relative; /* Needed for z-index of children like modal */
+    perspective: 1500px; /* Add perspective for 3D transitions */
 }
 
 /* Video Background Styling (now applies to iframe) */
@@ -46,15 +47,16 @@ body {
 /* Screen Container: Holds all main screens side-by-side for sliding */
 #screenContainer {
     display: flex; /* Arranges children (screens) horizontally */
-    width: 300vw; /* Three viewport widths wide (special features + main + scene) */
+    width: 300vw; /* Three viewport widths wide (features + main + scene) */
     height: 100vh; /* Full viewport height */
     position: absolute; /* Crucial: Position absolutely from top-left of viewport */
     top: 0;
     left: 0;
     /* Changed transition duration to 1s */
-    transition: transform 1s ease-in-out; /* Smooth transition for sliding */
-    z-index: 0; /* Ensure it's above the background but below modals */
-    transform: translateX(-100vw); /* Start on the main menu by default */
+    transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1), opacity 1.2s cubic-bezier(0.76, 0, 0.24, 1), filter 0.5s ease-out; /* Smooth transition for 3D effect and filter */
+    z-index: 10; /* Position above the about us screen initially */
+    transform: translateX(-100vw); /* Start on the main menu by default (now the 2nd screen) */
+    transform-origin: center center; /* Set transform origin for rotation */
 }
 
 /* Classes to slide the screen container left to specific pages */
@@ -530,16 +532,211 @@ footer {
     left: 20px;
 }
 
+/* Override default header styles for the About Us screen */
+#aboutUsScreen header h1 {
+    font-family: 'Special Elite', monospace;
+    color: #333;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-shadow: none;
+    transform: none;
+    letter-spacing: 2px;
+}
+
 /* Specific styling for the back button on the right (Special Features) */
 #backToMainMenuFromFeatures {
     right: 20px;
 }
 
+/* About Us Screen Specific Styling */
+#aboutUsScreen {
+    /* It's a modal-like panel that animates in 3D over the current screen */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 90vw;
+    height: 90vh;
+    max-width: 1200px; /* Adjusted max width for a cleaner look */
+    max-height: 750px; /* Adjusted max height */
+    z-index: 20; /* Positioned above the screenContainer (z-index: 10) */
+    background-color: tan; /* Tan background as requested */
+    color: #333; /* Darker text for readability on tan background */
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    /* Initial state for 3D animation: off-screen at the bottom, rotated back */
+    transform-origin: bottom center;
+    transform: translate(-50%, 50vh) rotateX(-90deg);
+    opacity: 0;
+    visibility: hidden;
+    /* A more dramatic transition for the 3D effect */
+    transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease-out, visibility 1s;
+}
+
+/* "TOP SECRET" stamp for the About Us page */
+#aboutUsScreen::after {
+    content: 'TOP SECRET';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-family: 'Bowlby One SC', sans-serif; /* A suitably blocky, impactful font */
+    font-size: clamp(8rem, 25vw, 20rem); /* Larger responsive font size */
+    color: rgba(200, 0, 0, 0.1); /* Much more transparent red */
+    border: 10px solid rgba(200, 0, 0, 0.1); /* Matching transparent border */
+    padding: 0.2em 0.5em;
+    border-radius: 8px;
+    transform: translate(-50%, -50%) rotate(12deg); /* Center and rotate */
+    /* z-index is removed; stacking is now controlled by .about-us-main */
+    pointer-events: none; /* Prevent it from interfering with clicks */
+    text-shadow: none;
+}
+
+/* Specific styling for the back button on the left (About Us) */
+#backToMainMenuFromAbout {
+    left: 20px;
+    color: #333; /* Make back button dark to be visible on tan */
+}
+
+/* --- 3D Transition Active State --- */
+
+/* When About Us is active, the background screen remains static and visible. */
+body.about-us-active #screenContainer {
+    /* No changes needed, it stays as is. */
+}
+
+/* And the about us screen animates into view */
+body.about-us-active #aboutUsScreen {
+    transform: translate(-50%, -50%) rotateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Make Contact Screen Overlay Styling */
+#makeContactScreen {
+    /* It's a full-screen overlay that fades in */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 20; /* Positioned above the screenContainer (z-index: 10) */
+    background-color: rgba(0, 0, 0, 0.9); /* Dark, semi-transparent background */
+    
+    /* Initial state for animation */
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.05); /* Start slightly zoomed in for a nice effect */
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease-out, visibility 0.4s;
+}
+
+/* Active state for the contact overlay */
+body.contact-active #makeContactScreen {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Center the content within the contact overlay */
+#makeContactScreen main {
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* NEW: Telepathy Message Styling */
+.telepathy-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #00ff00; /* Matrix green */
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(0.8rem, 2vw, 1.5rem);
+    padding: 30px;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+    text-align: center;
+    border-radius: 8px;
+    z-index: 1000; /* On top of everything */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0.5s;
+    max-width: 80vw; /* Responsive width */
+}
+
+.telepathy-message.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+
+/* When About Us is active, also hide the special features clone title.
+   This has higher specificity than .show-clone, so it will override it. */
+body.about-us-active #specialFeaturesClone {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* When Contact screen is active, also hide the special features clone title. */
+body.contact-active #specialFeaturesClone {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-out, visibility 0.2s ease-out; /* Add a quick fade out */
+}
+
+.about-us-content img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.about-us-main {
+    flex-grow: 1;
+    display: flex;
+    align-items: center; /* Center the content vertically */
+    justify-content: center; /* Center the content horizontally */
+    width: 100%;
+    padding: 20px;
+    position: relative; /* Create a stacking context */
+    z-index: 1; /* Ensure content is above the ::after pseudo-element (the stamp) */
+}
+
+.about-us-content {
+    display: flex;
+    gap: 40px;
+    max-width: 1200px;
+    align-items: center;
+}
+
+.about-us-text {
+    flex: 1;
+    font-family: 'Special Elite', monospace; /* Typewriter font */
+    font-size: 1.1rem; /* Slightly larger for readability */
+    line-height: 1.7;
+    color: #333; /* Dark text for tan background */
+}
+
+.about-us-images {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Wrapper for each image to apply paperclip and rotation */
+.image-wrapper {
+    position: relative;
+    /* Rotations and transitions removed */
+}
+
+.about-us-content img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
-    .button-container {
-        gap: 15px;
-    }
     .menu-button {
         padding: 8px 15px;
     }
@@ -551,6 +748,10 @@ footer {
     }
     #mainMenuScreen {
         padding: 20px 30px;
+    }
+    .about-us-content {
+        flex-direction: column; /* Stack text and images on smaller screens */
+        text-align: center;
     }
 }
 

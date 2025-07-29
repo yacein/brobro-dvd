@@ -25,8 +25,8 @@ let videoData = { // Changed to 'let' as it will be reassigned or merged
           thumbnailUrl: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/ad2a4236-30d9-4261-9af8-5b6166575282/Brother+Brother+Reel+2020-3-high.gif?content-type=image%2Fgif' }
     ],
     specialFeatures: [
-        { text: 'Make Contact', url: '#' },
-        { text: 'About Us', url: '#' },
+        { text: 'Make Contact', type: 'internal', targetScreen: 'contact' }, // Changed to trigger internal screen
+        { text: 'About Us' }, // Removed URL to handle with JS
         { text: 'Instagram', 
           // Corrected URL: Removed markdown formatting
           url: 'https://www.instagram.com/brobrofilm/', target: '_blank' },
@@ -52,9 +52,16 @@ const closeModalButton = document.getElementById('closeModal');
 const screenContainer = document.getElementById('screenContainer');
 const mainMenuScreen = document.getElementById('mainMenuScreen');
 const sceneSelectionScreen = document.getElementById('sceneSelectionScreen');
-const specialFeaturesScreen = document.getElementById('specialFeaturesScreen'); // Get reference to special features screen
+const specialFeaturesScreen = document.getElementById('specialFeaturesScreen');
+const aboutUsScreen = document.getElementById('aboutUsScreen'); // New: About Us screen
+const makeContactScreen = document.getElementById('makeContactScreen'); // NEW: Make Contact screen
+const telepathyButton = document.getElementById('telepathyButton'); // NEW: Telepathy button
+const telepathyMessage = document.getElementById('telepathyMessage'); // NEW: Telepathy message display
+
 const backToMainMenuFromScenes = document.getElementById('backToMainMenuFromScenes');
+const backToMainMenuFromAbout = document.getElementById('backToMainMenuFromAbout'); // New: Back button from About Us
 const backToMainMenuFromFeatures = document.getElementById('backToMainMenuFromFeatures');
+const backToMainMenuFromContact = document.getElementById('backToMainMenuFromContact'); // NEW: Back button from Contact
 const sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
 const transitionOverlay = document.getElementById('transitionOverlay'); // New: Transition Overlay
 const subtitleShowreelElement = document.querySelector('.subtitle-showreel'); // Reference to the subtitle element
@@ -106,6 +113,25 @@ function populateStaticData() {
         if (item.target) {
             button.target = item.target;
             button.rel = 'noopener noreferrer'; // Good practice for security
+        }
+        // Special handling for the 'About Us' button
+        if (item.text === 'About Us') {
+            button.href = '#'; // Keep it as a link for styling, but prevent default action
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('about-us-active');
+            });
+        } else if (item.type === 'internal' && item.targetScreen) {
+            button.href = '#'; // Prevent default navigation
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Handle different internal screens
+                if (item.targetScreen === 'contact') {
+                    document.body.classList.add('contact-active');
+                } else {
+                    goToScreen(item.targetScreen);
+                }
+            });
         }
         specialFeaturesButtonContainer.appendChild(button);
     });
@@ -287,11 +313,12 @@ function goToScreen(screenName) {
                 }, 1000 + 300); // Wait for 1s slide + 300ms hold
             }, 500); // Wait 0.5s for overlay to become fully opaque
         } else {
-            // If not coming from special features (e.g., initial load or from scene),
+            // If not coming from special features (e.g., initial load or from scene or contact),
             // just perform the screen slide directly without black box.
             screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
             screenContainer.classList.add('slide-to-main');
             sceneSelectionScreen.style.backgroundImage = ''; // Ensure scene background is cleared
+
             // Update main background video
             updateMainBackgroundVideo();            // Subtitle animation is now handled only on DOMContentLoaded, not on subsequent returns to main.
             // Animate subtitle on initial load as well
@@ -310,6 +337,7 @@ function goToScreen(screenName) {
         sceneSelectionScreen.style.backgroundSize = 'cover'; // Ensure it covers
         sceneSelectionScreen.style.backgroundPosition = 'center'; // Center the image
         specialFeaturesScreen.style.backgroundImage = ''; // Clear special features background
+
         updateMainBackgroundVideo();
         loadChapterVideos(); // Ensure chapters are loaded
     } else if (screenName === 'specialFeatures') {
@@ -342,6 +370,7 @@ function goToScreen(screenName) {
         specialFeaturesScreen.style.backgroundSize = 'cover';
         specialFeaturesScreen.style.backgroundPosition = 'center';
         sceneSelectionScreen.style.backgroundImage = ''; // Clear scene background
+
         updateMainBackgroundVideo();
         setTimeout(() => {
             screenContainer.classList.remove('slide-to-main', 'slide-to-scene');
@@ -384,10 +413,32 @@ specialFeaturesButton.addEventListener('click', (e) => {
     goToScreen('specialFeatures');
 });
 
+// NEW: Telepathy Button functionality
+telepathyButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    telepathyMessage.classList.add('show');
+    setTimeout(() => {
+        telepathyMessage.classList.remove('show');
+    }, 3000); // Message displayed for 3 seconds
+});
+
+
 // BACK TO MENU button functionality from Scene Selection screen
 backToMainMenuFromScenes.addEventListener('click', (e) => {
     e.preventDefault();
     goToScreen('main');
+});
+
+// BACK TO MENU button functionality from About Us screen
+backToMainMenuFromAbout.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.body.classList.remove('about-us-active');
+});
+
+// NEW: BACK TO MENU button functionality from Make Contact screen
+backToMainMenuFromContact.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.body.classList.remove('contact-active');
 });
 
 // BACK TO MENU button functionality from Special Features screen

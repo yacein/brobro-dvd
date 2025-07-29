@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&display=swap" rel="stylesheet">
     <!-- Jersey 24 Font -->
     <link href="https://fonts.googleapis.com/css2?family=Jersey+15&display=swap" rel="stylesheet">
+    <!-- Special Elite Font for typewriter effect -->
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
     <!-- Rubik Glitch Font -->
     <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap" rel="stylesheet">
     <!-- Bowlby One SC Font -->
@@ -113,6 +115,52 @@
 
     <!-- Black transition overlay -->
     <div id="transitionOverlay" class="transition-overlay"></div>
+
+    <!-- About Us Screen (now independent for 3D transition) -->
+    <div class="screen-wrapper" id="aboutUsScreen">
+        <a href="#" class="back-button" id="backToMainMenuFromAbout">&lt; BACK</a>
+        <header>
+            <h1>ABOUT US</h1>
+        </header>
+        <main class="about-us-main">
+            <div class="about-us-content">
+                <div class="about-us-text">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.</p>
+                    <p>Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor.</p>
+                </div>
+                <div class="about-us-images">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/400x300/000000/FFFFFF?text=Image+1" alt="Placeholder Image 1">
+                    </div>
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/400x300/333333/FFFFFF?text=Image+2" alt="Placeholder Image 2">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Make Contact Screen (Now an overlay) -->
+    <div class="screen-wrapper" id="makeContactScreen">
+        <a href="#" class="back-button" id="backToMainMenuFromContact">&lt; BACK</a>
+        <header>
+            <h1>MAKE CONTACT</h1>
+        </header>
+        <main>
+            <div class="button-container">
+                <a href="#" class="menu-button" id="telepathyButton">Click here to communicate telepathically with the brothers</a>
+            </div>
+        </main>
+        <footer>
+            <p class="copyright-text">&copy; 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.</p>
+        </footer>
+    </div>
+
+    <!-- Telepathy Message Display (NEW) -->
+    <div id="telepathyMessage" class="telepathy-message">
+        <p>A faint message echoes in your mind: "We hear you, mortal. Seek us in the void."</p>
+        <p>You will hear from the brothers in the next couple of days.</p>
+    </div>
 
     <!-- Link to external JavaScript file -->
     <script src="script.js"></script>
