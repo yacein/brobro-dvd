@@ -65,6 +65,7 @@ const backToMainMenuFromContact = document.getElementById('backToMainMenuFromCon
 const sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
 const transitionOverlay = document.getElementById('transitionOverlay'); // New: Transition Overlay
 const subtitleShowreelElement = document.querySelector('.subtitle-showreel'); // Reference to the subtitle element
+const loadingOverlay = document.getElementById('loadingOverlay'); // New: Loading Overlay
 
 // Placeholder for sound effect
 const bloopSound = new Audio('https://www.soundjay.com/buttons/button-1.mp3');
@@ -732,6 +733,9 @@ document.addEventListener('DOMContentLoaded', async () => { // Made async to use
     // Highlight the "Play Reel" button by default on page load.
     playReelButton.classList.add('is-active');
     console.log("Play Reel button highlighted."); // DEBUG
+
+    // Hide the loading overlay now that everything is ready
+    loadingOverlay.classList.add('hidden');
 
     // Get the container for the main menu buttons.
     const mainMenuButtonContainer = mainMenuScreen.querySelector('.button-container');

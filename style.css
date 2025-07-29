@@ -735,6 +735,46 @@ body.contact-active #specialFeaturesClone {
     border-radius: 4px;
 }
 
+/* New: Loading Overlay Styling */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    z-index: 9999; /* Highest z-index to be on top of everything */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    opacity: 1;
+    visibility: visible;
+}
+
+#loadingOverlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Prevent interaction when hidden */
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    color: #fff;
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #fff;
+    border-top-color: #ffff00; /* Yellow to match the site's highlight color */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .menu-button {
@@ -816,4 +856,11 @@ body.contact-active #specialFeaturesClone {
 .transition-overlay.show {
     opacity: 1;
     visibility: visible;
+}
+
+/* Keyframes for the spinner animation */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
