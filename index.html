@@ -24,10 +24,27 @@
     <link href="glitch.css" rel="stylesheet">
 </head>
 <body>
+    <!-- SVG Filter for Wavy Displacement Effect -->
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;">
+      <defs>
+        <filter id="telepathy-wave">
+          <!-- Generate turbulence noise -->
+          <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" seed="2" stitchTiles="stitch">
+            <!-- Animate the turbulence to make it look like it's moving -->
+            <animate attributeName="baseFrequency" dur="10s" keyTimes="0;0.5;1" values="0.02 0.05;0.03 0.08;0.02 0.05" repeatCount="indefinite"></animate>
+          </feTurbulence>
+          <!-- Use the turbulence as a displacement map on the source graphic -->
+          <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="0" xChannelSelector="R" yChannelSelector="G" result="displacement" id="displacementMap"></feDisplacementMap>
+        </filter>
+      </defs>
+    </svg>
     <!-- New: Loading Overlay -->
     <div id="loadingOverlay">
         <div class="loader-content">
-            <div class="loader-spinner"></div>
+            <div class="disc-loader">
+                <div class="disc"></div>
+                <div class="slot"></div>
+            </div>
             <p>LOADING...</p>
         </div>
     </div>

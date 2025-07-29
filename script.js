@@ -66,9 +66,12 @@ const sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
 const transitionOverlay = document.getElementById('transitionOverlay'); // New: Transition Overlay
 const subtitleShowreelElement = document.querySelector('.subtitle-showreel'); // Reference to the subtitle element
 const loadingOverlay = document.getElementById('loadingOverlay'); // New: Loading Overlay
+const displacementMap = document.getElementById('displacementMap'); // Get the SVG filter element
+let siteVersionId = '1'; // Will be updated with the ID from the URL
 
 // Placeholder for sound effect
 const bloopSound = new Audio('https://www.soundjay.com/buttons/button-1.mp3');
+bloopSound.volume = 0.3; // Set volume to 30% (0.0 is silent, 1.0 is full)
 
 // Function to play sound effect
 function playBloopSound() {
@@ -76,15 +79,20 @@ function playBloopSound() {
     bloopSound.play().catch(e => console.error("Error playing sound:", e));
 }
 
-// Function to attach hover sound to all menu buttons
-function attachButtonHoverSounds() {
-    // Remove existing listeners to prevent duplicates if called multiple times
+// Function to attach interaction sounds to all menu buttons
+function attachInteractionSounds() {
+    // On touch devices, play sound on click. On desktops, play on hover.
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const eventType = isTouchDevice ? 'click' : 'mouseenter';
+
+    // Remove existing listeners to prevent duplicates
     document.querySelectorAll('.menu-button').forEach(button => {
         button.removeEventListener('mouseenter', playBloopSound);
+        button.removeEventListener('click', playBloopSound); // Also remove click listener for safety
     });
     // Add new listeners
     document.querySelectorAll('.menu-button').forEach(button => {
-        button.addEventListener('mouseenter', playBloopSound);
+        button.addEventListener(eventType, playBloopSound);
     });
 }
 
@@ -136,7 +144,7 @@ function populateStaticData() {
         }
         specialFeaturesButtonContainer.appendChild(button);
     });
-    attachButtonHoverSounds(); // Re-attach sounds after populating buttons
+    attachInteractionSounds(); // Re-attach sounds after populating buttons
 }
 
 // Function to dynamically load chapter videos
@@ -414,15 +422,98 @@ specialFeaturesButton.addEventListener('click', (e) => {
     goToScreen('specialFeatures');
 });
 
-// NEW: Telepathy Button functionality
+// NEW: Telepathy Button functionality with Confirmation and Wavy Displacement
 telepathyButton.addEventListener('click', (e) => {
     e.preventDefault();
-    telepathyMessage.classList.add('show');
-    setTimeout(() => {
-        telepathyMessage.classList.remove('show');
-    }, 3000); // Message displayed for 3 seconds
+
+    // If the button is in the confirmation state, start the animation
+    if (telepathyButton.classList.contains('needs-confirmation')) {
+        // Prevent further clicks while animating
+        if (makeContactScreen.classList.contains('wavy-active')) {
+            return;
+        }
+
+        // 1. Add class to apply the SVG filter
+        makeContactScreen.classList.add('wavy-active');
+
+        // 2. Animate the 'scale' of the displacement map over 2 seconds
+        const duration = 2000; // 2 seconds
+        const maxScale = 50;
+        let startTime = null;
+
+        function animateWave(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
+            const scale = maxScale * Math.sin(progress * Math.PI);
+            displacementMap.setAttribute('scale', scale);
+
+            if (progress < 1) {
+                requestAnimationFrame(animateWave);
+            } else {
+                // Animation finished, clean up and show the message
+                displacementMap.setAttribute('scale', 0);
+                makeContactScreen.classList.remove('wavy-active');
+                telepathyMessage.classList.add('show');
+
+                console.log(`Telepathy confirmed. Sending notification for versionId: ${siteVersionId}`); // DEBUG
+                // --- NEW: Send notification with the site version ID ---
+                sendTelepathyNotification(siteVersionId);
+
+                // Show message, then hide it, then close the contact screen
+                setTimeout(() => {
+                    telepathyMessage.classList.remove('show');
+                    // Wait for the fade-out transition to finish (500ms) before closing
+                    setTimeout(() => {
+                        document.body.classList.remove('contact-active');
+                        resetTelepathyButton(); // Reset the button for next time
+                    }, 500);
+                }, 5000); // Message displayed for 5 seconds
+            }
+        }
+        requestAnimationFrame(animateWave);
+    } else {
+        // First click: change text and set state for confirmation
+        telepathyButton.textContent = 'Are you sure?';
+        telepathyButton.classList.add('needs-confirmation');
+    }
 });
 
+/**
+ * Sends a notification to a server-side script with the site version ID.
+ * This is an asynchronous "fire-and-forget" request.
+ * @param {string} versionId The ID of the site version.
+ */
+async function sendTelepathyNotification(versionId) {
+    console.log(`Attempting to send notification...`); // DEBUG
+    const notificationUrl = '/notify.php'; // The path to your PHP script on your server
+
+    try {
+        const formData = new FormData();
+        formData.append('versionId', versionId);
+
+        const response = await fetch(notificationUrl, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            // The user won't see this error, but it's useful for you during development
+            console.error(`Notification server responded with status: ${response.status}`);
+        } else {
+            console.log("Notification sent successfully."); // DEBUG
+        }
+    } catch (error) {
+        console.error('Failed to send telepathy notification:', error);
+    }
+}
+/**
+ * Resets the telepathy button to its original state.
+ */
+function resetTelepathyButton() {
+    telepathyButton.textContent = "Click here to communicate telepathically with the brothers";
+    telepathyButton.classList.remove('needs-confirmation');
+}
 
 // BACK TO MENU button functionality from Scene Selection screen
 backToMainMenuFromScenes.addEventListener('click', (e) => {
@@ -440,6 +531,7 @@ backToMainMenuFromAbout.addEventListener('click', (e) => {
 backToMainMenuFromContact.addEventListener('click', (e) => {
     e.preventDefault();
     document.body.classList.remove('contact-active');
+    resetTelepathyButton(); // Also reset the button state here
 });
 
 // BACK TO MENU button functionality from Special Features screen
@@ -696,6 +788,8 @@ document.addEventListener('DOMContentLoaded', async () => { // Made async to use
 
     // Attempt to fetch data first
     const fetchedDataFromCSV = await fetchData(); // Rename for clarity
+
+    siteVersionId = new URLSearchParams(window.location.search).get('id') || '1';
 
     if (fetchedDataFromCSV) {
         console.log("Data fetched from CSV:", JSON.parse(JSON.stringify(fetchedDataFromCSV)));

@@ -766,13 +766,50 @@ body.contact-active #specialFeaturesClone {
     color: #fff;
 }
 
-.loader-spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #fff;
-    border-top-color: #ffff00; /* Yellow to match the site's highlight color */
+.disc-loader {
+    position: relative;
+    width: 150px;
+    height: 54px; /* Adjusted height to align perfectly with the slot */
+    margin-bottom: 10px; /* Space between loader and text */
+    overflow: hidden; /* This will act as the mask, clipping the disc */
+}
+
+.slot {
+    position: absolute;
+    bottom: 0; /* Position the slot at the very bottom of the container */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px; /* Shorter slot, slightly wider than the disc */
+    height: 4px; /* Line thickness */
+    background-color: #fff; /* White line */
+    border-radius: 2px; /* Rounded ends */
+}
+
+.disc {
+    position: absolute;
+    left: 50%;
+    /* 'top' is removed, as the animation now controls the full vertical transform */
+    width: 60px; /* Larger disc */
+    height: 60px; /* Larger disc */
+    background-color: transparent; /* No fill color */
+    border: 4px solid #fff; /* White outline with matching thickness */
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    /* The transform is now fully controlled by the animation keyframes */
+    animation: insert-disc 2.5s ease-in-out infinite;
+}
+
+.disc::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px; /* Size of the inner hole */
+    height: 20px;
+    background-color: #000; /* Match the background to create a hole */
+    border: 4px solid #fff; /* White outline for the inner circle */
+    border-radius: 50%;
+    box-sizing: border-box; /* Ensure border is included in width/height */
 }
 
 /* Responsive adjustments for smaller screens */
@@ -856,6 +893,53 @@ body.contact-active #specialFeaturesClone {
 .transition-overlay.show {
     opacity: 1;
     visibility: visible;
+}
+
+/* New: Class to apply the wavy SVG filter for the telepathy effect */
+#makeContactScreen.wavy-active {
+    filter: url(#telepathy-wave);
+}
+
+/* Keyframes for the spinner animation */
+@keyframes insert-disc {
+    0% {
+        transform: translate(-50%, -40px); /* Start closer to the slot */
+    }
+    40% {
+        transform: translate(-50%, -8px); /* Adjusted so disc bottom enters the slot slightly */
+    }
+    100% {
+        transform: translate(-50%, 54px); /* Move disc completely through and out of the container */
+    }
+}
+
+/* New: Keyframes for the telepathy swirl effect */
+@keyframes telepathy-swirl {
+    0% {
+        filter: blur(0px) hue-rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        filter: blur(20px) hue-rotate(720deg);
+        opacity: 0.6;
+    }
+    100% {
+        filter: blur(0px) hue-rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Keyframes for the spinner animation */
+@keyframes insert-disc {
+    0% {
+        transform: translate(-50%, -40px); /* Start closer to the slot */
+    }
+    40% {
+        transform: translate(-50%, -8px); /* Adjusted so disc bottom enters the slot slightly */
+    }
+    100% {
+        transform: translate(-50%, 54px); /* Move disc completely through and out of the container */
+    }
 }
 
 /* Keyframes for the spinner animation */
