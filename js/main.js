@@ -101,15 +101,13 @@ async function initializeApp(id) {
 async function main() {
     console.log("DOMContentLoaded fired. Initializing application...");
 
-    // --- DEBUGGING STEP ---
-    // Log the live HTML of the body to the console to see what the script is working with.
-    console.log('Current document.body.innerHTML:', document.body.innerHTML);
-
     // Initialize all DOM element references now that the DOM is ready.
     initDom();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const requestedId = urlParams.get('id');
+    // Get the ID directly from the query string (e.g., "?2")
+    const queryString = window.location.search;
+    // If the query string has content (e.g., "?2"), strip the "?" and use it as the ID. Otherwise, it's null.
+    const requestedId = queryString.length > 1 ? queryString.substring(1).trim() : null;
 
     if (requestedId) {
         // ID is in the URL, hide password screen and start immediately.
