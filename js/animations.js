@@ -40,19 +40,19 @@ export function animateSubtitle(element, finalText, charCycleCounts) {
             let currentCycle = 0;
             let originalContent = finalChar;
 
-            const intervalId = setInterval(() => {
+            const cycleCharacter = () => {
                 if (currentCycle < numIncorrectCycles) {
                     charSpan.textContent = characterPool[Math.floor(Math.random() * characterPool.length)];
 
                     // Apply temporary "jiggle" and "flicker" styles
                     charSpan.style.opacity = Math.random() * 0.5 + 0.3;
                     charSpan.style.filter = `blur(${Math.random() * 2}px)`;
-                    charSpan.style.transform = `translateY(${Math.random() * 6 - 3}px)`;
+                    charSpan.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
                     charSpan.style.color = `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`;
 
                     currentCycle++;
+                    setTimeout(cycleCharacter, 100); // Schedule the next cycle
                 } else {
-                    clearInterval(intervalId);
                     charSpan.textContent = originalContent;
                     // Ensure final styles are applied
                     charSpan.style.opacity = '1';
@@ -61,7 +61,9 @@ export function animateSubtitle(element, finalText, charCycleCounts) {
                     charSpan.style.color = '#00ff00';
                     charSpan.style.textShadow = '0 0 5px rgba(0, 255, 0, 0.7), 0 0 10px rgba(0, 255, 0, 0.5)';
                 }
-            }, 100);
+            };
+
+            cycleCharacter(); // Start the animation loop
         }, index * 150);
     });
 }

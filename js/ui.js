@@ -119,32 +119,45 @@ function updateMainBackgroundVideo() {
 export function goToScreen(screenName) {
     const isComingFromSpecialFeatures = dom.screenContainer.classList.contains('slide-to-special-features');
 
-    dom.specialFeaturesClone.classList.remove('show-clone');
-    dom.specialFeaturesClone.style.top = '';
-    dom.specialFeaturesClone.style.left = '';
-    dom.specialFeaturesClone.style.fontSize = '';
-    dom.specialFeaturesClone.style.letterSpacing = '';
-
     dom.transitionOverlay.classList.remove('show');
     dom.transitionOverlay.style.transform = 'none';
     dom.transitionOverlay.style.transition = 'opacity 0.5s ease-out, visibility 0.5s ease-out';
 
     if (screenName === 'main') {
         if (isComingFromSpecialFeatures) {
+            // 1. Start fading in the transition GIF.
             dom.transitionOverlay.classList.add('show');
+
+            // 2. After the GIF has faded in (500ms)...
             setTimeout(() => {
+                // 3. Instantly hide the clone element and reset its styles.
+                dom.specialFeaturesClone.style.transition = 'none'; // Disable transition for instant change
+                dom.specialFeaturesClone.classList.remove('show-clone');
+                dom.specialFeaturesClone.style.top = '';
+                dom.specialFeaturesClone.style.left = '';
+                dom.specialFeaturesClone.style.fontSize = '';
+                dom.specialFeaturesClone.style.letterSpacing = '';
+
+                // 4. Start sliding the screen container back to the main menu.
                 dom.screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
                 dom.screenContainer.classList.add('slide-to-main');
+
+                // Reset other elements
                 dom.specialFeaturesButton.style.opacity = '1';
                 dom.specialFeaturesButton.style.pointerEvents = 'auto';
                 dom.specialFeaturesScreen.style.backgroundImage = '';
                 dom.sceneSelectionScreen.style.backgroundImage = '';
                 updateMainBackgroundVideo();
+
+                // 5. After a delay, fade out the GIF and restore the clone's transition property.
                 setTimeout(() => {
                     dom.transitionOverlay.classList.remove('show');
-                }, 1000 + 300);
+                    // Use a small timeout to ensure this happens after any potential reflow.
+                    setTimeout(() => dom.specialFeaturesClone.style.transition = '', 50);
+                }, 1000); // Wait 1 second (during the 1.2s slide)
             }, 500);
         } else {
+            // This handles transitions from other screens (like 'scene') to 'main'.
             dom.screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
             dom.screenContainer.classList.add('slide-to-main');
             dom.sceneSelectionScreen.style.backgroundImage = '';

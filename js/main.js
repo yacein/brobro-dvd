@@ -29,10 +29,10 @@ async function main() {
         console.log("Data fetched from CSV:", JSON.parse(JSON.stringify(fetchedDataFromCSV)));
         // Merge the fetched data with the hard-coded defaults.
         // The fetched data takes precedence, defaults fill in the blanks.
-        let finalData = JSON.parse(JSON.stringify(fetchedDataFromCSV));
+        let finalData = structuredClone(fetchedDataFromCSV);
         mergeDefaults(finalData, defaultConfig);
         updateVideoData(finalData); // Update the shared config object
-        console.log("videoData updated with fetched data and defaults merged:", JSON.parse(JSON.stringify(finalData)));
+        console.log("videoData updated with fetched data and defaults merged:", structuredClone(finalData));
     } else {
         console.warn("Failed to fetch data from CSV. Using ONLY hard-coded videoData defaults.");
     }

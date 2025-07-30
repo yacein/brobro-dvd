@@ -5,11 +5,29 @@
     box-sizing: border-box;
 }
 
+/* --- THEME & GLOBAL VARIABLES --- */
+:root {
+    /* Colors */
+    --color-text-light: #ffffff;
+    --color-text-dark: #333;
+    --color-background-dark: #000000;
+    --color-accent-yellow: #ffff00;
+    --color-accent-green: #00ff00;
+    --color-accent-gold: #FFD700;
+    --color-accent-tan: tan;
+
+    /* Fonts */
+    --font-pixel: 'Press Start 2P', cursive;
+    --font-title: 'Rubik Dirt', sans-serif;
+    --font-button: 'jersey 15', sans-serif;
+    --font-typewriter: 'Special Elite', monospace;
+}
+
 /* Body Styling: Full screen, retro font, dark background */
 body {
-    font-family: 'Press Start 2P', cursive; /* Apply the pixelated font as fallback */
-    color: #ffffff; /* White text for contrast */
-    background-color: #000000; /* Black background as fallback */
+    font-family: var(--font-pixel); /* Apply the pixelated font as fallback */
+    color: var(--color-text-light); /* White text for contrast */
+    background-color: var(--color-background-dark); /* Black background as fallback */
     min-height: 100vh; /* Ensure body takes full viewport height */
     overflow: hidden; /* Crucial: Hides any overflow from the oversized video background or sliding screens */
     position: relative; /* Needed for z-index of children like modal */
@@ -40,7 +58,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent black overlay */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
     z-index: -1; /* Between video/iframe and content */
 }
 
@@ -108,10 +126,10 @@ header {
 
 /* Specific font for the main title */
 #mainMenuScreen h1 {
-    font-family: 'Rubik Dirt', sans-serif; /* New textured font */
+    font-family: var(--font-title); /* New textured font */
     font-size: clamp(3rem, 14vw, 16rem); /* Larger and more responsive */
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9); /* Dark shadow to enhance texture */
-    color: #FFD700; /* Gold color for the title */
+    color: var(--color-accent-gold); /* Gold color for the title */
     text-align: center; /* Keep title centered */
     width: 100%; /* Ensure it spans full width for centering */
     transform: none; /* Reset 3D transform to let the font stand out */
@@ -120,9 +138,9 @@ header {
 
 /* New: Subtitle styling for 'THE SHOWREEL' */
 .subtitle-showreel {
-    font-family: 'Press Start 2P', cursive; /* Pixelated font */
+    font-family: var(--font-pixel); /* Pixelated font */
     font-size: clamp(0.8rem, 2.5vw, 2rem); /* Responsive size, smaller than main title */
-    color: #00ff00; /* Green for a "Matrix" feel */
+    color: var(--color-accent-green); /* Green for a "Matrix" feel */
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.7), /* Green glow */
                  0 0 10px rgba(0, 255, 0, 0.5);
     letter-spacing: 3px; /* Wider spacing */
@@ -137,7 +155,7 @@ header {
     opacity: 0;
     filter: blur(0); /* Start with no blur, animation will add it */
     transform: translateY(0); /* Start at final Y position */
-    color: #00ff00; /* Start with final color, animation will change it */
+    color: var(--color-accent-green); /* Start with final color, animation will change it */
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.7), 0 0 10px rgba(0, 255, 0, 0.5);
     
     /* Transition for the reveal to final state after cycling */
@@ -211,16 +229,16 @@ main {
 /* Individual Button Styling */
 .menu-button {
     text-decoration: none; /* Remove underline from links */
-    color: #ffffff; /* Default white text */
+    color: var(--color-text-light); /* Default white text */
     font-size: clamp(1rem, 3vw, 1.8rem); /* Responsive font size */
     padding: 10px 20px;rgb(254, 254, 178)
     text-align: center;
     transition: color 0.2s ease-in-out, opacity 0.3s ease-in-out; /* Smooth transition for hover effect and opacity */
     white-space: nowrap; /* Prevent text wrapping */
     cursor: pointer; /* Indicate clickable element */
-
+ 
     /* New: Button Font and Gradient */
-    font-family: 'jersey 15', sans-serif;
+    font-family: var(--font-button);
     font-size: clamp(1.5rem, 4vw, 2.5rem); /* Slightly larger for emphasis */
     background-image: linear-gradient(to bottom, #ffff00, #ff8c00); /* Vertical gradient: yellow to dark orange */
     -webkit-background-clip: text; /* Clip background to text shape */
@@ -246,9 +264,9 @@ main {
 /* Pixelated circle for main menu hovered items */
 #mainMenuScreen .menu-button::before {
     content: '■'; /* Changed icon to a square */
-    font-family: 'Press Start 2P', cursive; /* Force pixelated font for the dot */
+    font-family: var(--font-pixel); /* Force pixelated font for the dot */
     order: -1; /* Place before the text content in flex order */
-    color: #ffff00; /* Yellow square */
+    color: var(--color-accent-yellow); /* Yellow square */
     font-size: clamp(3rem, 8vw, 5rem);
     text-shadow: 1px 1px 0 black; /* Subtle shadow for definition */
     opacity: 0; /* Initially hidden */
@@ -269,9 +287,9 @@ main {
 
 /* Specific styling for special features menu buttons (revert font/style) */
 #specialFeaturesScreen .menu-button {
-    font-family: 'jersey 15', sans-serif;
+    font-family: var(--font-button);
     background-image: none; /* Remove gradient */
-    color: #ffffff; /* Ensure white text */
+    color: var(--color-text-light); /* Ensure white text */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Keep original shadow */
     font-size: clamp(1rem, 3vw, 1.8rem); /* Revert to original size */
     padding: 10px 20px; /* Revert to original padding */
@@ -279,30 +297,29 @@ main {
 }
 /* Ensure hover for special features buttons still works */
 #specialFeaturesScreen .menu-button:hover {
-    color: #ffff00;
-    text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00;
+    color: var(--color-accent-yellow);
+    text-shadow: 0 0 10px var(--color-accent-yellow), 0 0 20px var(--color-accent-yellow);
 }
 
 
 /* Button Hover Effect */
 .menu-button:hover {
-    color: #ffff00; /* Change to solid yellow on hover (overrides gradient) */
-    text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00; /* Add a subtle glow */
+    color: var(--color-accent-yellow); /* Change to solid yellow on hover (overrides gradient) */
+    text-shadow: 0 0 10px var(--color-accent-yellow), 0 0 20px var(--color-accent-yellow); /* Add a subtle glow */
     background-image: none; /* Remove gradient on hover for solid color */
 }
 /* Override for main menu hover to be white */
 #mainMenuScreen .menu-button:hover {
-    color: white; /* Make text white on hover */
-    text-shadow: 0 0 10px white, 0 0 20px white; /* White glow */
+    color: var(--color-text-light); /* Make text white on hover */
+    text-shadow: 0 0 10px var(--color-text-light), 0 0 20px var(--color-text-light); /* White glow */
 }
 
 /* New class to programmatically highlight a main menu button */
 #mainMenuScreen .menu-button.is-active {
-    color: white; /* Make text white */
-    text-shadow: 0 0 10px white, 0 0 20px white; /* White glow */
+    color: var(--color-text-light); /* Make text white */
+    text-shadow: 0 0 10px var(--color-text-light), 0 0 20px var(--color-text-light);
 }
-
-#mainMenuScreen .menu-button.is-active::before {
+.is-active::before {
     opacity: 1; /* Show the '»' icon */
     transform: none;
 }
@@ -353,11 +370,11 @@ footer {
 /* New: Speech bubble for the easter egg */
 .easter-egg-bubble {
     position: fixed; /* Position relative to the viewport */
-    background-color: white;
-    color: black;
+    background-color: var(--color-text-light);
+    color: var(--color-background-dark);
     padding: 10px 15px;
     border-radius: 8px;
-    font-family: 'Press Start 2P', cursive;
+    font-family: var(--font-pixel);
     font-size: 12px;
     white-space: nowrap;
     z-index: 201; /* Above the bouncing logo */
@@ -382,7 +399,7 @@ footer {
     transform: translateX(-50%);
     border-width: 8px;
     border-style: solid;
-    border-color: white transparent transparent transparent;
+    border-color: var(--color-text-light) transparent transparent transparent;
 }
 
 /* Video Modal Styling */
@@ -392,7 +409,7 @@ footer {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: black; /* Fully opaque */
+    background-color: var(--color-background-dark); /* Fully opaque */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -414,7 +431,7 @@ footer {
     width: 100%;
     max-width: 100%;
     /* No padding-bottom or height here, handled by aspect-ratio div */
-    background-color: #000;
+    background-color: var(--color-background-dark);
     border-radius: 0;
     box-shadow: none;
     display: flex;
@@ -443,7 +460,7 @@ footer {
     position: absolute;
     top: 10px;
     right: 20px;
-    color: #ffffff;
+    color: var(--color-text-light);
     font-size: 2rem;
     cursor: pointer;
     z-index: 101;
@@ -452,7 +469,7 @@ footer {
 }
 
 .close-modal:hover {
-    color: #ffff00;
+    color: var(--color-accent-yellow);
 }
 
 /* Scene Selection specific styling */
@@ -484,7 +501,7 @@ footer {
 
 .chapter-video-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(255, 255, 0, 0.7);
+    box-shadow: 0 8px 20px rgba(255, 255, 0, 0.4);
 }
 
 .chapter-video-item .video-thumbnail {
@@ -506,7 +523,7 @@ footer {
 .chapter-video-item .chapter-title {
     padding: 10px;
     font-size: clamp(0.8rem, 2vw, 1.2rem);
-    color: #ffffff;
+    color: var(--color-text-light);
     white-space: normal;
 }
 
@@ -514,7 +531,7 @@ footer {
 .back-button {
     position: absolute;
     top: 20px;
-    color: #ffffff;
+    color: var(--color-text-light);
     font-size: 1.5rem;
     text-decoration: none;
     cursor: pointer;
@@ -524,7 +541,7 @@ footer {
 }
 
 .back-button:hover {
-    color: #ffff00;
+    color: var(--color-accent-yellow);
 }
 
 /* Specific styling for the back button on the left (Scene Selection) */
@@ -534,8 +551,8 @@ footer {
 
 /* Override default header styles for the About Us screen */
 #aboutUsScreen header h1 {
-    font-family: 'Special Elite', monospace;
-    color: #333;
+    font-family: var(--font-typewriter);
+    color: var(--color-text-dark);
     font-size: clamp(2rem, 5vw, 3.5rem);
     text-shadow: none;
     transform: none;
@@ -558,8 +575,8 @@ footer {
     max-width: 1200px; /* Adjusted max width for a cleaner look */
     max-height: 750px; /* Adjusted max height */
     z-index: 20; /* Positioned above the screenContainer (z-index: 10) */
-    background-color: tan; /* Tan background as requested */
-    color: #333; /* Darker text for readability on tan background */
+    background-color: var(--color-accent-tan); /* Tan background as requested */
+    color: var(--color-text-dark); /* Darker text for readability on tan background */
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     /* Initial state for 3D animation: off-screen at the bottom, rotated back */
@@ -592,7 +609,7 @@ footer {
 /* Specific styling for the back button on the left (About Us) */
 #backToMainMenuFromAbout {
     left: 20px;
-    color: #333; /* Make back button dark to be visible on tan */
+    color: var(--color-text-dark); /* Make back button dark to be visible on tan */
 }
 
 /* --- 3D Transition Active State --- */
@@ -647,12 +664,12 @@ body.contact-active #makeContactScreen {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.9);
-    color: #00ff00; /* Matrix green */
-    font-family: 'Press Start 2P', cursive;
+    background-color: rgba(0, 0, 0, 0.95);
+    color: var(--color-accent-green); /* Matrix green */
+    font-family: var(--font-pixel);
     font-size: clamp(0.8rem, 2vw, 1.5rem);
     padding: 30px;
-    border: 2px solid #00ff00;
+    border: 2px solid var(--color-accent-green);
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
     text-align: center;
     border-radius: 8px;
@@ -710,10 +727,10 @@ body.contact-active #specialFeaturesClone {
 
 .about-us-text {
     flex: 1;
-    font-family: 'Special Elite', monospace; /* Typewriter font */
+    font-family: var(--font-typewriter); /* Typewriter font */
     font-size: 1.1rem; /* Slightly larger for readability */
     line-height: 1.7;
-    color: #333; /* Dark text for tan background */
+    color: var(--color-text-dark); /* Dark text for tan background */
 }
 
 .about-us-images {
@@ -742,7 +759,7 @@ body.contact-active #specialFeaturesClone {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #000;
+    background-color: var(--color-background-dark);
     z-index: 9999; /* Highest z-index to be on top of everything */
     display: flex;
     justify-content: center;
@@ -762,8 +779,7 @@ body.contact-active #specialFeaturesClone {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px;
-    color: #fff;
+    gap: 25px;    
 }
 
 .disc-loader {
@@ -781,7 +797,7 @@ body.contact-active #specialFeaturesClone {
     transform: translateX(-50%);
     width: 80px; /* Shorter slot, slightly wider than the disc */
     height: 4px; /* Line thickness */
-    background-color: #fff; /* White line */
+    background-color: var(--color-text-light); /* White line */
     border-radius: 2px; /* Rounded ends */
 }
 
@@ -792,7 +808,7 @@ body.contact-active #specialFeaturesClone {
     width: 60px; /* Larger disc */
     height: 60px; /* Larger disc */
     background-color: transparent; /* No fill color */
-    border: 4px solid #fff; /* White outline with matching thickness */
+    border: 4px solid var(--color-text-light); /* White outline with matching thickness */
     border-radius: 50%;
     /* The transform is now fully controlled by the animation keyframes */
     animation: insert-disc 2.5s ease-in-out infinite;
@@ -806,8 +822,8 @@ body.contact-active #specialFeaturesClone {
     transform: translate(-50%, -50%);
     width: 20px; /* Size of the inner hole */
     height: 20px;
-    background-color: #000; /* Match the background to create a hole */
-    border: 4px solid #fff; /* White outline for the inner circle */
+    background-color: var(--color-background-dark); /* Match the background to create a hole */
+    border: 4px solid var(--color-text-light); /* White outline for the inner circle */
     border-radius: 50%;
     box-sizing: border-box; /* Ensure border is included in width/height */
 }
@@ -852,12 +868,12 @@ body.contact-active #specialFeaturesClone {
     visibility: hidden;
     pointer-events: none;
     z-index: 95;
-    color: #ffffff;
-    font-family: 'jersey 15', sans-serif;
+    color: var(--color-text-light);
+    font-family: var(--font-button);
     text-align: center;
     white-space: nowrap;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    transition: opacity 2s ease-out, transform 2s ease-out, color 2s ease-out, top 2s ease-out, left 2s ease-out, font-size 2s ease-out, letter-spacing 2s ease-out;
+    transition: all 2s cubic-bezier(0.76, 0, 0.24, 1); /* Simplified transition */
     transform-origin: center center;
     transform: scale(1); /* Initial state for scale animation */
     letter-spacing: 0px; /* Initial letter spacing */
@@ -868,7 +884,7 @@ body.contact-active #specialFeaturesClone {
     opacity: 1;
     visibility: visible;
     pointer-events: none;
-    color: #ffff00;
+    color: var(--color-accent-yellow);
     font-size: clamp(1.8rem, 5vw, 3rem);
     letter-spacing: 5px;
 }
@@ -883,7 +899,7 @@ body.contact-active #specialFeaturesClone {
     background-image: url('assets/The_Swing_car_away.gif');
     background-size: cover;
     background-position: center;
-    z-index: 99;
+    z-index: 1001; /* Increased z-index to ensure it's on top of the fading clone */
     opacity: 0;
     visibility: hidden;
     transform: none;
@@ -926,25 +942,5 @@ body.contact-active #specialFeaturesClone {
     100% {
         filter: blur(0px) hue-rotate(0deg);
         opacity: 1;
-    }
-}
-
-/* Keyframes for the spinner animation */
-@keyframes insert-disc {
-    0% {
-        transform: translate(-50%, -40px); /* Start closer to the slot */
-    }
-    40% {
-        transform: translate(-50%, -8px); /* Adjusted so disc bottom enters the slot slightly */
-    }
-    100% {
-        transform: translate(-50%, 54px); /* Move disc completely through and out of the container */
-    }
-}
-
-/* Keyframes for the spinner animation */
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
     }
 }

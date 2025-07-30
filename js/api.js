@@ -162,7 +162,7 @@ export async function fetchData() {
                 }
             });
 
-            const resolvedRows = JSON.parse(JSON.stringify(allParsedRows));
+            const resolvedRows = structuredClone(allParsedRows);
             const maxResolutionPasses = 5;
             for (let pass = 0; pass < maxResolutionPasses; pass++) {
                 let changesMadeInPass = false;
@@ -170,8 +170,8 @@ export async function fetchData() {
                     const baseId = targetRow.basedOn;
                     if (baseId && rowIdMap.has(baseId)) {
                         const baseRowOriginal = rowIdMap.get(baseId);
-                        const baseToMerge = JSON.parse(JSON.stringify(baseRowOriginal));
-                        const originalTargetRow = JSON.parse(JSON.stringify(targetRow));
+                        const baseToMerge = structuredClone(baseRowOriginal);
+                        const originalTargetRow = structuredClone(targetRow);
                         mergeDefaults(targetRow, baseToMerge);
                         if (JSON.stringify(originalTargetRow) !== JSON.stringify(targetRow)) {
                             changesMadeInPass = true;
