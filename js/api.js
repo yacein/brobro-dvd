@@ -132,15 +132,13 @@ function parseCsv(csvString) {
 /**
  * Asynchronously fetches data from a Google Sheet CSV and selects a specific row by ID,
  * applying 'basedOn' inheritance.
+ * @param {string} requestedId The ID of the site version to fetch.
  * @returns {Promise<object|null>} A promise that resolves with the fetched and selected data, or null on error.
  */
-export async function fetchData() {
+export async function fetchData(requestedId) {
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnDZiD0zbEjdALbE4BPJrGUvnC3jK4mK4uebn2kLjajcgCbXQsE5xBG9a0R1wxn9WJo-ogpLC3p-X0/pub?gid=1534684239&single=true&output=csv';
     let retries = 3;
     let delay = 1000; // 1 second
-
-    const queryString = window.location.search;
-    let requestedId = queryString.length > 1 ? queryString.substring(1).trim() : '1';
     console.log("Requested ID from URL:", requestedId); // DEBUG: Log requested ID
 
     while (retries > 0) {

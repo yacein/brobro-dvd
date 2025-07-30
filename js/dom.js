@@ -1,31 +1,48 @@
-// Get references to DOM elements
-export const mainMenuHeroTitle = document.getElementById('mainMenuHeroTitle');
-export const mainMenuGlitchText = document.getElementById('mainMenuGlitchText');
-export const mainMenuSubtitle = document.getElementById('mainMenuSubtitle');
-export const specialFeaturesButtonContainer = document.getElementById('specialFeaturesButtonContainer');
-export const mainBackgroundVideo = document.getElementById('mainBackgroundVideo');
-export const playReelButton = document.getElementById('playReelButton');
-export const sceneSelectionButton = document.getElementById('sceneSelectionButton');
-export const specialFeaturesButton = document.getElementById('specialFeaturesButton'); // Original button
-export const specialFeaturesClone = document.getElementById('specialFeaturesClone'); // Clone element
-export const videoModal = document.getElementById('videoModal');
-export const videoModalIframe = document.getElementById('videoModalIframe');
-export const closeModalButton = document.getElementById('closeModal');
-export const screenContainer = document.getElementById('screenContainer');
-export const mainMenuScreen = document.getElementById('mainMenuScreen');
-export const sceneSelectionScreen = document.getElementById('sceneSelectionScreen');
-export const specialFeaturesScreen = document.getElementById('specialFeaturesScreen');
-export const aboutUsScreen = document.getElementById('aboutUsScreen'); // New: About Us screen
-export const makeContactScreen = document.getElementById('makeContactScreen'); // NEW: Make Contact screen
-export const telepathyButton = document.getElementById('telepathyButton'); // NEW: Telepathy button
-export const telepathyMessage = document.getElementById('telepathyMessage'); // NEW: Telepathy message display
-export const backToMainMenuFromScenes = document.getElementById('backToMainMenuFromScenes');
-export const backToMainMenuFromAbout = document.getElementById('backToMainMenuFromAbout'); // New: Back button from About Us
-export const backToMainMenuFromFeatures = document.getElementById('backToMainMenuFromFeatures');
-export const backToMainMenuFromContact = document.getElementById('backToMainMenuFromContact'); // NEW: Back button from Contact
-export const sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
-export const transitionOverlay = document.getElementById('transitionOverlay'); // New: Transition Overlay
-export const subtitleShowreelElement = document.querySelector('.subtitle-showreel'); // Reference to the subtitle element
-export const loadingOverlay = document.getElementById('loadingOverlay'); // New: Loading Overlay
-export const displacementMap = document.getElementById('displacementMap'); // Get the SVG filter element
-export const dvdLogo = document.getElementById('dvdLogo');
+// Declare variables for DOM elements. They will be initialized after the DOM is loaded.
+export let mainMenuHeroTitle, mainMenuGlitchText, mainMenuSubtitle, specialFeaturesButtonContainer,
+    mainBackgroundVideo, playReelButton, sceneSelectionButton, specialFeaturesButton,
+    specialFeaturesClone, videoModal, videoModalIframe, closeModalButton, screenContainer,
+    mainMenuScreen, sceneSelectionScreen, specialFeaturesScreen, aboutUsScreen, makeContactScreen,
+    telepathyButton, telepathyMessage, backToMainMenuFromScenes, backToMainMenuFromAbout,
+    backToMainMenuFromFeatures, backToMainMenuFromContact, sceneSelectionGrid, transitionOverlay,
+    subtitleShowreelElement, loadingOverlay, displacementMap, dvdLogo, passwordScreen,
+    passwordForm, passcodeInput;
+
+/**
+ * Initializes all DOM element variables. This should be called after DOMContentLoaded.
+ */
+export function initDom() {
+    mainMenuHeroTitle = document.getElementById('mainMenuHeroTitle');
+    mainMenuGlitchText = document.getElementById('mainMenuGlitchText');
+    mainMenuSubtitle = document.getElementById('mainMenuSubtitle');
+    specialFeaturesButtonContainer = document.getElementById('specialFeaturesButtonContainer');
+    mainBackgroundVideo = document.getElementById('mainBackgroundVideo');
+    playReelButton = document.getElementById('playReelButton');
+    sceneSelectionButton = document.getElementById('sceneSelectionButton');
+    specialFeaturesButton = document.getElementById('specialFeaturesButton');
+    specialFeaturesClone = document.getElementById('specialFeaturesClone');
+    videoModal = document.getElementById('videoModal');
+    videoModalIframe = document.getElementById('videoModalIframe');
+    closeModalButton = document.getElementById('closeModal');
+    screenContainer = document.getElementById('screenContainer');
+    mainMenuScreen = document.getElementById('mainMenuScreen');
+    sceneSelectionScreen = document.getElementById('sceneSelectionScreen');
+    specialFeaturesScreen = document.getElementById('specialFeaturesScreen');
+    aboutUsScreen = document.getElementById('aboutUsScreen');
+    makeContactScreen = document.getElementById('makeContactScreen');
+    telepathyButton = document.getElementById('telepathyButton');
+    telepathyMessage = document.getElementById('telepathyMessage');
+    backToMainMenuFromScenes = document.getElementById('backToMainMenuFromScenes');
+    backToMainMenuFromAbout = document.getElementById('backToMainMenuFromAbout');
+    backToMainMenuFromFeatures = document.getElementById('backToMainMenuFromFeatures');
+    backToMainMenuFromContact = document.getElementById('backToMainMenuFromContact');
+    sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
+    transitionOverlay = document.getElementById('transitionOverlay');
+    subtitleShowreelElement = document.querySelector('.subtitle-showreel');
+    loadingOverlay = document.getElementById('loadingOverlay');
+    displacementMap = document.getElementById('displacementMap');
+    dvdLogo = document.getElementById('dvdLogo');
+    passwordScreen = document.getElementById('passwordScreen');
+    passwordForm = document.getElementById('passwordForm');
+    passcodeInput = document.getElementById('passcodeInput');
+}

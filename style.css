@@ -916,6 +916,59 @@ body.contact-active #specialFeaturesClone {
     filter: url(#telepathy-wave);
 }
 
+/* --- Password Screen --- */
+#passwordScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--color-background-dark);
+    z-index: 10000; /* Above the loading screen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-pixel);
+    color: var(--color-accent-green);
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    padding: 20px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+#passwordScreen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#passwordForm {
+    display: flex;
+    flex-direction: column; /* Stack label and input vertically */
+    gap: 1em; /* Add some space between them */
+    align-items: flex-start; /* Align items to the left */
+}
+
+#passwordForm label {
+    line-height: 1.8;
+    white-space: pre; /* Ensures the space after '>' is respected */
+}
+
+#passcodeInput {
+    background: transparent;
+    border: none;
+    color: var(--color-accent-green);
+    font-family: var(--font-pixel);
+    font-size: inherit; /* Inherit size from parent */
+    outline: none;
+    width: 12ch; /* Give it some initial width */
+    /* Create a blinking cursor with a border */
+    border-bottom: 0.15em solid var(--color-accent-green);
+    animation: blink-caret 1s step-end infinite;
+    display: none; /* Initially hidden, will be shown by JS */
+}
+
 /* Keyframes for the spinner animation */
 @keyframes insert-disc {
     0% {
@@ -943,4 +996,10 @@ body.contact-active #specialFeaturesClone {
         filter: blur(0px) hue-rotate(0deg);
         opacity: 1;
     }
+}
+
+/* Keyframes for the input cursor blink */
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--color-accent-green); }
 }
