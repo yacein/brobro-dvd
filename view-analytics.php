@@ -168,9 +168,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: bold;
         }
         /* New class for N/A cells */
-        .na-cell {
-            color: #888; /* Dark grey */
+        td.na-cell {
+            color: #222; /* Darker grey as requested */
             font-style: italic;
+            /* Ensure N/A cells are not bold, even in error/contact rows */
+            font-weight: normal;
         }
         .login-form {
             max-width: 300px;
@@ -214,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 10px;
             color: var(--color-text);
         }
-        .filter-group input {
+        .filter-group input, .filter-group select {
             background-color: #333;
             border: 1px solid var(--color-border);
             color: var(--color-accent-green);
@@ -242,25 +244,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php
             // Fetch the company data right before rendering the table.
             $company_map = get_company_map($company_data_csv_url);
+
+            // Prepare to collect unique values for dropdown filters
+            $unique_values = [
+                'company' => [],
+                'ip' => [],
+                'eventType' => []
+            ];
+            $log_lines = file_exists($log_file) ? file($log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
+
+            // First pass: collect all unique values from the log
+            foreach ($log_lines as $line) {
+                $entry = json_decode($line, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $versionId = $entry['data']['versionId'] ?? null;
+                    $companyName = isset($company_map[$versionId]) ? $company_map[$versionId] : 'N/A';
+                    if ($companyName !== 'N/A') $unique_values['company'][$companyName] = true;
+
+                    $ip = $entry['ip'] ?? 'N/A';
+                    if ($ip !== 'N/A') $unique_values['ip'][$ip] = true;
+
+                    $eventType = $entry['type'] ?? 'N/A';
+                    if ($eventType !== 'N/A') $unique_values['eventType'][$eventType] = true;
+                }
+            }
+
+            // Sort the unique values alphabetically
+            ksort($unique_values['company']);
+            ksort($unique_values['ip']);
+            ksort($unique_values['eventType']);
             ?>
 
             <!-- Filter Controls -->
             <div class="filter-bar">
                 <div class="filter-group">
                     <label for="filterDate">Filter by Date (dd/mm/yyyy)</label>
-                    <input type="text" id="filterDate" placeholder="e.g., 25/07/2024">
+                    <input type="text" id="filterDate" placeholder="e.g., 25/07/2024" autocomplete="off">
                 </div>
                 <div class="filter-group">
                     <label for="filterCompany">Filter by Company</label>
-                    <input type="text" id="filterCompany" placeholder="e.g., Client Inc.">
+                    <select id="filterCompany">
+                        <option value="">All Companies</option>
+                        <?php foreach (array_keys($unique_values['company']) as $company): echo "<option value=\"".htmlspecialchars($company)."\">".htmlspecialchars($company)."</option>"; endforeach; ?>
+                    </select>
                 </div>
                 <div class="filter-group">
                     <label for="filterIp">Filter by IP</label>
-                    <input type="text" id="filterIp" placeholder="e.g., 8.8.8.8">
+                    <select id="filterIp">
+                        <option value="">All IPs</option>
+                        <?php foreach (array_keys($unique_values['ip']) as $ip): echo "<option value=\"".htmlspecialchars($ip)."\">".htmlspecialchars($ip)."</option>"; endforeach; ?>
+                    </select>
                 </div>
                 <div class="filter-group">
                     <label for="filterEventType">Filter by Event Type</label>
-                    <input type="text" id="filterEventType" placeholder="e.g., site_load">
+                    <select id="filterEventType">
+                        <option value="">All Events</option>
+                        <?php foreach (array_keys($unique_values['eventType']) as $event): echo "<option value=\"".htmlspecialchars($event)."\">".htmlspecialchars($event)."</option>"; endforeach; ?>
+                    </select>
                 </div>
             </div>
 
@@ -277,11 +317,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </thead>
                 <tbody id="analyticsTableBody">
                     <?php
-                    if (file_exists($log_file)) {
-                        $lines = file($log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-
-                        $lines = array_reverse($lines); // Show newest entries first
+                    if (!empty($log_lines)) {
+                        $lines = array_reverse($log_lines); // Show newest entries first
                         foreach ($lines as $line) {
                             $entry = json_decode($line, true);
 
@@ -357,15 +394,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const filterInputs = document.querySelectorAll('.filter-bar input');
+            const filterControls = document.querySelectorAll('.filter-bar input, .filter-bar select');
             const tableBody = document.getElementById('analyticsTableBody');
 
             function applyFilters() {
                 const filters = {
                     date: document.getElementById('filterDate').value.toLowerCase(),
-                    company: document.getElementById('filterCompany').value.toLowerCase(),
-                    ip: document.getElementById('filterIp').value.toLowerCase(),
-                    eventType: document.getElementById('filterEventType').value.toLowerCase()
+                    company: document.getElementById('filterCompany').value, // Exact match, case-sensitive from dropdown
+                    ip: document.getElementById('filterIp').value,
+                    eventType: document.getElementById('filterEventType').value
                 };
 
                 const rows = tableBody.getElementsByTagName('tr');
@@ -379,23 +416,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (cells.length < 6) continue;
 
                     const rowData = {
-                        date: cells[0].textContent.toLowerCase(),
-                        company: cells[1].textContent.toLowerCase(),
-                        ip: cells[2].textContent.toLowerCase(),
-                        eventType: cells[3].textContent.toLowerCase()
+                        date: cells[0].textContent,
+                        company: cells[1].textContent,
+                        ip: cells[2].textContent,
+                        eventType: cells[3].textContent
                     };
 
                     const isVisible = 
-                        rowData.date.includes(filters.date) &&
-                        rowData.company.includes(filters.company) &&
-                        rowData.ip.includes(filters.ip) &&
-                        rowData.eventType.includes(filters.eventType);
+                        (rowData.date.toLowerCase().includes(filters.date)) &&
+                        (filters.company === "" || rowData.company === filters.company) &&
+                        (filters.ip === "" || rowData.ip === filters.ip) &&
+                        (filters.eventType === "" || rowData.eventType === filters.eventType);
 
                     row.style.display = isVisible ? '' : 'none';
                 }
             }
 
-            filterInputs.forEach(input => input.addEventListener('input', applyFilters));
+            filterControls.forEach(control => control.addEventListener('input', applyFilters));
         });
     </script>
     <?php endif; ?>
