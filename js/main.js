@@ -123,15 +123,45 @@ async function main() {
 
         // The loading overlay remains visible underneath the password screen to prevent flashing.
         const promptLabel = dom.passwordForm.querySelector('label');
-        const promptText = 'Hello...<br>Please enter your passcode > ';
+        const initialText = 'Hello...';
+        const restOfText = 'We\'re glad you found us.<br>Please type your passcode and press enter > ';
         const typingSpeed = 80;
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-        // Start the typewriter animation.
-        typeWriter(promptLabel, promptText, typingSpeed, () => {
-            // When typing is complete, reveal and focus the input field.
-            dom.passcodeInput.style.display = 'block';
-            dom.passcodeInput.focus();
-        });
+        if (isTouchDevice) {
+            // --- MOBILE (TOUCH) LOGIC ---
+            // 1. Type out the initial greeting.
+            typeWriter(promptLabel, initialText, typingSpeed, () => {
+                // 2. Once the greeting is typed, show the "tap to continue" prompt.
+                dom.tapPrompt.style.display = 'block';
+
+                // 3. Add a one-time event listener for the tap.
+                dom.passwordScreen.addEventListener('click', () => {
+                    // 4. Focus the invisible input to trigger keyboard.
+                    dom.passcodeInput.focus();
+                    // 5. Hide the tap prompt.
+                    dom.tapPrompt.style.display = 'none';
+
+                    // 6. Type the rest of the message.
+                    promptLabel.innerHTML += '<br>';
+                    const spanForRest = document.createElement('span');
+                    promptLabel.appendChild(spanForRest);
+                    typeWriter(spanForRest, restOfText, typingSpeed, () => {
+                        // 7. When typing is complete, make the input field visually appear.
+                        dom.passcodeInput.classList.add('visible');
+                    });
+                }, { once: true }); // The listener runs only once.
+            });
+        } else {
+            // --- DESKTOP (NON-TOUCH) LOGIC ---
+            const fullText = initialText + '<br>' + restOfText;
+            typeWriter(promptLabel, fullText, typingSpeed, () => {
+                // When typing is complete, reveal and focus the input field.
+                dom.passcodeInput.classList.add('visible');
+                dom.passcodeInput.focus();
+            });
+        }
+
 
         dom.passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();

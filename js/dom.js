@@ -3,7 +3,7 @@ export let mainMenuHeroTitle, mainMenuGlitchText, mainMenuSubtitle, specialFeatu
     mainBackgroundVideo, playReelButton, sceneSelectionButton, specialFeaturesButton,
     specialFeaturesClone, videoModal, videoModalIframe, closeModalButton, screenContainer,
     mainMenuScreen, sceneSelectionScreen, specialFeaturesScreen, aboutUsScreen, makeContactScreen,
-    telepathyButton, telepathyMessage, backToMainMenuFromScenes, backToMainMenuFromAbout,
+    telepathyButton, telepathyMessage, backToMainMenuFromScenes, backToMainMenuFromAbout, tapPrompt,
     backToMainMenuFromFeatures, backToMainMenuFromContact, sceneSelectionGrid, transitionOverlay,
     subtitleShowreelElement, loadingOverlay, displacementMap, dvdLogo, passwordScreen,
     passwordForm, passcodeInput;
@@ -32,6 +32,7 @@ export function initDom() {
     makeContactScreen = document.getElementById('makeContactScreen');
     telepathyButton = document.getElementById('telepathyButton');
     telepathyMessage = document.getElementById('telepathyMessage');
+    tapPrompt = document.getElementById('tapPrompt');
     backToMainMenuFromScenes = document.getElementById('backToMainMenuFromScenes');
     backToMainMenuFromAbout = document.getElementById('backToMainMenuFromAbout');
     backToMainMenuFromFeatures = document.getElementById('backToMainMenuFromFeatures');

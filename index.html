@@ -29,7 +29,8 @@
         <form id="passwordForm">
             <!-- The label will be populated by the typewriter effect in JS -->
             <label for="passcodeInput"></label>
-            <input type="text" id="passcodeInput" autocomplete="off" autofocus>
+            <div id="tapPrompt">[ TAP TO CONTINUE ]</div>
+            <input type="text" id="passcodeInput" autocomplete="off">
         </form>
     </div>
 
@@ -94,7 +95,7 @@
             <!-- Main Title Section -->
             <header>
                 <div class="hero-container">
-                    <h1 class="hero glitch layers" id="mainMenuGlitchText" data-text="YAZ and HAZ">
+                    <h1 class="hero x_glitch x_layers" id="mainMenuGlitchText" data-text="YAZ and HAZ"> <!-- temporarily disabled glitch and layers -->
                         <span id="mainMenuHeroTitle">BROTHER BROTHER</span>
                     </h1>
                     <h2 class="subtitle-showreel" data-text="THE SHOWREEL" id="mainMenuSubtitle">
@@ -119,7 +120,7 @@
             </footer>
         </div>
 
-        <!-- Scene Selection Screen (now the third screen) -->
+        <!-- Scene Selection Screen -->
         <div class="screen-wrapper" id="sceneSelectionScreen">
             <a href="#" class="back-button" id="backToMainMenuFromScenes">&lt; BACK TO MENU</a>
             <header>

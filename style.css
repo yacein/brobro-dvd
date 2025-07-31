@@ -28,7 +28,8 @@ body {
     font-family: var(--font-pixel); /* Apply the pixelated font as fallback */
     color: var(--color-text-light); /* White text for contrast */
     background-color: var(--color-background-dark); /* Black background as fallback */
-    min-height: 100vh; /* Ensure body takes full viewport height */
+    /* Use dynamic viewport height (dvh) to avoid layout jumps from mobile browser UI */
+    height: 100dvh;
     overflow: hidden; /* Crucial: Hides any overflow from the oversized video background or sliding screens */
     position: relative; /* Needed for z-index of children like modal */
     perspective: 1500px; /* Add perspective for 3D transitions */
@@ -66,7 +67,7 @@ body {
 #screenContainer {
     display: flex; /* Arranges children (screens) horizontally */
     width: 300vw; /* Three viewport widths wide (features + main + scene) */
-    height: 100vh; /* Full viewport height */
+    height: 100dvh; /* Use dynamic viewport height */
     position: absolute; /* Crucial: Position absolutely from top-left of viewport */
     top: 0;
     left: 0;
@@ -93,8 +94,8 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between; /* Pushes header to top, footer to bottom, main in between */
-    align-items: center; /* Default center alignment for content */
-    min-height: 100vh;
+    align-items: center;
+    height: 100dvh; /* Use dynamic viewport height */
     width: 100vw; /* Each screen takes one full viewport width */
     flex-shrink: 0; /* Prevents shrinking */
     position: relative; /* For back button positioning */
@@ -263,21 +264,18 @@ main {
 
 /* Pixelated circle for main menu hovered items */
 #mainMenuScreen .menu-button::before {
-    content: '■'; /* Changed icon to a square */
-    font-family: var(--font-pixel); /* Force pixelated font for the dot */
+    content: ''; /* We will create the square with width/height instead of a font character */
+    display: inline-block; /* Treat it like a block-level element in the flex row */
     order: -1; /* Place before the text content in flex order */
-    color: var(--color-accent-yellow); /* Yellow square */
-    font-size: clamp(3rem, 8vw, 5rem);
-    text-shadow: 1px 1px 0 black; /* Subtle shadow for definition */
+
+    /* Proportional sizing using em units, relative to the button's font-size */
+    width: 0.6em;
+    height: 0.6em;
+    background-color: var(--color-accent-yellow);
+    box-shadow: 1px 1px 0 black; /* Use box-shadow instead of text-shadow */
+
     opacity: 0; /* Initially hidden */
     transition: opacity 0s ease-in-out; /* Only opacity transition, no transform */
-
-    /* This is the key: by setting line-height to 0, the giant icon doesn't add vertical space to the menu item, fixing the spacing issue. */
-    line-height: 0;
-
-    /* --- VERTICAL ALIGNMENT TWEAK --- */
-    position: relative; /* Allows us to nudge the element's position */
-    top: -15px;
 }
 
 #mainMenuScreen .menu-button:hover::before {
@@ -319,8 +317,10 @@ main {
     color: var(--color-text-light); /* Make text white */
     text-shadow: 0 0 10px var(--color-text-light), 0 0 20px var(--color-text-light);
 }
-.is-active::before {
-    opacity: 1; /* Show the '»' icon */
+
+/* Make the selector more specific to override the default opacity: 0 */
+#mainMenuScreen .menu-button.is-active::before {
+    opacity: 1; /* Show the square icon */
     transform: none;
 }
 
@@ -407,8 +407,8 @@ footer {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100dvh;
     background-color: var(--color-background-dark); /* Fully opaque */
     display: flex;
     justify-content: center;
@@ -571,7 +571,7 @@ footer {
     top: 50%;
     left: 50%;
     width: 90vw;
-    height: 90vh;
+    height: 90dvh;
     max-width: 1200px; /* Adjusted max width for a cleaner look */
     max-height: 750px; /* Adjusted max height */
     z-index: 20; /* Positioned above the screenContainer (z-index: 10) */
@@ -581,9 +581,10 @@ footer {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     /* Initial state for 3D animation: off-screen at the bottom, rotated back */
     transform-origin: bottom center;
-    transform: translate(-50%, 50vh) rotateX(-90deg);
+    transform: translate(-50%, -50%) rotateX(-90deg); /* Keep centered, just rotated out of view */
     opacity: 0;
     visibility: hidden;
+    pointer-events: none; /* Ensure it's not interactive when hidden */
     /* A more dramatic transition for the 3D effect */
     transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease-out, visibility 1s;
 }
@@ -624,6 +625,7 @@ body.about-us-active #aboutUsScreen {
     transform: translate(-50%, -50%) rotateX(0);
     opacity: 1;
     visibility: visible;
+    pointer-events: auto; /* Make it interactive when shown */
 }
 
 /* Make Contact Screen Overlay Styling */
@@ -632,8 +634,8 @@ body.about-us-active #aboutUsScreen {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100dvh;
     z-index: 20; /* Positioned above the screenContainer (z-index: 10) */
     background-color: rgba(0, 0, 0, 0.9); /* Dark, semi-transparent background */
     
@@ -641,6 +643,7 @@ body.about-us-active #aboutUsScreen {
     opacity: 0;
     visibility: hidden;
     transform: scale(1.05); /* Start slightly zoomed in for a nice effect */
+    pointer-events: none; /* Ensure it's not interactive when hidden */
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease-out, visibility 0.4s;
 }
 
@@ -649,6 +652,7 @@ body.contact-active #makeContactScreen {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
+    pointer-events: auto; /* Make it interactive when shown */
 }
 
 /* Center the content within the contact overlay */
@@ -757,8 +761,8 @@ body.contact-active #specialFeaturesClone {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100dvh;
     background-color: var(--color-background-dark);
     z-index: 9999; /* Highest z-index to be on top of everything */
     display: flex;
@@ -830,8 +834,40 @@ body.contact-active #specialFeaturesClone {
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
+    /* More aggressive adjustments to fit content within the mobile viewport height */
+    header {
+        margin-top: 2vh; /* Further reduce top margin */
+        padding: 5px;
+    }
+
+    #mainMenuScreen h1 {
+        font-size: clamp(2rem, 11vw, 4rem); /* Make title even smaller on mobile */
+        letter-spacing: 1px; /* Tighten letter spacing more */
+        margin-bottom: 1vh; /* Add a bit of space below title */
+    }
+
+    .subtitle-showreel {
+        font-size: clamp(0.7rem, 2vw, 1rem); /* Make subtitle smaller */
+        margin-top: 0;
+    }
+
+    #mainMenuScreen main {
+        flex-grow: 1; /* Allow main to fill the space between header and footer */
+        padding-bottom: 30px; /* Create space above the footer, matching the side padding */
+    }
+
+    footer {
+        padding: 5px;
+        margin-bottom: 1vh; /* Nudge footer up slightly from the absolute bottom */
+    }
+
     .menu-button {
         padding: 8px 15px;
+    }
+
+    /* On mobile, move the DVD logo up to prevent overlapping the copyright text */
+    #dvdLogo {
+        bottom: 60px;
     }
     /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
     .scene-selection-grid {
@@ -845,6 +881,26 @@ body.contact-active #specialFeaturesClone {
     .about-us-content {
         flex-direction: column; /* Stack text and images on smaller screens */
         text-align: center;
+    }
+
+    /* On mobile, right-align the main menu block */
+    #mainMenuScreen main {
+        align-items: flex-end;
+    }
+
+    /* On mobile, stack main menu buttons vertically and remove the background */
+    #mainMenuScreen .button-container {
+        flex-direction: column;
+        gap: 15px; /* Reduce gap between buttons */
+        width: auto; /* Allow the container to fit its content */
+        background-color: transparent; /* Remove the background */
+        border-radius: 0; /* Remove rounded corners */
+        padding: 0; /* Remove padding to align cleanly to the right */
+    }
+
+    /* Right-align the text and icon within each button on mobile */
+    #mainMenuScreen .menu-button {
+        justify-content: flex-end;
     }
 }
 
@@ -867,71 +923,41 @@ body.contact-active #specialFeaturesClone {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    z-index: 95;
-    color: var(--color-text-light);
+    z-index: 95; /* Below the main screens but visible during transition */
+    color: var(--color-accent-yellow); /* Default color */
     font-family: var(--font-button);
-    text-align: center;
     white-space: nowrap;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    transition: all 2s cubic-bezier(0.76, 0, 0.24, 1); /* Simplified transition */
+    /* Add flex properties to perfectly center the text inside the clone's box */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Animate all properties except opacity and left. Match duration to screen scroll. */
+    transition-property: top, transform, font-size, letter-spacing, color, width, height;
+    transition-duration: 1.2s;
+    transition-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
     transform-origin: center center;
-    transform: scale(1); /* Initial state for scale animation */
-    letter-spacing: 0px; /* Initial letter spacing */
 }
 
-/* Class to show and animate the clone */
+/* Class to make the clone instantly visible. The animation itself is triggered by JS. */
 #specialFeaturesClone.show-clone {
     opacity: 1;
     visibility: visible;
     pointer-events: none;
-    color: var(--color-accent-yellow);
-    font-size: clamp(1.8rem, 5vw, 3rem);
-    letter-spacing: 5px;
 }
 
-/* Black transition overlay */
-.transition-overlay {
-    position: fixed;
-    top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-image: url('assets/The_Swing_car_away.gif');
-    background-size: cover;
-    background-position: center;
-    z-index: 1001; /* Increased z-index to ensure it's on top of the fading clone */
-    opacity: 0;
-    visibility: hidden;
-    transform: none;
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
-}
-
-.transition-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* New: Class to apply the wavy SVG filter for the telepathy effect */
-#makeContactScreen.wavy-active {
-    filter: url(#telepathy-wave);
-}
-
-/* --- Password Screen --- */
-#passwordScreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100dvh;
     background-color: var(--color-background-dark);
     z-index: 10000; /* Above the loading screen */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start; /* Changed from 'center' to align to left */
+    align-items: flex-start; /* Changed from 'center' to align to top */
     font-family: var(--font-pixel);
     color: var(--color-accent-green);
-    font-size: clamp(1rem, 3vw, 1.5rem);
-    padding: 20px;
+    font-size: clamp(0.8rem, 2.5vw, 1.2rem); /* Made font smaller, especially on mobile */
+    padding: 15vh 20px 20px; /* Pushes content down from the top */
     opacity: 1;
     visibility: visible;
     transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
@@ -952,7 +978,7 @@ body.contact-active #specialFeaturesClone {
 
 #passwordForm label {
     line-height: 1.8;
-    white-space: pre; /* Ensures the space after '>' is respected */
+    white-space: pre-wrap; /* Allows wrapping while preserving whitespace sequences */
 }
 
 #passcodeInput {
@@ -963,9 +989,25 @@ body.contact-active #specialFeaturesClone {
     font-size: inherit; /* Inherit size from parent */
     outline: none;
     width: 12ch; /* Give it some initial width */
-    /* Create a blinking cursor with a border */
-    border-bottom: 0.15em solid var(--color-accent-green);
-    animation: blink-caret 1s step-end infinite;
+    display: block; /* Must be displayed to be focusable */
+    opacity: 0; /* But make it invisible */
+    pointer-events: none; /* And not clickable */
+    transition: opacity 0.3s ease-out; /* For a nice fade-in effect */
+    /* The default browser cursor will now be used */
+}
+
+/* Class to fade the input in when it's ready */
+#passcodeInput.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Style for the new tap prompt */
+#tapPrompt {
+    color: var(--color-accent-yellow);
+    margin-top: 1em;
+    animation: pulse 2s infinite;
+    cursor: pointer;
     display: none; /* Initially hidden, will be shown by JS */
 }
 
@@ -998,8 +1040,9 @@ body.contact-active #specialFeaturesClone {
     }
 }
 
-/* Keyframes for the input cursor blink */
-@keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: var(--color-accent-green); }
+/* Keyframes for the tap prompt pulse */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 }

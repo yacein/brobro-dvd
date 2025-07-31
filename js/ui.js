@@ -22,11 +22,11 @@ export function attachInteractionSounds() {
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     const eventType = isTouchDevice ? 'click' : 'mouseenter';
 
-    document.querySelectorAll('.menu-button').forEach(button => {
+    // Select only the buttons on the main menu screen to apply the sound effect.
+    document.querySelectorAll('#mainMenuScreen .menu-button').forEach(button => {
+        // It's good practice to remove listeners before adding them to prevent duplicates.
         button.removeEventListener('mouseenter', playBloopSound);
         button.removeEventListener('click', playBloopSound);
-    });
-    document.querySelectorAll('.menu-button').forEach(button => {
         button.addEventListener(eventType, playBloopSound);
     });
 }
@@ -132,12 +132,15 @@ export function goToScreen(screenName) {
             setTimeout(() => {
                 // 3. Instantly hide the clone element and reset its styles.
                 dom.specialFeaturesClone.style.transition = 'none'; // Disable transition for instant change
-                dom.specialFeaturesClone.classList.remove('show-clone');
+                // Reset all styles for the next time it's used.
                 dom.specialFeaturesClone.style.top = '';
                 dom.specialFeaturesClone.style.left = '';
+                dom.specialFeaturesClone.style.width = '';
+                dom.specialFeaturesClone.style.height = '';
                 dom.specialFeaturesClone.style.fontSize = '';
                 dom.specialFeaturesClone.style.letterSpacing = '';
-
+                dom.specialFeaturesClone.style.transform = '';
+                dom.specialFeaturesClone.classList.remove('show-clone'); // Now hide it.
                 // 4. Start sliding the screen container back to the main menu.
                 dom.screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
                 dom.screenContainer.classList.add('slide-to-main');
@@ -175,28 +178,46 @@ export function goToScreen(screenName) {
         updateMainBackgroundVideo();
         loadChapterVideos();
     } else if (screenName === 'specialFeatures') {
+        // 1. Get the exact position and dimensions of the original button.
         const rect = dom.specialFeaturesButton.getBoundingClientRect();
+
+        // 2. Make the original button invisible.
         dom.specialFeaturesButton.style.opacity = '0';
         dom.specialFeaturesButton.style.pointerEvents = 'none';
+
+        // 3. Set up the clone to be an exact replica of the button's initial state and position.
         dom.specialFeaturesClone.textContent = dom.specialFeaturesButton.textContent;
         dom.specialFeaturesClone.style.top = `${rect.top}px`;
-        dom.specialFeaturesClone.style.left = `${rect.left}px`;
+        dom.specialFeaturesClone.style.width = `${rect.width}px`;
+        dom.specialFeaturesClone.style.height = `${rect.height}px`;
         dom.specialFeaturesClone.style.fontSize = window.getComputedStyle(dom.specialFeaturesButton).fontSize;
-        dom.specialFeaturesClone.style.padding = window.getComputedStyle(dom.specialFeaturesButton).padding;
-        dom.specialFeaturesClone.style.lineHeight = window.getComputedStyle(dom.specialFeaturesButton).lineHeight;
         dom.specialFeaturesClone.style.textShadow = window.getComputedStyle(dom.specialFeaturesButton).textShadow;
         dom.specialFeaturesClone.style.letterSpacing = window.getComputedStyle(dom.specialFeaturesButton).letterSpacing;
+        dom.specialFeaturesClone.style.color = 'var(--color-accent-yellow)';
 
+        // Use a single positioning model: a constant 'left' and animated 'transform'.
+        dom.specialFeaturesClone.style.left = '50%';
+        // Calculate the initial horizontal offset to perfectly center the clone over the button.
+        const initialXOffset = rect.left + rect.width / 2 - window.innerWidth / 2;
+        dom.specialFeaturesClone.style.transform = `translateX(${initialXOffset}px) scale(1)`;
+
+        // 4. Make the clone instantly visible.
+        dom.specialFeaturesClone.classList.add('show-clone');
+
+        // 5. In the next frame, apply the final animation styles to trigger the transition.
         requestAnimationFrame(() => {
-            dom.specialFeaturesClone.classList.add('show-clone');
-            requestAnimationFrame(() => {
-                dom.specialFeaturesClone.style.top = '100px';
-                dom.specialFeaturesClone.style.left = '50%';
-                dom.specialFeaturesClone.style.transform = 'translateX(-50%) scale(2)';
-                dom.specialFeaturesClone.style.fontSize = 'clamp(1.8rem, 5vw, 3rem)';
-                dom.specialFeaturesClone.style.letterSpacing = '5px';
-            });
+            const isMobile = window.innerWidth <= 768;
+            // Animate to the final state.
+            dom.specialFeaturesClone.style.top = isMobile ? '15vh' : '100px';
+            dom.specialFeaturesClone.style.transform = isMobile ? 'translateX(-50%) scale(1.2)' : 'translateX(-50%) scale(2)';
+            dom.specialFeaturesClone.style.fontSize = 'clamp(1.8rem, 5vw, 3rem)';
+            dom.specialFeaturesClone.style.letterSpacing = isMobile ? '3px' : '5px';
+            // Unset width/height so the element can grow naturally with its new font size.
+            dom.specialFeaturesClone.style.width = '';
+            dom.specialFeaturesClone.style.height = '';
         });
+
+        // 6. Set the new background image for the destination screen.
         dom.specialFeaturesScreen.style.backgroundImage = `url('${videoData.specialFeaturesBackgroundImage}')`;
         dom.specialFeaturesScreen.style.backgroundSize = 'cover';
         dom.specialFeaturesScreen.style.backgroundPosition = 'center';
@@ -204,9 +225,10 @@ export function goToScreen(screenName) {
 
         updateMainBackgroundVideo();
         setTimeout(() => {
+            // 7. A moment after the clone animation starts, begin the screen scroll.
             dom.screenContainer.classList.remove('slide-to-main', 'slide-to-scene');
             dom.screenContainer.classList.add('slide-to-special-features');
-        }, 1000);
+        }, 200); // Start scroll 200ms after clone animation begins.
     }
 }
 
