@@ -1,4 +1,5 @@
 import { dvdLogo } from './dom.js';
+import { logEvent } from './analytics.js';
 
 /**
  * Creates and displays a speech bubble pointing to a target element.
@@ -58,6 +59,7 @@ export function initEasterEgg() {
             dvdLogo.style.transition = '';
             originalParent.insertBefore(dvdLogo, originalNextSibling);
         } else {
+            logEvent('dvd_logo_click');
             isBouncing = true;
             const startRect = dvdLogo.getBoundingClientRect();
             document.body.appendChild(dvdLogo);

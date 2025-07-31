@@ -36,6 +36,10 @@ function log_validation_error_and_exit($log_file, $http_code, $error_type, $erro
 // --- Configuration ---
 $log_file = __DIR__ . '/analytics_log.txt';
 
+// Email configuration (moved from notify.php)
+$email_to = 'yacein@gmail.com';
+$email_subject_prefix = '[Telepathy Contact]';
+
 // IMPORTANT: For security, specify the exact origin of your website.
 $allowed_origins = [
     'https://dvd.brobro.local', // Local development
@@ -88,6 +92,24 @@ if (json_last_error() !== JSON_ERROR_NONE) {
         'error' => 'Invalid JSON received',
         'raw_data' => $_POST['eventData']
     ];
+}
+
+// --- Special Actions for Specific Events ---
+if ($eventType === 'telepathic_contact') {
+    // This event should also trigger an email notification.
+    if (isset($eventData['versionId']) && !empty($eventData['versionId'])) {
+        $versionId = htmlspecialchars(strip_tags(trim($eventData['versionId'])));
+
+        $subject = "$email_subject_prefix New contact from site version: $versionId";
+        $email_message = "You have received a new telepathic contact.\n\n"
+                 . "Site Version ID: " . $versionId . "\n"
+                 . "Timestamp: " . date('Y-m-d H:i:s') . " (UTC)\n"
+                 . "User IP Address: " . $_SERVER['REMOTE_ADDR'] . "\n";
+
+        $headers = 'From: noreply@' . $_SERVER['SERVER_NAME'] . "\r\n";
+
+        mail($email_to, $subject, $email_message, $headers);
+    }
 }
 
 $log_entry = [

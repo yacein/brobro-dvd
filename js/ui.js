@@ -87,6 +87,7 @@ export function populateStaticData() {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (item.targetScreen === 'contact') {
+                    logEvent('make_contact_click');
                     document.body.classList.add('contact-active');
                 } else {
                     goToScreen(item.targetScreen);
@@ -275,22 +276,6 @@ export function goToScreen(screenName) {
     }
 }
 
-async function sendTelepathyNotification(versionId) {
-    const notificationUrl = 'https://assets.brobro.film/dvd/notify.php';
-    try {
-        const formData = new FormData();
-        formData.append('versionId', versionId);
-        const response = await fetch(notificationUrl, { method: 'POST', body: formData });
-        if (!response.ok) {
-            console.error(`Notification server responded with status: ${response.status}`);
-        } else {
-            console.log("Notification sent successfully.");
-        }
-    } catch (error) {
-        console.error('Failed to send telepathy notification:', error);
-    }
-}
-
 function resetTelepathyButton() {
     dom.telepathyButton.innerHTML = "Click here to communicate <br>telepathically with the brothers";
     dom.telepathyButton.classList.remove('needs-confirmation');
@@ -318,11 +303,17 @@ export function initEventListeners() {
     });
 
     dom.sceneSelectionButton.addEventListener('click', (e) => { e.preventDefault(); goToScreen('scene'); });
-    dom.specialFeaturesButton.addEventListener('click', (e) => { e.preventDefault(); goToScreen('specialFeatures'); });
+    dom.specialFeaturesButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        logEvent('special_features_click');
+        goToScreen('specialFeatures');
+    });
 
     dom.telepathyButton.addEventListener('click', (e) => {
         e.preventDefault();
         if (dom.telepathyButton.classList.contains('needs-confirmation')) {
+            // Log the event and include the versionId so the server can send the email.
+            logEvent('telepathic_contact', { versionId: siteVersionId });
             if (dom.makeContactScreen.classList.contains('wavy-active')) return;
 
             // Hide the button immediately upon confirmation to prevent it from being visible during the animation.
@@ -343,8 +334,7 @@ export function initEventListeners() {
                 } else {
                     dom.displacementMap.setAttribute('scale', 0);
                     dom.makeContactScreen.classList.remove('wavy-active');
-                    dom.telepathyMessage.classList.add('show');
-                    sendTelepathyNotification(siteVersionId);
+                    dom.telepathyMessage.classList.add('show'); // Show the confirmation message
                     setTimeout(() => {
                         dom.telepathyMessage.classList.remove('show');
                         setTimeout(() => {

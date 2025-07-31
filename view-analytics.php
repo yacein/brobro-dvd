@@ -117,6 +117,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .error-row td pre {
             font-weight: normal; /* Keep preformatted text normal weight for readability */
         }
+        /* New class for telepathic contact rows */
+        .contact-row td, .contact-row td pre {
+            color: var(--color-link); /* Yellow text */
+            font-weight: bold;
+        }
         .login-form {
             max-width: 300px;
         }
@@ -170,8 +175,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             // Check if the line was valid JSON
                             if (json_last_error() === JSON_ERROR_NONE) {
-                                $is_error = isset($entry['type']) && $entry['type'] === 'validation_error';
-                                $row_class = $is_error ? 'class="error-row"' : '';
+                                $row_class = '';
+                                if (isset($entry['type'])) {
+                                    if ($entry['type'] === 'validation_error') {
+                                        $row_class = 'class="error-row"';
+                                    } elseif ($entry['type'] === 'telepathic_contact') {
+                                        $row_class = 'class="contact-row"';
+                                    }
+                                }
 
                                 // Format the timestamp to be more readable (UK format)
                                 $formatted_timestamp = 'N/A';
