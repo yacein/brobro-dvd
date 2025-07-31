@@ -167,6 +167,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--color-link); /* Yellow text */
             font-weight: bold;
         }
+        /* New class for N/A cells */
+        .na-cell {
+            color: #888; /* Dark grey */
+            font-style: italic;
+        }
         .login-form {
             max-width: 300px;
         }
@@ -193,11 +198,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--color-error);
             margin-bottom: 1em;
         }
+        /* New styles for the filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1.5em;
+            flex-wrap: wrap; /* Allow filters to wrap on smaller screens */
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filter-group label {
+            font-size: 10px;
+            color: var(--color-text);
+        }
+        .filter-group input {
+            background-color: #333;
+            border: 1px solid var(--color-border);
+            color: var(--color-accent-green);
+            padding: 0.5em;
+            font-family: var(--font-pixel);
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <?php if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
+            <?php
+            // Helper function to render a table cell with special styling for 'N/A' values.
+            function render_cell($content) {
+                $class = ($content === 'N/A') ? ' class="na-cell"' : '';
+                echo "<td{$class}>{$content}</td>";
+            }
+            ?>
+
             <!-- Analytics View -->
             <h1>Analytics Log</h1>
             <p><a href="?logout=true">Logout</a></p>
@@ -206,6 +243,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Fetch the company data right before rendering the table.
             $company_map = get_company_map($company_data_csv_url);
             ?>
+
+            <!-- Filter Controls -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="filterDate">Filter by Date (dd/mm/yyyy)</label>
+                    <input type="text" id="filterDate" placeholder="e.g., 25/07/2024">
+                </div>
+                <div class="filter-group">
+                    <label for="filterCompany">Filter by Company</label>
+                    <input type="text" id="filterCompany" placeholder="e.g., Client Inc.">
+                </div>
+                <div class="filter-group">
+                    <label for="filterIp">Filter by IP</label>
+                    <input type="text" id="filterIp" placeholder="e.g., 8.8.8.8">
+                </div>
+                <div class="filter-group">
+                    <label for="filterEventType">Filter by Event Type</label>
+                    <input type="text" id="filterEventType" placeholder="e.g., site_load">
+                </div>
+            </div>
 
             <table>
                 <thead>
@@ -218,10 +275,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <th>Data</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="analyticsTableBody">
                     <?php
                     if (file_exists($log_file)) {
                         $lines = file($log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
 
                         $lines = array_reverse($lines); // Show newest entries first
                         foreach ($lines as $line) {
@@ -253,17 +311,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 // This is a valid entry, display it normally.
                                 echo "<tr {$row_class}>";
                                 echo '<td>' . $formatted_timestamp . '</td>';
-
+                                
                                 // Look up and display the company name from the map.
                                 $versionIdFromLog = $entry['data']['versionId'] ?? null;
                                 $companyName = isset($company_map[$versionIdFromLog]) ? htmlspecialchars($company_map[$versionIdFromLog]) : 'N/A';
-                                echo '<td>' . $companyName . '</td>';
+                                render_cell($companyName);
 
-                                echo '<td>' . htmlspecialchars($entry['ip'] ?? 'N/A') . '</td>';
-                                echo '<td>' . htmlspecialchars($entry['type'] ?? 'N/A') . '</td>';
-                                // Extract and display versionId in its own column for clarity.
+                                render_cell(htmlspecialchars($entry['ip'] ?? 'N/A'));
+                                render_cell(htmlspecialchars($entry['type'] ?? 'N/A'));
+
                                 $versionIdDisplay = $versionIdFromLog ? htmlspecialchars($versionIdFromLog) : 'N/A';
-                                echo '<td>' . $versionIdDisplay . '</td>';
+                                render_cell($versionIdDisplay);
+
                                 echo '<td><pre>' . htmlspecialchars(json_encode($entry['data'] ?? [], JSON_PRETTY_PRINT)) . '</pre></td>';
                                 echo '</tr>';
                             } else {
@@ -294,5 +353,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         <?php endif; ?>
     </div>
+
+    <?php if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInputs = document.querySelectorAll('.filter-bar input');
+            const tableBody = document.getElementById('analyticsTableBody');
+
+            function applyFilters() {
+                const filters = {
+                    date: document.getElementById('filterDate').value.toLowerCase(),
+                    company: document.getElementById('filterCompany').value.toLowerCase(),
+                    ip: document.getElementById('filterIp').value.toLowerCase(),
+                    eventType: document.getElementById('filterEventType').value.toLowerCase()
+                };
+
+                const rows = tableBody.getElementsByTagName('tr');
+
+                for (const row of rows) {
+                    // Skip header rows or malformed rows
+                    if (row.getElementsByTagName('th').length > 0) continue;
+
+                    const cells = row.getElementsByTagName('td');
+                    // Skip rows that don't have the expected number of cells (like error rows)
+                    if (cells.length < 6) continue;
+
+                    const rowData = {
+                        date: cells[0].textContent.toLowerCase(),
+                        company: cells[1].textContent.toLowerCase(),
+                        ip: cells[2].textContent.toLowerCase(),
+                        eventType: cells[3].textContent.toLowerCase()
+                    };
+
+                    const isVisible = 
+                        rowData.date.includes(filters.date) &&
+                        rowData.company.includes(filters.company) &&
+                        rowData.ip.includes(filters.ip) &&
+                        rowData.eventType.includes(filters.eventType);
+
+                    row.style.display = isVisible ? '' : 'none';
+                }
+            }
+
+            filterInputs.forEach(input => input.addEventListener('input', applyFilters));
+        });
+    </script>
+    <?php endif; ?>
 </body>
 </html>
