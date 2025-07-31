@@ -147,8 +147,7 @@ export function initImageEasterEgg() {
         let clickState = 0;
 
         imageWrapper.addEventListener('click', () => {
-            // This is a cycle of 8 distinct actions, followed by a loop.
-            // States 0-7 correspond to 8 clicks. The 9th click will loop back to state 1.
+            // This is a cycle of 10 distinct actions, followed by a loop.
             clickState = (clickState + 1) % 10;
 
             let showGraffiti = false;
