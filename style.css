@@ -119,7 +119,7 @@ header {
     text-align: center;
     padding: 20px; /* Add horizontal padding back here to keep title constrained */
     z-index: 1; /* Ensure title is above video and overlay */
-    margin-top: 5vh; /* Push title down a bit from the top */
+    margin-top: 10vh; /* Push title down from the top to create more space */
     /* Add perspective to the header for 3D effect on h1 */
     perspective: 600px; /* Changed perspective to 400px */
     transform-style: preserve-3d; /* Preserve 3D transformations for children */
@@ -128,7 +128,7 @@ header {
 /* Specific font for the main title */
 #mainMenuScreen h1 {
     font-family: var(--font-title); /* New textured font */
-    font-size: clamp(3rem, 14vw, 16rem); /* Larger and more responsive */
+    font-size: clamp(3rem, 10vw, 12rem); /* Adjusted for a more reasonable desktop size */
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9); /* Dark shadow to enhance texture */
     color: var(--color-accent-gold); /* Gold color for the title */
     text-align: center; /* Keep title centered */
@@ -720,6 +720,7 @@ body.contact-active #specialFeaturesClone {
     padding: 20px;
     position: relative; /* Create a stacking context */
     z-index: 1; /* Ensure content is above the ::after pseudo-element (the stamp) */
+    overflow-y: auto;
 }
 
 .about-us-content {
@@ -836,12 +837,12 @@ body.contact-active #specialFeaturesClone {
 @media (max-width: 768px) {
     /* More aggressive adjustments to fit content within the mobile viewport height */
     header {
-        margin-top: 2vh; /* Further reduce top margin */
+        margin-top: 8vh; /* Increase top margin to prevent overlap with back button */
         padding: 5px;
     }
 
     #mainMenuScreen h1 {
-        font-size: clamp(2rem, 11vw, 4rem); /* Make title even smaller on mobile */
+        font-size: clamp(3rem, 13vw, 6rem); /* Make title larger on mobile */
         letter-spacing: 1px; /* Tighten letter spacing more */
         margin-bottom: 1vh; /* Add a bit of space below title */
     }
@@ -863,6 +864,17 @@ body.contact-active #specialFeaturesClone {
 
     .menu-button {
         padding: 8px 15px;
+    }
+
+    /* Make Special Features menu buttons larger on mobile */
+    #specialFeaturesScreen .menu-button {
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+    }
+
+    /* Make the 'Back to Menu' buttons smaller on mobile for a cleaner look */
+    .back-button {
+        font-size: 1rem;
+        top: 25px; /* Adjust position slightly to align with new size */
     }
 
     /* On mobile, move the DVD logo up to prevent overlapping the copyright text */
@@ -901,12 +913,13 @@ body.contact-active #specialFeaturesClone {
     /* Right-align the text and icon within each button on mobile */
     #mainMenuScreen .menu-button {
         justify-content: flex-end;
+        font-size: clamp(2rem, 5vw, 3rem); /* Make main menu buttons larger on mobile */
     }
 }
 
 @media (max-width: 480px) { /* Stack to 1 column on very small phones */
     .scene-selection-grid {
-        grid-template-columns: 1fr;
+        /* grid-template-columns: 1fr; */
     }
     #mainMenuScreen {
         padding: 20px 20px;
@@ -932,11 +945,14 @@ body.contact-active #specialFeaturesClone {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Animate all properties except opacity and left. Match duration to screen scroll. */
+    transform-origin: center center;
+}
+
+/* NEW: Class to apply transitions only when the animation should run */
+#specialFeaturesClone.is-animating {
     transition-property: top, transform, font-size, letter-spacing, color, width, height;
     transition-duration: 1.2s;
     transition-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
-    transform-origin: center center;
 }
 
 /* Class to make the clone instantly visible. The animation itself is triggered by JS. */
@@ -946,21 +962,24 @@ body.contact-active #specialFeaturesClone {
     pointer-events: none;
 }
 
+/* Black transition overlay for screen changes */
+#transitionOverlay {
+    position: fixed;
+    top: 0;
     left: 0;
     width: 100%;
     height: 100dvh;
-    background-color: var(--color-background-dark);
-    z-index: 10000; /* Above the loading screen */
-    display: flex;
-    justify-content: flex-start; /* Changed from 'center' to align to left */
-    align-items: flex-start; /* Changed from 'center' to align to top */
-    font-family: var(--font-pixel);
-    color: var(--color-accent-green);
-    font-size: clamp(0.8rem, 2.5vw, 1.2rem); /* Made font smaller, especially on mobile */
-    padding: 15vh 20px 20px; /* Pushes content down from the top */
+    background: #000 url('assets/The_Swing_car_away.gif') center center / cover no-repeat;
+    z-index: 500; /* High enough to cover content during transition */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+#transitionOverlay.show {
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
 
 #passwordScreen.hidden {

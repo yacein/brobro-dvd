@@ -19,7 +19,19 @@ export function initEasterEgg() {
             bubble.textContent = 'argh you caught me';
             document.body.appendChild(bubble);
 
-            bubble.style.left = `${logoRect.left + logoRect.width / 2}px`;
+            // Get the bubble's dimensions now that it's in the DOM (but invisible)
+            const bubbleWidth = bubble.offsetWidth;
+            const bubbleHalfWidth = bubbleWidth / 2;
+
+            // Calculate the ideal horizontal center for the bubble (centered on the logo)
+            let bubbleLeft = logoRect.left + logoRect.width / 2;
+
+            // Clamp the bubble's horizontal position to keep it within the viewport
+            bubbleLeft = Math.max(bubbleHalfWidth, bubbleLeft); // Prevent it from going off the left edge
+            bubbleLeft = Math.min(bubbleLeft, window.innerWidth - bubbleHalfWidth); // Prevent it from going off the right edge
+
+            // Apply the constrained position
+            bubble.style.left = `${bubbleLeft}px`;
             bubble.style.top = `${logoRect.top}px`;
 
             void bubble.offsetWidth;

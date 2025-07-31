@@ -131,7 +131,8 @@ export function goToScreen(screenName) {
             // 2. After the GIF has faded in (500ms)...
             setTimeout(() => {
                 // 3. Instantly hide the clone element and reset its styles.
-                dom.specialFeaturesClone.style.transition = 'none'; // Disable transition for instant change
+                dom.specialFeaturesClone.classList.remove('show-clone', 'is-animating'); // Remove animation/visibility classes
+                dom.specialFeaturesClone.style.transition = 'none'; // Temporarily disable any transitions
                 // Reset all styles for the next time it's used.
                 dom.specialFeaturesClone.style.top = '';
                 dom.specialFeaturesClone.style.left = '';
@@ -140,7 +141,6 @@ export function goToScreen(screenName) {
                 dom.specialFeaturesClone.style.fontSize = '';
                 dom.specialFeaturesClone.style.letterSpacing = '';
                 dom.specialFeaturesClone.style.transform = '';
-                dom.specialFeaturesClone.classList.remove('show-clone'); // Now hide it.
                 // 4. Start sliding the screen container back to the main menu.
                 dom.screenContainer.classList.remove('slide-to-special-features', 'slide-to-scene');
                 dom.screenContainer.classList.add('slide-to-main');
@@ -156,7 +156,7 @@ export function goToScreen(screenName) {
                 setTimeout(() => {
                     dom.transitionOverlay.classList.remove('show');
                     // Use a small timeout to ensure this happens after any potential reflow.
-                    setTimeout(() => dom.specialFeaturesClone.style.transition = '', 50);
+                    requestAnimationFrame(() => dom.specialFeaturesClone.style.transition = '');
                 }, 1000); // Wait 1 second (during the 1.2s slide)
             }, 500);
         } else {
@@ -178,8 +178,25 @@ export function goToScreen(screenName) {
         updateMainBackgroundVideo();
         loadChapterVideos();
     } else if (screenName === 'specialFeatures') {
-        // 1. Get the exact position and dimensions of the original button.
-        const rect = dom.specialFeaturesButton.getBoundingClientRect();
+        // --- New, more robust positioning logic ---
+        // 1. To get a perfect match, we measure the text content of the button directly,
+        // ignoring the ::before pseudo-element (the square icon) and complex padding.
+        const button = dom.specialFeaturesButton;
+        // Find the text node, ignoring other child elements/nodes like whitespace.
+        const textNode = Array.from(button.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '');
+
+        if (!textNode) {
+            console.error("Could not find the text node in the Special Features button. Aborting animation.");
+            return; // Exit if the button's text can't be found.
+        }
+
+        // Temporarily wrap the text node in a span to measure it.
+        const tempSpan = document.createElement('span');
+        button.replaceChild(tempSpan, textNode);
+        tempSpan.appendChild(textNode);
+        const textRect = tempSpan.getBoundingClientRect(); // This gives us the PRECISE position of the text.
+        // Restore the original button structure immediately.
+        button.replaceChild(textNode, tempSpan);
 
         // 2. Make the original button invisible.
         dom.specialFeaturesButton.style.opacity = '0';
@@ -187,33 +204,35 @@ export function goToScreen(screenName) {
 
         // 3. Set up the clone to be an exact replica of the button's initial state and position.
         dom.specialFeaturesClone.textContent = dom.specialFeaturesButton.textContent;
-        dom.specialFeaturesClone.style.top = `${rect.top}px`;
-        dom.specialFeaturesClone.style.width = `${rect.width}px`;
-        dom.specialFeaturesClone.style.height = `${rect.height}px`;
+        dom.specialFeaturesClone.style.top = `${textRect.top}px`;
+        dom.specialFeaturesClone.style.width = `${textRect.width}px`;
+        dom.specialFeaturesClone.style.height = `${textRect.height}px`;
         dom.specialFeaturesClone.style.fontSize = window.getComputedStyle(dom.specialFeaturesButton).fontSize;
         dom.specialFeaturesClone.style.textShadow = window.getComputedStyle(dom.specialFeaturesButton).textShadow;
         dom.specialFeaturesClone.style.letterSpacing = window.getComputedStyle(dom.specialFeaturesButton).letterSpacing;
         dom.specialFeaturesClone.style.color = 'var(--color-accent-yellow)';
 
-        // Use a single positioning model: a constant 'left' and animated 'transform'.
+        // NEW: Match the text alignment of the original button, which changes on mobile.
+        const isMobileForClone = window.innerWidth <= 768;
+        dom.specialFeaturesClone.style.justifyContent = isMobileForClone ? 'flex-end' : 'center';
+
         dom.specialFeaturesClone.style.left = '50%';
-        // Calculate the initial horizontal offset to perfectly center the clone over the button.
-        const initialXOffset = rect.left + rect.width / 2 - window.innerWidth / 2;
+        const initialXOffset = textRect.left - (window.innerWidth / 2);
         dom.specialFeaturesClone.style.transform = `translateX(${initialXOffset}px) scale(1)`;
 
-        // 4. Make the clone instantly visible.
+        // 4. Now, make the clone instantly visible. It will appear perfectly over the original button.
         dom.specialFeaturesClone.classList.add('show-clone');
 
-        // 5. In the next frame, apply the final animation styles to trigger the transition.
+        // 5. In the next frame, enable transitions and apply the final animation styles.
         requestAnimationFrame(() => {
+            dom.specialFeaturesClone.classList.add('is-animating'); // Enable transitions
             const isMobile = window.innerWidth <= 768;
             // Animate to the final state.
             dom.specialFeaturesClone.style.top = isMobile ? '15vh' : '100px';
             dom.specialFeaturesClone.style.transform = isMobile ? 'translateX(-50%) scale(1.2)' : 'translateX(-50%) scale(2)';
             dom.specialFeaturesClone.style.fontSize = 'clamp(1.8rem, 5vw, 3rem)';
             dom.specialFeaturesClone.style.letterSpacing = isMobile ? '3px' : '5px';
-            // Unset width/height so the element can grow naturally with its new font size.
-            dom.specialFeaturesClone.style.width = '';
+            dom.specialFeaturesClone.style.width = ''; // Unset width/height to allow natural growth
             dom.specialFeaturesClone.style.height = '';
         });
 
@@ -222,7 +241,6 @@ export function goToScreen(screenName) {
         dom.specialFeaturesScreen.style.backgroundSize = 'cover';
         dom.specialFeaturesScreen.style.backgroundPosition = 'center';
         dom.sceneSelectionScreen.style.backgroundImage = '';
-
         updateMainBackgroundVideo();
         setTimeout(() => {
             // 7. A moment after the clone animation starts, begin the screen scroll.
