@@ -1032,6 +1032,25 @@ body.contact-active #specialFeaturesClone {
     visibility: visible;
 }
 
+#passwordScreen {
+    position: fixed;
+    z-index: 10000; /* Higher than the loading overlay */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    background-color: var(--color-background-dark);
+    font-family: var(--font-pixel);
+    color: var(--color-accent-green);
+    display: flex;
+    padding: 2em;
+    font-size: clamp(0.8rem, 2.5vw, 1.2rem); 
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    justify-content: flex-start; /* Changed from 'center' to align to left */
+    align-items: flex-start; /* Changed from 'center' to align to top */
+   
+}
+
 #passwordScreen.hidden {
     opacity: 0;
     visibility: hidden;
