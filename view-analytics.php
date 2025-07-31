@@ -35,31 +35,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Viewer</title>
+    <!-- Google Fonts: Press Start 2P for a pixelated, retro feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-bg: #1a1a1a;
+            --color-bg: #000000;
             --color-text: #e0e0e0;
             --color-border: #444;
             --color-header-bg: #2a2a2a;
             --color-row-hover: #333;
-            --color-link: #00ff00;
+            --color-link: #ffff00; /* Yellow to match site accent */
+            --color-accent-green: #00ff00;
+            --color-warning-bg: #504030; /* Dark orange/brown for warnings */
             --color-error: #ff4d4d;
+            --font-pixel: 'Press Start 2P', cursive;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--font-pixel);
             background-color: var(--color-bg);
             color: var(--color-text);
             margin: 0;
             padding: 2em;
+            font-size: 12px; /* Pixel fonts look best at specific sizes */
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px; /* A bit wider for the new font */
             margin: 0 auto;
         }
         h1 {
             border-bottom: 2px solid var(--color-border);
             padding-bottom: 0.5em;
             margin-bottom: 1em;
+        }
+        h1, .login-form label {
+            color: var(--color-link);
         }
         a {
             color: var(--color-link);
@@ -107,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .login-form button {
             padding: 0.7em 1.5em;
-            background-color: var(--color-link);
+            background-color: var(--color-accent-green);
             color: #000;
             border: none;
             border-radius: 4px;
@@ -142,12 +151,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $lines = array_reverse($lines); // Show newest entries first
                         foreach ($lines as $line) {
                             $entry = json_decode($line, true);
+                            // Check if the line was valid JSON
                             if (json_last_error() === JSON_ERROR_NONE) {
-                                echo '<tr>';
+                                // Add special styling for validation errors to make them stand out.
+                                $row_style = '';
+                                if (isset($entry['type']) && $entry['type'] === 'validation_error') {
+                                    $row_style = 'style="background-color: var(--color-warning-bg);"';
+                                }
+                                // This is a valid entry, display it normally.
+                                echo "<tr {$row_style}>";
                                 echo '<td>' . htmlspecialchars($entry['timestamp'] ?? 'N/A') . '</td>';
                                 echo '<td>' . htmlspecialchars($entry['ip'] ?? 'N/A') . '</td>';
                                 echo '<td>' . htmlspecialchars($entry['type'] ?? 'N/A') . '</td>';
                                 echo '<td><pre>' . htmlspecialchars(json_encode($entry['data'] ?? [], JSON_PRETTY_PRINT)) . '</pre></td>';
+                                echo '</tr>';
+                            } else {
+                                // This is a malformed line. Display it as an error so it's visible.
+                                echo '<tr style="background-color: #5d3a3a;">';
+                                echo '<td colspan="3" style="font-weight: bold; color: var(--color-error);">Malformed Log Entry</td>';
+                                echo '<td><pre>' . htmlspecialchars($line) . '</pre></td>';
                                 echo '</tr>';
                             }
                         }

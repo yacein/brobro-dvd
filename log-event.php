@@ -1,6 +1,38 @@
 <?php
 // log-event.php
 
+// Polyfill for str_ends_with() for PHP versions < 8.0
+if (!function_exists('str_ends_with')) {
+    function str_ends_with(string $haystack, string $needle): bool
+    {
+        $needle_len = strlen($needle);
+        return ($needle_len === 0) || (substr($haystack, -$needle_len) === $needle);
+    }
+}
+
+/**
+ * Logs a structured validation error to the analytics log and exits the script.
+ * @param string $log_file The path to the log file.
+ * @param int $http_code The HTTP status code to send.
+ * @param string $error_type A short description of the error type.
+ * @param string $error_details Specific details about the error.
+ */
+function log_validation_error_and_exit($log_file, $http_code, $error_type, $error_details) {
+    http_response_code($http_code);
+    $log_entry = [
+        'timestamp' => date('c'),
+        'ip' => $_SERVER['REMOTE_ADDR'],
+        'type' => 'validation_error',
+        'data' => [
+            'source_script' => basename(__FILE__),
+            'error' => $error_type,
+            'details' => $error_details
+        ]
+    ];
+    file_put_contents($log_file, json_encode($log_entry) . "\n", FILE_APPEND | LOCK_EX);
+    exit;
+}
+
 // --- Configuration ---
 $log_file = __DIR__ . '/analytics_log.txt';
 
@@ -15,8 +47,7 @@ $allowed_origins = [
 
 // Only allow POST requests.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405); // Method Not Allowed
-    exit('Error: This script only accepts POST requests.');
+    log_validation_error_and_exit($log_file, 405, 'Method Not Allowed', 'Expected POST, received ' . $_SERVER['REQUEST_METHOD']);
 }
 
 // Check the origin of the request against the allowed list.
@@ -34,14 +65,12 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 }
 
 if (!$origin_is_allowed) {
-    http_response_code(403); // Forbidden
-    exit('Error: Origin not allowed.');
+    log_validation_error_and_exit($log_file, 403, 'Origin Not Allowed', 'Origin: ' . ($_SERVER['HTTP_ORIGIN'] ?? 'Not set'));
 }
 
 // Check if the eventType was sent.
 if (!isset($_POST['eventType']) || empty($_POST['eventType'])) {
-    http_response_code(400); // Bad Request
-    exit('Error: Missing eventType.');
+    log_validation_error_and_exit($log_file, 400, 'Bad Request', 'Missing eventType');
 }
 
 // --- Process & Log Data ---
