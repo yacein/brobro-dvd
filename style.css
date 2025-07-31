@@ -667,8 +667,12 @@ body.contact-active #makeContactScreen {
     align-items: center;
 }
 
+/* Allow line breaks in the telepathy button and ensure it's centered */
+#makeContactScreen #telepathyButton {
+    white-space: normal;
+    text-align: center;
+}
 
-/* NEW: Telepathy Message Styling */
 .telepathy-message {
     position: fixed;
     top: 50%;

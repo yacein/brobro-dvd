@@ -272,7 +272,7 @@ async function sendTelepathyNotification(versionId) {
 }
 
 function resetTelepathyButton() {
-    dom.telepathyButton.textContent = "Click here to communicate telepathically with the brothers";
+    dom.telepathyButton.innerHTML = "Click here to communicate <br>telepathically with the brothers";
     dom.telepathyButton.classList.remove('needs-confirmation');
     dom.telepathyButton.style.visibility = 'visible';
 }
@@ -303,6 +303,10 @@ export function initEventListeners() {
         e.preventDefault();
         if (dom.telepathyButton.classList.contains('needs-confirmation')) {
             if (dom.makeContactScreen.classList.contains('wavy-active')) return;
+
+            // Hide the button immediately upon confirmation to prevent it from being visible during the animation.
+            dom.telepathyButton.style.visibility = 'hidden';
+
             dom.makeContactScreen.classList.add('wavy-active');
             const duration = 2000;
             const maxScale = 50;
@@ -319,7 +323,6 @@ export function initEventListeners() {
                     dom.displacementMap.setAttribute('scale', 0);
                     dom.makeContactScreen.classList.remove('wavy-active');
                     dom.telepathyMessage.classList.add('show');
-                    dom.telepathyButton.style.visibility = 'hidden';
                     sendTelepathyNotification(siteVersionId);
                     setTimeout(() => {
                         dom.telepathyMessage.classList.remove('show');
