@@ -162,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <th>Timestamp</th>
                         <th>IP Address</th>
                         <th>Event Type</th>
+                        <th>Version ID</th>
                         <th>Data</th>
                     </tr>
                 </thead>
@@ -201,18 +202,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 echo '<td>' . $formatted_timestamp . '</td>';
                                 echo '<td>' . htmlspecialchars($entry['ip'] ?? 'N/A') . '</td>';
                                 echo '<td>' . htmlspecialchars($entry['type'] ?? 'N/A') . '</td>';
+                                // Extract and display versionId in its own column for clarity.
+                                $versionId = isset($entry['data']['versionId']) ? htmlspecialchars($entry['data']['versionId']) : 'N/A';
+                                echo '<td>' . $versionId . '</td>';
                                 echo '<td><pre>' . htmlspecialchars(json_encode($entry['data'] ?? [], JSON_PRETTY_PRINT)) . '</pre></td>';
                                 echo '</tr>';
                             } else {
                                 // This is a malformed line. Display it as an error so it's visible.
                                 echo '<tr class="error-row">';
-                                echo '<td colspan="3">Malformed Log Entry</td>';
+                                echo '<td colspan="4">Malformed Log Entry</td>';
                                 echo '<td><pre>' . htmlspecialchars($line) . '</pre></td>';
                                 echo '</tr>';
                             }
                         }
                     } else {
-                        echo '<tr><td colspan="4">Log file not found or is empty.</td></tr>';
+                        echo '<tr><td colspan="5">Log file not found or is empty.</td></tr>';
                     }
                     ?>
                 </tbody>

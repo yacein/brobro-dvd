@@ -69,7 +69,7 @@ function parseCsv(csvString) {
     }
 
     const headers = lines[0].split(',').map(header => header.trim());
-    console.log("CSV Headers:", headers); // DEBUG: Log headers
+    // console.log("CSV Headers:", headers); // DEBUG: Log headers
 
     const parsedDataRows = [];
 
@@ -120,7 +120,7 @@ function parseCsv(csvString) {
         rowObject.chapters = rowObject.chapters.filter(chapter => Object.keys(chapter).length > 0 && chapter.title);
         rowObject.specialFeatures = rowObject.specialFeatures.filter(feature => Object.keys(feature).length > 0 && feature.text);
 
-        console.log(`Parsed Row ${i}:`, rowObject); // DEBUG: Log each parsed row object
+        // console.log(`Parsed Row ${i}:`, rowObject); // DEBUG: Log each parsed row object
 
         parsedDataRows.push(rowObject);
     }
@@ -148,10 +148,10 @@ export async function fetchData(requestedId) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const csvText = await response.text();
-            console.log("Raw Fetched CSV data:", csvText); // DEBUG: Log raw CSV content
+            // console.log("Raw Fetched CSV data:", csvText); // DEBUG: Log raw CSV content
 
             const allParsedRows = parseCsv(csvText);
-            console.log("All Parsed CSV Rows (before resolution):", JSON.parse(JSON.stringify(allParsedRows)));
+            // console.log("All Parsed CSV Rows (before resolution):", JSON.parse(JSON.stringify(allParsedRows)));
 
             const rowIdMap = new Map();
             allParsedRows.forEach(row => {
@@ -181,7 +181,7 @@ export async function fetchData(requestedId) {
                     break;
                 }
             }
-            console.log("All Parsed CSV Rows (after resolution):", JSON.parse(JSON.stringify(resolvedRows)));
+            // console.log("All Parsed CSV Rows (after resolution):", JSON.parse(JSON.stringify(resolvedRows)));
 
             let selectedData = resolvedRows.find(row => row.rowId === requestedId);
             if (!selectedData) {
@@ -192,7 +192,7 @@ export async function fetchData(requestedId) {
                 selectedData = resolvedRows[0];
             }
 
-            console.log("Selected data row for use (after resolution):", selectedData);
+            // console.log("Selected data row for use (after resolution):", selectedData);
             return selectedData;
         } catch (error) {
             console.error(`Error fetching data: ${error.message}. Retrying in ${delay / 1000}s...`);

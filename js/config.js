@@ -36,3 +36,14 @@ export function updateVideoData(newData) {
 // Placeholder for sound effect
 export const bloopSound = new Audio('https://www.soundjay.com/buttons/button-1.mp3');
 bloopSound.volume = 0.3; // Set volume to 30% (0.0 is silent, 1.0 is full)
+
+// --- GLOBAL STATE ---
+export let siteVersionId = '1';
+
+export function setSiteVersionId(id) {
+    siteVersionId = id;
+}
+
+export function getSiteVersionId() {
+    return siteVersionId;
+}

@@ -1,17 +1,12 @@
 // Import necessary modules and functions
-import { updateVideoData, videoData as defaultConfig } from './config.js';
+import { updateVideoData, videoData as defaultConfig, setSiteVersionId } from './config.js';
 import { fetchData, mergeDefaults } from './api.js';
 import * as dom from './dom.js'; // Imports the variables
 import { logEvent } from './analytics.js';
 import { initDom } from './dom.js'; // Imports the initializer function
 import { animateSubtitle } from './animations.js';
 import { initEasterEgg, initImageEasterEgg, initSecondImageEasterEgg, initMenuEasterEgg } from './easter-egg.js';
-import {
-    populateStaticData,
-    goToScreen,
-    initEventListeners,
-    setSiteVersionId
-} from './ui.js';
+import { populateStaticData, goToScreen, initEventListeners } from './ui.js';
 
 /**
  * Animates text with a typewriter effect, supporting simple HTML like <br>.
@@ -62,7 +57,7 @@ async function initializeApp(id, arrivalMethod) {
         let finalData = structuredClone(fetchedDataFromCSV);
         mergeDefaults(finalData, defaultConfig);
         updateVideoData(finalData); // Update the shared config object
-        console.log("videoData updated with fetched data and defaults merged:", structuredClone(finalData));
+        // console.log("videoData updated with fetched data and defaults merged:", structuredClone(finalData));
     } else {
         console.warn("Failed to fetch data from CSV. Using ONLY hard-coded videoData defaults.");
     }

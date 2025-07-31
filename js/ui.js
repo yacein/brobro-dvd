@@ -1,9 +1,7 @@
-import { videoData, bloopSound } from './config.js';
+import { videoData, bloopSound, getSiteVersionId } from './config.js';
 import { loadEasterEggImages } from './easter-egg.js';
 import { logEvent } from './analytics.js';
 import * as dom from './dom.js';
-
-let siteVersionId = '1'; // Will be updated with the ID from the URL
 
 /**
  * Constructs a Vimeo player URL, correctly handling IDs with existing query parameters.
@@ -21,14 +19,6 @@ function buildVimeoUrl(vimeoId, params) {
     // Otherwise, use '?' to start a new query string.
     const separator = processedVimeoId.includes('?') ? '&' : '?';
     return `${baseUrl}${separator}${params}`;
-}
-
-/**
- * Sets the site version ID based on the URL query string.
- * @param {string} id The version ID.
- */
-export function setSiteVersionId(id) {
-    siteVersionId = id;
 }
 
 // Function to play sound effect
@@ -87,7 +77,7 @@ export function populateStaticData() {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (item.targetScreen === 'contact') {
-                    logEvent('make_contact_click');
+                    logEvent('make_contact_click', { versionId: getSiteVersionId() });
                     document.body.classList.add('contact-active');
                 } else {
                     goToScreen(item.targetScreen);
@@ -124,7 +114,7 @@ export function loadChapterVideos() {
 
         chapterItem.addEventListener('click', () => {
             const vimeoId = chapter.vimeoId || videoData.mainBackgroundVimeoId;
-            logEvent('chapter_click', { title: chapter.title, vimeoId: vimeoId });
+            logEvent('chapter_click', { title: chapter.title, vimeoId: vimeoId, versionId: getSiteVersionId() });
             dom.videoModalIframe.src = buildVimeoUrl(vimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
             dom.videoModal.classList.add('show-modal');
         });
@@ -285,7 +275,7 @@ function resetTelepathyButton() {
 export function initEventListeners() {
     dom.playReelButton.addEventListener('click', (e) => {
         e.preventDefault();
-        logEvent('play_reel_click', { vimeoId: videoData.mainReelVimeoId });
+        logEvent('play_reel_click', { vimeoId: videoData.mainReelVimeoId, versionId: getSiteVersionId() });
         dom.videoModalIframe.src = buildVimeoUrl(videoData.mainReelVimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
         dom.videoModal.classList.add('show-modal');
     });
@@ -305,15 +295,14 @@ export function initEventListeners() {
     dom.sceneSelectionButton.addEventListener('click', (e) => { e.preventDefault(); goToScreen('scene'); });
     dom.specialFeaturesButton.addEventListener('click', (e) => {
         e.preventDefault();
-        logEvent('special_features_click');
+        logEvent('special_features_click', { versionId: getSiteVersionId() });
         goToScreen('specialFeatures');
     });
 
     dom.telepathyButton.addEventListener('click', (e) => {
         e.preventDefault();
         if (dom.telepathyButton.classList.contains('needs-confirmation')) {
-            // Log the event and include the versionId so the server can send the email.
-            logEvent('telepathic_contact', { versionId: siteVersionId });
+            logEvent('telepathic_contact', { versionId: getSiteVersionId() });
             if (dom.makeContactScreen.classList.contains('wavy-active')) return;
 
             // Hide the button immediately upon confirmation to prevent it from being visible during the animation.
