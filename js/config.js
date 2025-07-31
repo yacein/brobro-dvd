@@ -6,7 +6,7 @@ export let videoData = {
     mainMenuSubtitle: 'THE SHOWREEL',
     copyrightText: '© 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.',
     mainBackgroundVimeoId: '292109430',
-    mainReelVimeoId: '1105829365',
+    mainReelVimeoId: '1105829365/0f8376e14b',
     specialFeaturesBackgroundImage: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/d56856ff-5d6d-4d98-acfe-1ed609ef3d75/RUTH+|+festival+preview-high1.gif',
     sceneBackgroundImage: 'assets/MakeItCount-bucket.jpg',
     chapters: [
@@ -14,7 +14,7 @@ export let videoData = {
           thumbnailUrl: 'assets/make-it-count-thumbnail.gif' },
         { title: 'DATASNIPPERS - Sandcastles', vimeoId: '1105915041?h=7eb0001144',
           thumbnailUrl: 'assets/datasnipper-thumbnail.gif' },
-        { title: 'PVCASE - What Would You Do', vimeoId: '1080953247',
+        { title: 'PVCASE - What Would You Do', vimeoId: '1106051275/2656e0296f',
           thumbnailUrl: 'assets/pvcase-thumbnail.gif' },
         { title: 'SIEMENS - Smart Kitchen', vimeoId: '856359531',
           thumbnailUrl: 'assets/siemens-thumbnail.gif' },

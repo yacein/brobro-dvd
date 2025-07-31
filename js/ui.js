@@ -5,6 +5,24 @@ import * as dom from './dom.js';
 let siteVersionId = '1'; // Will be updated with the ID from the URL
 
 /**
+ * Constructs a Vimeo player URL, correctly handling IDs with existing query parameters.
+ * It supports IDs in the format 'VIDEO_ID', 'VIDEO_ID?h=HASH', or 'VIDEO_ID/HASH'.
+ * @param {string} vimeoId The Vimeo video ID.
+ * @param {string} params The query parameters to append (e.g., "autoplay=1&muted=0").
+ * @returns {string} The full Vimeo player URL.
+ */
+function buildVimeoUrl(vimeoId, params) {
+    // Handle the 'ID/HASH' format by converting it to 'ID?h=HASH'
+    let processedVimeoId = vimeoId.includes('/') ? vimeoId.replace('/', '?h=') : vimeoId;
+
+    const baseUrl = `https://player.vimeo.com/video/${processedVimeoId}`;
+    // If the processed ID already has a query string, use '&' to append more params.
+    // Otherwise, use '?' to start a new query string.
+    const separator = processedVimeoId.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}${params}`;
+}
+
+/**
  * Sets the site version ID based on the URL query string.
  * @param {string} id The version ID.
  */
@@ -104,7 +122,7 @@ export function loadChapterVideos() {
 
         chapterItem.addEventListener('click', () => {
             const vimeoId = chapter.vimeoId || videoData.mainBackgroundVimeoId;
-            dom.videoModalIframe.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=0&autopause=1&muted=0`;
+            dom.videoModalIframe.src = buildVimeoUrl(vimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
             dom.videoModal.classList.add('show-modal');
         });
 
@@ -114,7 +132,7 @@ export function loadChapterVideos() {
 
 // Helper function to set the main background video if it's not already set
 function updateMainBackgroundVideo() {
-    const newBackgroundSrc = `https://player.vimeo.com/video/${videoData.mainBackgroundVimeoId}?background=1&autoplay=1&loop=1&autopause=0&muted=1`;
+    const newBackgroundSrc = buildVimeoUrl(videoData.mainBackgroundVimeoId, 'background=1&autoplay=1&loop=1&autopause=0&muted=1');
     if (dom.mainBackgroundVideo.src !== newBackgroundSrc) {
         dom.mainBackgroundVideo.src = newBackgroundSrc;
     }
@@ -280,7 +298,7 @@ function resetTelepathyButton() {
 export function initEventListeners() {
     dom.playReelButton.addEventListener('click', (e) => {
         e.preventDefault();
-        dom.videoModalIframe.src = `https://player.vimeo.com/video/${videoData.mainReelVimeoId}?autoplay=1&loop=0&autopause=1&muted=0`;
+        dom.videoModalIframe.src = buildVimeoUrl(videoData.mainReelVimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
         dom.videoModal.classList.add('show-modal');
     });
 
