@@ -4,7 +4,7 @@ import { fetchData, mergeDefaults } from './api.js';
 import * as dom from './dom.js'; // Imports the variables
 import { initDom } from './dom.js'; // Imports the initializer function
 import { animateSubtitle } from './animations.js';
-import { initEasterEgg } from './easter-egg.js';
+import { initEasterEgg, initImageEasterEgg, initSecondImageEasterEgg, initMenuEasterEgg } from './easter-egg.js';
 import {
     populateStaticData,
     goToScreen,
@@ -89,6 +89,15 @@ async function initializeApp(id) {
 
     // Initialize the bouncing DVD logo easter egg
     initEasterEgg();
+
+    // Initialize the image click easter egg
+    initImageEasterEgg();
+
+    // Initialize the second image easter egg
+    initSecondImageEasterEgg();
+
+    // Initialize the menu easter egg
+    initMenuEasterEgg();
 
     // Hide the loading overlay now that everything is ready
     dom.loadingOverlay.classList.add('hidden');

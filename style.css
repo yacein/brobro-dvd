@@ -23,6 +23,10 @@
     --font-typewriter: 'Special Elite', monospace;
 }
 
+html {
+    overflow: hidden;
+}
+
 /* Body Styling: Full screen, retro font, dark background */
 body {
     font-family: var(--font-pixel); /* Apply the pixelated font as fallback */
@@ -585,8 +589,10 @@ footer {
     opacity: 0;
     visibility: hidden;
     pointer-events: none; /* Ensure it's not interactive when hidden */
-    /* A more dramatic transition for the 3D effect */
     transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease-out, visibility 1s;
+    overflow-y: auto;
+    overflow-x: hidden;
+    justify-content: flex-start;
 }
 
 /* "TOP SECRET" stamp for the About Us page */
@@ -690,6 +696,10 @@ body.contact-active #makeContactScreen {
     transform: translate(-50%, -50%) scale(1);
 }
 
+#makeContactScreen.wavy-active {
+    filter: url(#telepathy-wave);
+}
+
 
 /* When About Us is active, also hide the special features clone title.
    This has higher specificity than .show-clone, so it will override it. */
@@ -714,13 +724,12 @@ body.contact-active #specialFeaturesClone {
 .about-us-main {
     flex-grow: 1;
     display: flex;
-    align-items: center; /* Center the content vertically */
+    align-items: center;
     justify-content: center; /* Center the content horizontally */
     width: 100%;
     padding: 20px;
     position: relative; /* Create a stacking context */
     z-index: 1; /* Ensure content is above the ::after pseudo-element (the stamp) */
-    overflow-y: auto;
 }
 
 .about-us-content {
@@ -738,6 +747,10 @@ body.contact-active #specialFeaturesClone {
     color: var(--color-text-dark); /* Dark text for tan background */
 }
 
+.about-us-text p {
+    margin-bottom: 2em; /* Adjust this value to increase or decrease the space */
+}
+
 .about-us-images {
     flex: 1;
     display: flex;
@@ -748,7 +761,22 @@ body.contact-active #specialFeaturesClone {
 /* Wrapper for each image to apply paperclip and rotation */
 .image-wrapper {
     position: relative;
-    /* Rotations and transitions removed */
+    transition: transform 0.3s ease-in-out; /* Smooth transition for hover effect */
+}
+
+.image-wrapper:hover {
+    transform: rotate(0) scale(1.05); /* Straighten and slightly enlarge on hover */
+    z-index: 2; /* Bring the hovered image to the front */
+}
+
+/* Rotate the first image clockwise */
+.about-us-images .image-wrapper:first-child {
+    transform: rotate(3deg);
+}
+
+/* Rotate the second image counter-clockwise */
+.about-us-images .image-wrapper:last-child {
+    transform: rotate(-4deg);
 }
 
 .about-us-content img {
@@ -757,6 +785,24 @@ body.contact-active #specialFeaturesClone {
     border-radius: 4px;
 }
 
+/* New: Easter egg overlays for the About Us image */
+.image-wrapper .easter-egg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensure the whole overlay is visible without stretching */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Allow clicks to pass through to the main image */
+    transition: opacity 0.4s ease-in-out;
+}
+
+.image-wrapper .easter-egg-overlay.show-overlay {
+    opacity: 1;
+    visibility: visible;
+}
 /* New: Loading Overlay Styling */
 #loadingOverlay {
     position: fixed;

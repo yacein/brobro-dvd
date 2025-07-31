@@ -1,4 +1,5 @@
 import { videoData, bloopSound } from './config.js';
+import { loadEasterEggImages } from './easter-egg.js';
 import * as dom from './dom.js';
 
 let siteVersionId = '1'; // Will be updated with the ID from the URL
@@ -52,10 +53,14 @@ export function populateStaticData() {
             button.target = item.target;
             button.rel = 'noopener noreferrer';
         }
+        if (item.text === 'Easter Eggs') {
+            button.id = 'easterEggsButton'; // Assign an ID for the easter egg
+        }
         if (item.text === 'About Us') {
             button.href = '#';
             button.addEventListener('click', (e) => {
                 e.preventDefault();
+                loadEasterEggImages(); // Load images on demand before showing the page
                 document.body.classList.add('about-us-active');
             });
         } else if (item.type === 'internal' && item.targetScreen) {
@@ -269,6 +274,7 @@ async function sendTelepathyNotification(versionId) {
 function resetTelepathyButton() {
     dom.telepathyButton.textContent = "Click here to communicate telepathically with the brothers";
     dom.telepathyButton.classList.remove('needs-confirmation');
+    dom.telepathyButton.style.visibility = 'visible';
 }
 
 export function initEventListeners() {
@@ -313,6 +319,7 @@ export function initEventListeners() {
                     dom.displacementMap.setAttribute('scale', 0);
                     dom.makeContactScreen.classList.remove('wavy-active');
                     dom.telepathyMessage.classList.add('show');
+                    dom.telepathyButton.style.visibility = 'hidden';
                     sendTelepathyNotification(siteVersionId);
                     setTimeout(() => {
                         dom.telepathyMessage.classList.remove('show');
