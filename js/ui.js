@@ -1,5 +1,6 @@
 import { videoData, bloopSound } from './config.js';
 import { loadEasterEggImages } from './easter-egg.js';
+import { logEvent } from './analytics.js';
 import * as dom from './dom.js';
 
 let siteVersionId = '1'; // Will be updated with the ID from the URL
@@ -122,6 +123,7 @@ export function loadChapterVideos() {
 
         chapterItem.addEventListener('click', () => {
             const vimeoId = chapter.vimeoId || videoData.mainBackgroundVimeoId;
+            logEvent('chapter_click', { title: chapter.title, vimeoId: vimeoId });
             dom.videoModalIframe.src = buildVimeoUrl(vimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
             dom.videoModal.classList.add('show-modal');
         });
@@ -274,7 +276,7 @@ export function goToScreen(screenName) {
 }
 
 async function sendTelepathyNotification(versionId) {
-    const notificationUrl = '/notify.php';
+    const notificationUrl = 'https://assets.brobro.film/dvd/notify.php';
     try {
         const formData = new FormData();
         formData.append('versionId', versionId);
@@ -298,6 +300,7 @@ function resetTelepathyButton() {
 export function initEventListeners() {
     dom.playReelButton.addEventListener('click', (e) => {
         e.preventDefault();
+        logEvent('play_reel_click', { vimeoId: videoData.mainReelVimeoId });
         dom.videoModalIframe.src = buildVimeoUrl(videoData.mainReelVimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
         dom.videoModal.classList.add('show-modal');
     });

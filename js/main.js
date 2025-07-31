@@ -2,6 +2,7 @@
 import { updateVideoData, videoData as defaultConfig } from './config.js';
 import { fetchData, mergeDefaults } from './api.js';
 import * as dom from './dom.js'; // Imports the variables
+import { logEvent } from './analytics.js';
 import { initDom } from './dom.js'; // Imports the initializer function
 import { animateSubtitle } from './animations.js';
 import { initEasterEgg, initImageEasterEgg, initSecondImageEasterEgg, initMenuEasterEgg } from './easter-egg.js';
@@ -44,9 +45,13 @@ function typeWriter(element, fullText, speed, onComplete) {
 /**
  * Initializes the main application after a passcode has been provided or found.
  * @param {string} id The site version ID to load.
+ * @param {string} arrivalMethod How the user arrived ('direct_link' or 'password_entry').
  */
-async function initializeApp(id) {
+async function initializeApp(id, arrivalMethod) {
     setSiteVersionId(id);
+
+    // --- ANALYTICS: Log the initial site load with the version ID and arrival method ---
+    logEvent('site_load', { versionId: id, method: arrivalMethod });
 
     // Attempt to fetch dynamic data from the CSV
     const fetchedDataFromCSV = await fetchData(id);
@@ -121,8 +126,11 @@ async function main() {
     if (requestedId) {
         // ID is in the URL, hide password screen and start immediately.
         dom.passwordScreen.style.display = 'none'; // Hide instantly
-        initializeApp(requestedId);
+        initializeApp(requestedId, 'direct_link');
     } else {
+        // --- ANALYTICS: Log that the user has landed on the password screen ---
+        logEvent('password_screen_view');
+
         // Defensive check: ensure the password screen elements were found in the DOM.
         if (!dom.passwordScreen || !dom.passcodeInput || !dom.passwordForm.querySelector('label')) {
             console.error("Fatal Error: Password screen HTML elements not found. Please ensure index.html is up to date and not cached.");
@@ -178,7 +186,7 @@ async function main() {
             if (enteredId) {
                 // Fade out the password screen, revealing the loader underneath.
                 dom.passwordScreen.classList.add('hidden');
-                initializeApp(enteredId);
+                initializeApp(enteredId, 'password_entry');
             }
         });
     }
