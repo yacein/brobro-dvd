@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --color-header-bg: #2a2a2a;
             --color-row-hover: #333;
             --color-link: #ffff00; /* Yellow to match site accent */
-            --color-accent-green: #00ff00;
+            --color-accent-green: #00ff00; /* Matrix green */
             --color-warning-bg: #504030; /* Dark orange/brown for warnings */
             --color-error: #ff4d4d;
             --font-pixel: 'Press Start 2P', cursive;
@@ -87,9 +87,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 0.8em;
             text-align: left;
             vertical-align: top;
+            color: var(--color-accent-green); /* Default text color for table cells */
         }
         thead {
             background-color: var(--color-header-bg);
+        }
+        /* Make table headers yellow to stand out */
+        th {
+            color: var(--color-link);
         }
         tbody tr:hover {
             background-color: var(--color-row-hover);
@@ -100,6 +105,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.9em;
             white-space: pre-wrap;
             word-wrap: break-word;
+        }
+        /* New class for error rows */
+        .error-row {
+            background-color: var(--color-bg); /* Black background */
+        }
+        .error-row td, .error-row td pre {
+            color: var(--color-error); /* Red text */
+            font-weight: bold;
+        }
+        .error-row td pre {
+            font-weight: normal; /* Keep preformatted text normal weight for readability */
         }
         .login-form {
             max-width: 300px;
@@ -151,24 +167,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $lines = array_reverse($lines); // Show newest entries first
                         foreach ($lines as $line) {
                             $entry = json_decode($line, true);
+
                             // Check if the line was valid JSON
                             if (json_last_error() === JSON_ERROR_NONE) {
-                                // Add special styling for validation errors to make them stand out.
-                                $row_style = '';
-                                if (isset($entry['type']) && $entry['type'] === 'validation_error') {
-                                    $row_style = 'style="background-color: var(--color-warning-bg);"';
+                                $is_error = isset($entry['type']) && $entry['type'] === 'validation_error';
+                                $row_class = $is_error ? 'class="error-row"' : '';
+
+                                // Format the timestamp to be more readable (UK format)
+                                $formatted_timestamp = 'N/A';
+                                if (!empty($entry['timestamp'])) {
+                                    try {
+                                        $date = new DateTime($entry['timestamp']);
+                                        $formatted_timestamp = $date->format('d/m/Y H:i:s');
+                                    } catch (Exception $e) {
+                                        // Fallback for invalid date format
+                                        $formatted_timestamp = htmlspecialchars($entry['timestamp']);
+                                    }
                                 }
+
                                 // This is a valid entry, display it normally.
-                                echo "<tr {$row_style}>";
-                                echo '<td>' . htmlspecialchars($entry['timestamp'] ?? 'N/A') . '</td>';
+                                echo "<tr {$row_class}>";
+                                echo '<td>' . $formatted_timestamp . '</td>';
                                 echo '<td>' . htmlspecialchars($entry['ip'] ?? 'N/A') . '</td>';
                                 echo '<td>' . htmlspecialchars($entry['type'] ?? 'N/A') . '</td>';
                                 echo '<td><pre>' . htmlspecialchars(json_encode($entry['data'] ?? [], JSON_PRETTY_PRINT)) . '</pre></td>';
                                 echo '</tr>';
                             } else {
                                 // This is a malformed line. Display it as an error so it's visible.
-                                echo '<tr style="background-color: #5d3a3a;">';
-                                echo '<td colspan="3" style="font-weight: bold; color: var(--color-error);">Malformed Log Entry</td>';
+                                echo '<tr class="error-row">';
+                                echo '<td colspan="3">Malformed Log Entry</td>';
                                 echo '<td><pre>' . htmlspecialchars($line) . '</pre></td>';
                                 echo '</tr>';
                             }
