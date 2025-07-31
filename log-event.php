@@ -18,6 +18,13 @@ if (!function_exists('str_ends_with')) {
  * @param string $error_details Specific details about the error.
  */
 function log_validation_error_and_exit($log_file, $http_code, $error_type, $error_details) {
+    // Suppress validation error logging for local development to keep logs clean.
+    $local_dev_origin = 'http://127.0.0.1:5500';
+    if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] === $local_dev_origin) {
+        http_response_code($http_code);
+        exit; // Exit silently without logging.
+    }
+
     http_response_code($http_code);
     $log_entry = [
         'timestamp' => date('c'),
