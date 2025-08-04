@@ -2,7 +2,7 @@
 export let mainMenuHeroTitle, mainMenuGlitchText, mainMenuSubtitle, specialFeaturesButtonContainer,
     mainBackgroundVideo, playReelButton, sceneSelectionButton, specialFeaturesButton,
     specialFeaturesClone, videoModal, videoModalIframe, closeModalButton, screenContainer,
-    mainMenuScreen, sceneSelectionScreen, specialFeaturesScreen, aboutUsScreen, makeContactScreen,
+    mainMenuScreen, sceneSelectionScreen, specialFeaturesScreen, aboutUsScreen, makeContactScreen, paginationControls,
     telepathyButton, telepathyMessage, backToMainMenuFromScenes, backToMainMenuFromAbout, tapPrompt,
     backToMainMenuFromFeatures, backToMainMenuFromContact, sceneSelectionGrid, transitionOverlay,
     subtitleShowreelElement, loadingOverlay, displacementMap, dvdLogo, passwordScreen,
@@ -46,4 +46,6 @@ export function initDom() {
     passwordScreen = document.getElementById('passwordScreen');
     passwordForm = document.getElementById('passwordForm');
     passcodeInput = document.getElementById('passcodeInput');
+    paginationControls = document.getElementById('paginationControls');
+
 }

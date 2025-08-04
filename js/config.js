@@ -17,8 +17,9 @@ export let videoData = {
         { title: 'PVCASE - What Would You Do', vimeoId: '1106051275/2656e0296f',
           thumbnailUrl: 'assets/pvcase-thumbnail.gif' },
         { title: 'SIEMENS - Smart Kitchen', vimeoId: '856359531',
-          thumbnailUrl: 'assets/siemens-thumbnail.gif' },
+          thumbnailUrl: 'assets/siemens-thumbnail.gif' }
     ],
+    pagination: [    ],
     specialFeatures: [
         { text: 'Make Contact', type: 'internal', targetScreen: 'contact' },
         { text: 'About Us' },

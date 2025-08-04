@@ -531,6 +531,41 @@ footer {
     white-space: normal;
 }
 
+/* Pagination Controls */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px; /* Padding inside the border */
+    margin: 20px auto 10px auto; /* Top, horizontal auto, bottom */
+    width: fit-content; /* Fit the content */
+    border: 2px solid var(--color-text-light); /* White outline around the list */
+    border-radius: 4px;
+}
+
+.pagination-item {
+    font-family: var(--font-pixel);
+    font-size: 1rem;
+    color: var(--color-text-light); /* White text */
+    background-color: transparent; /* Transparent background */
+    border: none; /* No individual borders */
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.pagination-item.active {
+    background-color: var(--color-text-light); /* White background */
+    color: var(--color-background-dark); /* Black text */
+    cursor: default;
+}
+
+.pagination-item:not(.active):hover {
+    background-color: var(--color-accent-yellow);
+    color: var(--color-background-dark);
+}
+
 /* Back button for scene selection and special features */
 .back-button {
     position: absolute;

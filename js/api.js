@@ -80,6 +80,7 @@ function parseCsv(csvString) {
         // Initialize chapters and specialFeatures arrays to ensure they are always present
         rowObject.chapters = [];
         rowObject.specialFeatures = [];
+        rowObject.pagination = [];
 
         headers.forEach((header, index) => {
             const value = dataRowValues[index];
@@ -112,13 +113,23 @@ function parseCsv(csvString) {
                 return; // Move to next header
             }
 
+            // Check for paginationX.property pattern
+            const paginationMatch = header.match(/^pagination(\d+)\.(.+)$/);
+            if (paginationMatch) {
+                const pageIndex = parseInt(paginationMatch[1], 10) - 1; // 0-based index
+                const propName = paginationMatch[2];
+
+                // Ensure the pagination object exists in the array
+                if (!rowObject.pagination[pageIndex]) {
+                    rowObject.pagination[pageIndex] = {};
+                }
+                rowObject.pagination[pageIndex][propName] = value;
+                return; // Move to next header
+            }
+
             // For all other (flat) properties, including 'rowId' and 'basedOn'
             rowObject[header] = value;
         });
-
-        // Filter out empty or incomplete chapters/special features if the CSV has sparse data
-        rowObject.chapters = rowObject.chapters.filter(chapter => Object.keys(chapter).length > 0 && chapter.title);
-        rowObject.specialFeatures = rowObject.specialFeatures.filter(feature => Object.keys(feature).length > 0 && feature.text);
 
         // console.log(`Parsed Row ${i}:`, rowObject); // DEBUG: Log each parsed row object
 
@@ -190,6 +201,20 @@ export async function fetchData(requestedId) {
             if (!selectedData && resolvedRows.length > 0) {
                 console.warn(`Requested ID '${requestedId}' not found, and '1' not found. Defaulting to first available resolved row in CSV.`);
                 selectedData = resolvedRows[0];
+            }
+
+            // After all inheritance is resolved, compact the arrays to remove empty slots
+            // and invalid entries before sending the data to the UI.
+            if (selectedData) {
+                if (Array.isArray(selectedData.chapters)) {
+                    selectedData.chapters = selectedData.chapters.filter(chapter => chapter && Object.keys(chapter).length > 0 && chapter.title);
+                }
+                if (Array.isArray(selectedData.specialFeatures)) {
+                    selectedData.specialFeatures = selectedData.specialFeatures.filter(feature => feature && Object.keys(feature).length > 0 && feature.text);
+                }
+                if (Array.isArray(selectedData.pagination)) {
+                    selectedData.pagination = selectedData.pagination.filter(page => page && Object.keys(page).length > 0 && page.name);
+                }
             }
 
             // console.log("Selected data row for use (after resolution):", selectedData);

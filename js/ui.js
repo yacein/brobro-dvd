@@ -89,10 +89,28 @@ export function populateStaticData() {
     attachInteractionSounds();
 }
 
+// Keep track of the current page for chapters
+let currentChapterPage = 1;
+const chaptersPerPage = 4;
+
 // Function to dynamically load chapter videos
 export function loadChapterVideos() {
     dom.sceneSelectionGrid.innerHTML = '';
-    videoData.chapters.forEach(chapter => {
+    dom.paginationControls.innerHTML = ''; // Clear existing controls first
+    dom.paginationControls.style.display = 'none'; // Hide the container by default
+
+    const totalChapters = videoData.chapters.length;
+    if (totalChapters === 0) return; // Nothing to display
+
+    const totalPages = Math.ceil(totalChapters / chaptersPerPage);
+
+    // Calculate the chapters for the current page
+    const startIndex = (currentChapterPage - 1) * chaptersPerPage;
+    const endIndex = startIndex + chaptersPerPage;
+    const chaptersToShow = videoData.chapters.slice(startIndex, endIndex);
+
+    // Render the chapter items for the current page
+    chaptersToShow.forEach(chapter => {
         const chapterItem = document.createElement('div');
         chapterItem.classList.add('chapter-video-item');
 
@@ -121,6 +139,46 @@ export function loadChapterVideos() {
 
         dom.sceneSelectionGrid.appendChild(chapterItem);
     });
+
+    // Only show pagination if there's more than one page (i.e., more than 4 chapters)
+    if (totalPages > 1) {
+        dom.paginationControls.style.display = 'flex'; // Make the container visible again
+        renderPaginationControls(totalPages);
+    }
+}
+
+function renderPaginationControls(totalPages) {
+    // The container itself will have the white border from CSS.
+    // We just need to add the page items.
+    for (let i = 1; i <= totalPages; i++) {
+        const pageItem = document.createElement('button');
+        pageItem.className = 'pagination-item';
+        if (i === currentChapterPage) {
+            pageItem.classList.add('active');
+        }
+
+        const pageIndex = i - 1;
+        // Use optional chaining for safety in case pagination config is missing
+        const customName = videoData.pagination?.[pageIndex]?.name;
+
+        if (customName) {
+            pageItem.textContent = customName;
+        } else {
+            // Default to a range like "1-4", "5-8", etc.
+            const start = pageIndex * chaptersPerPage + 1;
+            const end = Math.min((pageIndex + 1) * chaptersPerPage, videoData.chapters.length);
+            pageItem.textContent = `${start}-${end}`;
+        }
+
+        pageItem.addEventListener('click', () => {
+            if (currentChapterPage !== i) {
+                currentChapterPage = i;
+                loadChapterVideos();
+            }
+        });
+
+        dom.paginationControls.appendChild(pageItem);
+    }
 }
 
 // Helper function to set the main background video if it's not already set
