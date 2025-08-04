@@ -91,9 +91,9 @@ $analytics_page_url = 'https://assets.brobro.film/dvd/view-analytics.php';
 
 // Email configuration (moved from notify.php)
 $email_recipients = [
-    //'halshaater@gmail.com',
-    //'brobrofilm@gmail.com',
-    'yacein@gmail.com' // temporarily disabled others while testing
+    'halshaater@gmail.com',
+    'brobrofilm@gmail.com',
+    'yacein@gmail.com' 
 ];
 $email_to = implode(',', $email_recipients);
 $email_subject_prefix = '[Telepathy Contact]';
