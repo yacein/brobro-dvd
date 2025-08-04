@@ -1,4 +1,14 @@
 const endpoint = 'https://assets.brobro.film/dvd/log-event.php';
+let analyticsEnabled = true; // Enabled by default
+
+/**
+ * Disables all analytics logging for the current session.
+ * This is triggered by appending '-x' to the site ID.
+ */
+export function disableAnalytics() {
+    analyticsEnabled = false;
+    console.log('%cAnalytics logging is disabled for this session.', 'color: orange; font-weight: bold;');
+}
 
 /**
  * Sends a custom event to the analytics backend. This is a "fire and forget" call.
@@ -6,6 +16,9 @@ const endpoint = 'https://assets.brobro.film/dvd/log-event.php';
  * @param {object} [data={}] Additional data to log with the event.
  */
 export async function logEvent(eventType, data = {}) {
+    if (!analyticsEnabled) {
+        return; // Do nothing if analytics are disabled for this session.
+    }
     try {
         const formData = new FormData();
         formData.append('eventType', eventType);

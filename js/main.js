@@ -2,7 +2,7 @@
 import { updateVideoData, videoData as defaultConfig, setSiteVersionId } from './config.js';
 import { fetchData, mergeDefaults } from './api.js';
 import * as dom from './dom.js'; // Imports the variables
-import { logEvent } from './analytics.js';
+import { logEvent, disableAnalytics } from './analytics.js';
 import { initDom } from './dom.js'; // Imports the initializer function
 import { animateSubtitle } from './animations.js';
 import { initEasterEgg, initImageEasterEgg, initSecondImageEasterEgg, initMenuEasterEgg } from './easter-egg.js';
@@ -130,8 +130,13 @@ async function main() {
 
     // Get the ID directly from the query string (e.g., "?2")
     const queryString = window.location.search;
-    // If the query string has content (e.g., "?2"), strip the "?" and use it as the ID. Otherwise, it's null.
-    const requestedId = queryString.length > 1 ? queryString.substring(1).trim() : null;
+    let requestedId = queryString.length > 1 ? queryString.substring(1).trim() : null;
+
+    // Check for the analytics exclusion flag '-x'
+    if (requestedId && requestedId.endsWith('-x')) {
+        disableAnalytics(); // Disable logging for this session
+        requestedId = requestedId.slice(0, -2); // Use the ID without the flag
+    }
 
     if (requestedId) {
         // ID is in the URL, hide password screen and start immediately.
@@ -192,7 +197,14 @@ async function main() {
 
         dom.passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const enteredId = dom.passcodeInput.value.trim();
+            let enteredId = dom.passcodeInput.value.trim();
+
+            // Check for the analytics exclusion flag '-x' in the password input
+            if (enteredId.endsWith('-x')) {
+                disableAnalytics(); // Disable logging for this session
+                enteredId = enteredId.slice(0, -2); // Use the ID without the flag
+            }
+
             if (enteredId) {
                 // Fade out the password screen, revealing the loader underneath.
                 dom.passwordScreen.classList.add('hidden');
