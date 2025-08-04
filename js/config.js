@@ -7,7 +7,7 @@ export let videoData = {
     copyrightText: '© 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.',
     mainBackgroundVimeoId: '292109430',
     mainReelVimeoId: '1105829365/0f8376e14b',
-    specialFeaturesBackgroundImage: 'https://images.squarespace-cdn.com/content/62c2b737a32928605d35b9dd/d56856ff-5d6d-4d98-acfe-1ed609ef3d75/RUTH+|+festival+preview-high1.gif',
+    specialFeaturesBackgroundImage: 'assets/ruth-window-bg.gif',
     sceneBackgroundImage: 'assets/MakeItCount-bucket.jpg',
     chapters: [
         { title: 'SUMUP - Make it Count', vimeoId: '1017849814',
