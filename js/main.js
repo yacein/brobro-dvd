@@ -56,8 +56,23 @@ async function initializeApp(id, arrivalMethod) {
         // The fetched data takes precedence, defaults fill in the blanks.
         let finalData = structuredClone(fetchedDataFromCSV);
         mergeDefaults(finalData, defaultConfig);
+
+        // Now that all merging is complete, compact the arrays to remove empty slots and invalid entries.
+        // This is the correct place for this logic.
+        if (finalData) {
+            if (Array.isArray(finalData.chapters)) {
+                finalData.chapters = finalData.chapters.filter(chapter => chapter && Object.keys(chapter).length > 0 && chapter.title);
+            }
+            if (Array.isArray(finalData.specialFeatures)) {
+                finalData.specialFeatures = finalData.specialFeatures.filter(feature => feature && Object.keys(feature).length > 0 && feature.text);
+            }
+            if (Array.isArray(finalData.pagination)) {
+                finalData.pagination = finalData.pagination.filter(page => page && Object.keys(page).length > 0 && page.name);
+            }
+        }
+
         updateVideoData(finalData); // Update the shared config object
-        // console.log("videoData updated with fetched data and defaults merged:", structuredClone(finalData));
+        console.log("MAIN: Final videoData object after all merging and cleanup:", structuredClone(finalData));
     } else {
         console.warn("Failed to fetch data from CSV. Using ONLY hard-coded videoData defaults.");
     }

@@ -149,8 +149,7 @@ function parseCsv(csvString) {
 export async function fetchData(requestedId) {
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnDZiD0zbEjdALbE4BPJrGUvnC3jK4mK4uebn2kLjajcgCbXQsE5xBG9a0R1wxn9WJo-ogpLC3p-X0/pub?gid=1534684239&single=true&output=csv';
     let retries = 3;
-    let delay = 1000; // 1 second
-    console.log("Requested ID from URL:", requestedId); // DEBUG: Log requested ID
+    let delay = 1000; // 1 second    
 
     while (retries > 0) {
         try {
@@ -159,10 +158,9 @@ export async function fetchData(requestedId) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const csvText = await response.text();
-            // console.log("Raw Fetched CSV data:", csvText); // DEBUG: Log raw CSV content
 
             const allParsedRows = parseCsv(csvText);
-            // console.log("All Parsed CSV Rows (before resolution):", JSON.parse(JSON.stringify(allParsedRows)));
+            console.log("API: All Parsed CSV Rows (before resolution):", JSON.parse(JSON.stringify(allParsedRows)));
 
             const rowIdMap = new Map();
             allParsedRows.forEach(row => {
@@ -188,11 +186,11 @@ export async function fetchData(requestedId) {
                     }
                 });
                 if (!changesMadeInPass && pass > 0) {
-                    console.log(`Resolution complete after ${pass} passes.`);
+                    console.log(`API: 'basedOn' resolution complete after ${pass} passes.`);
                     break;
                 }
             }
-            // console.log("All Parsed CSV Rows (after resolution):", JSON.parse(JSON.stringify(resolvedRows)));
+            console.log("API: All Parsed CSV Rows (after 'basedOn' resolution):", JSON.parse(JSON.stringify(resolvedRows)));
 
             let selectedData = resolvedRows.find(row => row.rowId === requestedId);
             if (!selectedData) {
@@ -203,21 +201,7 @@ export async function fetchData(requestedId) {
                 selectedData = resolvedRows[0];
             }
 
-            // After all inheritance is resolved, compact the arrays to remove empty slots
-            // and invalid entries before sending the data to the UI.
-            if (selectedData) {
-                if (Array.isArray(selectedData.chapters)) {
-                    selectedData.chapters = selectedData.chapters.filter(chapter => chapter && Object.keys(chapter).length > 0 && chapter.title);
-                }
-                if (Array.isArray(selectedData.specialFeatures)) {
-                    selectedData.specialFeatures = selectedData.specialFeatures.filter(feature => feature && Object.keys(feature).length > 0 && feature.text);
-                }
-                if (Array.isArray(selectedData.pagination)) {
-                    selectedData.pagination = selectedData.pagination.filter(page => page && Object.keys(page).length > 0 && page.name);
-                }
-            }
-
-            // console.log("Selected data row for use (after resolution):", selectedData);
+            console.log("API: Selected data row for use (before final merge):", structuredClone(selectedData));
             return selectedData;
         } catch (error) {
             console.error(`Error fetching data: ${error.message}. Retrying in ${delay / 1000}s...`);
