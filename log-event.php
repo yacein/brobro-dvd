@@ -40,11 +40,62 @@ function log_validation_error_and_exit($log_file, $http_code, $error_type, $erro
     exit;
 }
 
+/**
+ * Fetches company data from a Google Sheet CSV and creates a lookup map.
+ * @param string $url The URL of the published Google Sheet CSV.
+ * @return array An associative array mapping versionId to company_name.
+ */
+function get_company_map($url) {
+    $map = [];
+    // Use a stream context to set a timeout, preventing the page from hanging if Google Sheets is slow.
+    $context = stream_context_create(['http' => ['timeout' => 5]]);
+    // Use @ to suppress warnings on failure, we handle the error below.
+    $csv_data = @file_get_contents($url, false, $context);
+
+    if ($csv_data === false) {
+        return []; // Return an empty map if the fetch fails.
+    }
+
+    $lines = str_getcsv($csv_data, "\n");
+    if (count($lines) < 2) {
+        return []; // Not enough data (must have header + at least one row).
+    }
+
+    $headers = str_getcsv(array_shift($lines));
+    $versionId_index = array_search('versionId', $headers);
+    $companyName_index = array_search('company_name', $headers);
+
+    // If required columns aren't found, we can't build the map.
+    if ($versionId_index === false || $companyName_index === false) {
+        return [];
+    }
+
+    foreach ($lines as $line) {
+        $row = str_getcsv($line);
+        $versionId = $row[$versionId_index] ?? null;
+        $companyName = $row[$companyName_index] ?? null;
+
+        if ($versionId && $companyName) {
+            $map[trim($versionId)] = trim($companyName);
+        }
+    }
+
+    return $map;
+}
+
 // --- Configuration ---
 $log_file = __DIR__ . '/analytics_log.txt';
+// The private Google Sheet CSV URL for company data enrichment.
+$company_data_csv_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnDZiD0zbEjdALbE4BPJrGUvnC3jK4mK4uebn2kLjajcgCbXQsE5xBG9a0R1wxn9WJo-ogpLC3p-X0/pub?gid=0&single=true&output=csv';
+$analytics_page_url = 'https://assets.brobro.film/dvd/view-analytics.php';
 
 // Email configuration (moved from notify.php)
-$email_to = 'yacein@gmail.com';
+$email_recipients = [
+    //'halshaater@gmail.com',
+    //'brobrofilm@gmail.com',
+    'yacein@gmail.com' // temporarily disabled others while testing
+];
+$email_to = implode(',', $email_recipients);
 $email_subject_prefix = '[Telepathy Contact]';
 
 // IMPORTANT: For security, specify the exact origin of your website.
@@ -111,11 +162,60 @@ if ($eventType === 'telepathic_contact') {
         $email_message = "You have received a new telepathic contact.\n\n"
                  . "Site Version ID: " . $versionId . "\n"
                  . "Timestamp: " . date('Y-m-d H:i:s') . " (UTC)\n"
-                 . "User IP Address: " . $_SERVER['REMOTE_ADDR'] . "\n";
+                 . "User IP Address: " . $_SERVER['REMOTE_ADDR'] . "\n\n"
+                 . "View Analytics: " . $analytics_page_url . "\n";
 
         $headers = 'From: noreply@' . $_SERVER['SERVER_NAME'] . "\r\n";
 
         mail($email_to, $subject, $email_message, $headers);
+    }
+}
+
+// Check for a first-time site load for a specific versionId
+if ($eventType === 'site_load') {
+    if (isset($eventData['versionId']) && !empty($eventData['versionId'])) {
+        $versionId = $eventData['versionId'];
+        $isFirstVisit = true;
+
+        // Check existing logs to see if this versionId has been loaded before.
+        // This check happens *before* the new event is logged.
+        if (file_exists($log_file)) {
+            $handle = fopen($log_file, 'r');
+            if ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    $entry = json_decode($line, true);
+                    if (
+                        $entry && // Ensure line is valid JSON
+                        isset($entry['type']) && $entry['type'] === 'site_load' &&
+                        isset($entry['data']['versionId']) && $entry['data']['versionId'] === $versionId
+                    ) {
+                        $isFirstVisit = false;
+                        break; // Found a previous visit, no need to check further.
+                    }
+                }
+                fclose($handle);
+            }
+        }
+
+        if ($isFirstVisit) {
+            // This is the first time, send an email notification.
+            $company_map = get_company_map($company_data_csv_url);
+            $companyName = htmlspecialchars($company_map[$versionId] ?? 'Unknown Company');
+            $arrivalMethod = htmlspecialchars($eventData['method'] ?? 'N/A');
+            $versionIdSafe = htmlspecialchars($versionId);
+
+            $subject = "[First Visit] $companyName has accessed the site ($versionIdSafe)";
+            $email_message = "This is the first time this version of the site has been accessed.\n\n"
+                             . "Company: " . $companyName . "\n"
+                             . "Site Version ID: " . $versionIdSafe . "\n"
+                             . "Arrival Method: " . $arrivalMethod . "\n"
+                             . "Timestamp: " . date('Y-m-d H:i:s') . " (UTC)\n"
+                             . "User IP Address: " . $_SERVER['REMOTE_ADDR'] . "\n\n"
+                             . "View Analytics: " . $analytics_page_url . "\n";
+
+            $headers = 'From: noreply@' . $_SERVER['SERVER_NAME'] . "\r\n";
+            mail($email_to, $subject, $email_message, $headers);
+        }
     }
 }
 
