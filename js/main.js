@@ -88,7 +88,9 @@ async function initializeApp(id, arrivalMethod, playIntro = false) {
 
     // If requested, play the intro reel immediately
     if (playIntro) {
-        playIntroReel();
+        playIntroReel(true); // Pass true to indicate we should hide the loader when video starts
+    } else {
+        dom.loadingOverlay.classList.add('hidden');
     }
 
     // Animate subtitle on initial load
@@ -119,9 +121,7 @@ async function initializeApp(id, arrivalMethod, playIntro = false) {
     // Initialize the menu easter egg
     initMenuEasterEgg();
 
-    // Hide the loading overlay now that everything is ready
-    dom.loadingOverlay.classList.add('hidden');
-    console.log("Loading overlay hidden. Application is ready.");
+    console.log("Application is ready.");
 }
 
 /**

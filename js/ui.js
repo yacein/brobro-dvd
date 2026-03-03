@@ -328,7 +328,7 @@ export function goToScreen(screenName) {
  * Plays the intro reel (Main Showreel) in the modal, shows the "Menu" button,
  * and automatically advances to the Main Menu when finished.
  */
-export function playIntroReel() {
+export function playIntroReel(hideLoader = false) {
     const skipButton = document.getElementById('skipToMenu');
     
     // 1. Open the modal with the main reel
@@ -341,6 +341,17 @@ export function playIntroReel() {
     // 3. Initialize Vimeo Player to listen for the 'ended' event
     // We assume the Vimeo SDK script is loaded in index.html
     const player = new Vimeo.Player(dom.videoModalIframe);
+
+    if (hideLoader) {
+        // Wait for the video to actually start playing before hiding the loader
+        player.on('play', () => {
+            dom.loadingOverlay.classList.add('hidden');
+        });
+        // Safety fallback: if video doesn't play within 5s, hide loader anyway
+        setTimeout(() => {
+            dom.loadingOverlay.classList.add('hidden');
+        }, 5000);
+    }
 
     const finishIntro = () => {
         // Hide modal and clear source
