@@ -133,9 +133,12 @@ async function main() {
     // Initialize all DOM element references now that the DOM is ready.
     initDom();
 
-    // Get the ID directly from the query string (e.g., "?2")
+    // --- URL Parameter Parsing ---
     const queryString = window.location.search;
-    let requestedId = queryString.length > 1 ? queryString.substring(1).trim() : null;
+    // Check if we should skip the intro reel (for testing/direct access)
+    const skipIntro = queryString.includes('&menu');
+    // The ID is the part of the query string before any other parameters like '&menu'
+    let requestedId = queryString.length > 1 ? queryString.substring(1).split('&')[0].trim() : null;
 
     // Check for the analytics exclusion flag '-x'
     if (requestedId && requestedId.endsWith('-x')) {
@@ -147,15 +150,19 @@ async function main() {
         // ID is in the URL.
         dom.passwordScreen.style.display = 'none'; // Hide instantly
         
-        // Show the "Insert VHS" screen instead of starting immediately
-        const insertVhsScreen = document.getElementById('insertVhsScreen');
-        const insertVhsButton = document.getElementById('insertVhsButton');
-        insertVhsScreen.classList.remove('hidden');
+        if (skipIntro) {
+            initializeApp(requestedId, 'direct_link', false);
+        } else {
+            // Show the "Insert VHS" screen instead of starting immediately
+            const insertVhsScreen = document.getElementById('insertVhsScreen');
+            const insertVhsButton = document.getElementById('insertVhsButton');
+            insertVhsScreen.classList.remove('hidden');
 
-        insertVhsButton.addEventListener('click', () => {
-            insertVhsScreen.classList.add('hidden');
-            initializeApp(requestedId, 'direct_link', true); // true = play intro
-        });
+            insertVhsButton.addEventListener('click', () => {
+                insertVhsScreen.classList.add('hidden');
+                initializeApp(requestedId, 'direct_link', true); // true = play intro
+            });
+        }
     } else {
         // --- ANALYTICS: Log that the user has landed on the password screen ---
         logEvent('password_screen_view');
@@ -222,7 +229,7 @@ async function main() {
             if (enteredId) {
                 // Fade out the password screen, revealing the loader underneath.
                 dom.passwordScreen.classList.add('hidden');
-                initializeApp(enteredId, 'password_entry', true); // true = play intro
+                initializeApp(enteredId, 'password_entry', !skipIntro); // Play intro unless '&menu' is present
             }
         });
     }
