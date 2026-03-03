@@ -4,9 +4,9 @@ export let videoData = {
     mainMenuTitle: 'BROTHER BROTHER',
     mainMenuGlitchText: 'YAZ and HAZ',
     mainMenuSubtitle: 'THE SHOWREEL',
-    copyrightText: '© 2025 BROTHER BROTHER. ALL RIGHTS RESERVED.',
+    copyrightText: '© 1996 BROTHER BROTHER. ALL RIGHTS RESERVED.',
     mainBackgroundVimeoId: '292109430',
-    mainReelVimeoId: '1105829365/0f8376e14b',
+    mainReelVimeoId: '1169812685/d5e26b828a',
     specialFeaturesBackgroundImage: 'assets/ruth-window-bg.gif',
     sceneBackgroundImage: 'assets/MakeItCount-bucket.jpg',
     chapters: [

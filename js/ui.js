@@ -324,6 +324,47 @@ export function goToScreen(screenName) {
     }
 }
 
+/**
+ * Plays the intro reel (Main Showreel) in the modal, shows the "Menu" button,
+ * and automatically advances to the Main Menu when finished.
+ */
+export function playIntroReel() {
+    const skipButton = document.getElementById('skipToMenu');
+    
+    // 1. Open the modal with the main reel
+    dom.videoModalIframe.src = buildVimeoUrl(videoData.mainReelVimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
+    dom.videoModal.classList.add('show-modal');
+
+    // 2. Show the "Menu" button
+    skipButton.classList.add('visible');
+
+    // 3. Initialize Vimeo Player to listen for the 'ended' event
+    // We assume the Vimeo SDK script is loaded in index.html
+    const player = new Vimeo.Player(dom.videoModalIframe);
+
+    const finishIntro = () => {
+        // Hide modal and clear source
+        dom.videoModal.classList.remove('show-modal');
+        dom.videoModalIframe.src = '';
+        
+        // Hide skip button
+        skipButton.classList.remove('visible');
+        
+        // Ensure we are on the main screen (should already be there behind the modal)
+        goToScreen('main');
+    };
+
+    player.on('ended', () => {
+        finishIntro();
+    });
+
+    // 4. Handle the Skip/Menu button click
+    skipButton.onclick = (e) => {
+        e.preventDefault();
+        finishIntro();
+    };
+}
+
 function resetTelepathyButton() {
     dom.telepathyButton.innerHTML = "Click here to communicate <br>telepathically with the brothers";
     dom.telepathyButton.classList.remove('needs-confirmation');

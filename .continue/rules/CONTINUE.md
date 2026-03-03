@@ -5,7 +5,7 @@
 
 Note that some elements of this site that appear to be errors may actually be intentional glitches. Please check before "correcting" any code.
 
-Note that much of this project was "vibe-coded" with AI, and sparodically over a  long time period, so I don't necessarily have a full handle on all the technologies in use, or how everything works.
+Note that much of this project was "vibe-coded" with AI, and sparodically over a long time period, so I don't necessarily have a full handle on all the technologies in use, or how everything works.
 
 ### Key Technologies
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6 Modules)

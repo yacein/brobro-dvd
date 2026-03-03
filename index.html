@@ -22,6 +22,9 @@
     <!-- Link to external CSS files -->
     <link href="style.css" rel="stylesheet">
     <link href="glitch.css" rel="stylesheet">
+
+    <!-- Vimeo Player API -->
+    <script src="https://player.vimeo.com/api/player.js"></script>
 </head>
 <body>
     <!-- Password Screen -->
@@ -32,6 +35,11 @@
             <div id="tapPrompt">[ TAP TO CONTINUE ]</div>
             <input type="text" id="passcodeInput" autocomplete="off">
         </form>
+    </div>
+
+    <!-- Insert VHS Screen (Placeholder for autoplay policy) -->
+    <div id="insertVhsScreen" class="hidden">
+        <button id="insertVhsButton">INSERT VHS</button>
     </div>
 
     <!-- SVG Filter for Wavy Displacement Effect -->
@@ -149,6 +157,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Skip to Menu Button (Floating) -->
+    <button id="skipToMenu">MENU</button>
 
     <!-- Black transition overlay -->
     <div id="transitionOverlay" class="transition-overlay"></div>

@@ -6,7 +6,7 @@ import { logEvent, disableAnalytics } from './analytics.js';
 import { initDom } from './dom.js'; // Imports the initializer function
 import { animateSubtitle } from './animations.js';
 import { initEasterEgg, initImageEasterEgg, initSecondImageEasterEgg, initMenuEasterEgg } from './easter-egg.js';
-import { populateStaticData, goToScreen, initEventListeners } from './ui.js';
+import { populateStaticData, goToScreen, initEventListeners, playIntroReel } from './ui.js';
 
 /**
  * Animates text with a typewriter effect, supporting simple HTML like <br>.
@@ -42,7 +42,7 @@ function typeWriter(element, fullText, speed, onComplete) {
  * @param {string} id The site version ID to load.
  * @param {string} arrivalMethod How the user arrived ('direct_link' or 'password_entry').
  */
-async function initializeApp(id, arrivalMethod) {
+async function initializeApp(id, arrivalMethod, playIntro = false) {
     setSiteVersionId(id);
 
     // --- ANALYTICS: Log the initial site load with the version ID and arrival method ---
@@ -85,6 +85,11 @@ async function initializeApp(id, arrivalMethod) {
 
     // Start on the main screen
     goToScreen('main');
+
+    // If requested, play the intro reel immediately
+    if (playIntro) {
+        playIntroReel();
+    }
 
     // Animate subtitle on initial load
     const finalSubtitleText = dom.mainMenuSubtitle.dataset.text;
@@ -139,9 +144,18 @@ async function main() {
     }
 
     if (requestedId) {
-        // ID is in the URL, hide password screen and start immediately.
+        // ID is in the URL.
         dom.passwordScreen.style.display = 'none'; // Hide instantly
-        initializeApp(requestedId, 'direct_link');
+        
+        // Show the "Insert VHS" screen instead of starting immediately
+        const insertVhsScreen = document.getElementById('insertVhsScreen');
+        const insertVhsButton = document.getElementById('insertVhsButton');
+        insertVhsScreen.classList.remove('hidden');
+
+        insertVhsButton.addEventListener('click', () => {
+            insertVhsScreen.classList.add('hidden');
+            initializeApp(requestedId, 'direct_link', true); // true = play intro
+        });
     } else {
         // --- ANALYTICS: Log that the user has landed on the password screen ---
         logEvent('password_screen_view');
@@ -208,7 +222,7 @@ async function main() {
             if (enteredId) {
                 // Fade out the password screen, revealing the loader underneath.
                 dom.passwordScreen.classList.add('hidden');
-                initializeApp(enteredId, 'password_entry');
+                initializeApp(enteredId, 'password_entry', true); // true = play intro
             }
         });
     }
