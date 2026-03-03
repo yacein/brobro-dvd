@@ -1,6 +1,69 @@
-import { dvdLogo } from './dom.js';
+import { dvdLogo, eggCounter, eggCountElement, eggTotalElement, eggProgressFill } from './dom.js';
 import { logEvent } from './analytics.js';
 import { getSiteVersionId } from './config.js';
+
+// --- Easter Egg Tracking Logic ---
+const totalEggs = 5;
+const foundEggs = new Set();
+
+/**
+ * Marks a specific easter egg as found and updates the UI.
+ * @param {string} eggId Unique identifier for the egg.
+ */
+function markEggFound(eggId) {
+    if (!foundEggs.has(eggId)) {
+        foundEggs.add(eggId);
+        updateEggCounterUI();
+        // Optional: Play a small sound or visual cue here
+    }
+}
+
+function updateEggCounterUI() {
+    if (eggCountElement && eggTotalElement && eggProgressFill) {
+        const count = foundEggs.size;
+        eggCountElement.textContent = count;
+        eggTotalElement.textContent = totalEggs;
+        const percentage = (count / totalEggs) * 100;
+        eggProgressFill.style.width = `${percentage}%`;
+
+        // Flash the text container
+        const textContainer = eggCountElement.parentElement;
+        if (textContainer) {
+            textContainer.classList.remove('flash');
+            void textContainer.offsetWidth; // Trigger reflow to restart animation
+            textContainer.classList.add('flash');
+        }
+
+        if (percentage === 100) {
+            eggProgressFill.style.backgroundColor = 'var(--color-accent-green)';
+            // Trigger the particle explosion when 100% is reached
+            createParticleExplosion(eggProgressFill);
+            // Add a class to make the counter clickable for re-triggering the effect
+            if (eggCounter) {
+                eggCounter.classList.add('completed');
+            }
+        } else if (percentage >= 75) {
+            eggProgressFill.style.backgroundColor = 'var(--color-accent-yellow)';
+        } else if (percentage >= 50) {
+            eggProgressFill.style.backgroundColor = 'var(--color-accent-gold)';
+        } else {
+            eggProgressFill.style.backgroundColor = '#ffa500'; // Orange
+        }
+    }
+}
+
+/**
+ * Initializes a click listener on the egg counter to re-trigger the explosion when full.
+ */
+function initEggCounterClickListener() {
+    if (!eggCounter) return;
+
+    eggCounter.addEventListener('click', () => {
+        if (foundEggs.size === totalEggs) {
+            createParticleExplosion(eggProgressFill);
+        }
+    });
+}
 
 /**
  * Creates and displays a speech bubble pointing to a target element.
@@ -43,6 +106,8 @@ function createSpeechBubble(targetElement, text, autoDismiss = true) {
 export function initEasterEgg() {
     if (!dvdLogo) return;
 
+    initEggCounterClickListener(); // Set up the listener for the progress bar
+
     let isBouncing = false;
     let bounceHandler;
     const originalParent = dvdLogo.parentElement;
@@ -51,6 +116,7 @@ export function initEasterEgg() {
     dvdLogo.addEventListener('click', () => {
         if (isBouncing) {
             createSpeechBubble(dvdLogo, 'argh you caught me');
+            markEggFound('dvd-catch'); // Track: Caught the logo
 
             isBouncing = false;
             dvdLogo.removeEventListener('transitionend', bounceHandler);
@@ -61,6 +127,7 @@ export function initEasterEgg() {
             originalParent.insertBefore(dvdLogo, originalNextSibling);
         } else {
             logEvent('dvd_logo_click', { versionId: getSiteVersionId() });
+            markEggFound('dvd-start'); // Track: Started the logo
             isBouncing = true;
             const startRect = dvdLogo.getBoundingClientRect();
             document.body.appendChild(dvdLogo);
@@ -153,6 +220,14 @@ export function initImageEasterEgg() {
             // This is a cycle of 10 distinct actions, followed by a loop.
             clickState = (clickState + 1) % 10;
 
+            // Track specific clicks
+            if (clickState === 1) {
+                markEggFound('about-photo-1'); // Track: 1st click
+            }
+            if (clickState === 8) {
+                markEggFound('about-photo-8'); // Track: 8th click
+            }
+
             let showGraffiti = false;
             let showFunny = false;
             let showSarcastic = false;
@@ -180,6 +255,58 @@ export function initImageEasterEgg() {
 }
 
 /**
+ * Creates a particle explosion effect originating from a target element.
+ * @param {HTMLElement} targetElement The element to use as the origin point.
+ */
+function createParticleExplosion(targetElement) {
+    if (!targetElement) return;
+
+    const rect = targetElement.getBoundingClientRect();
+    const container = document.body;
+    const particleCount = 40; // Increased for a bigger effect
+    const colors = ['#ffa500', 'var(--color-accent-gold)', 'var(--color-accent-yellow)', 'var(--color-accent-green)'];
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        container.appendChild(particle);
+
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size = Math.random() * 8 + 4; // size between 4px and 12px
+
+        particle.style.backgroundColor = color;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+
+        // Position in the center of the target
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + rect.height / 2;
+        particle.style.left = `${startX}px`;
+        particle.style.top = `${startY}px`;
+        particle.style.transform = 'translate(-50%, -50%) scale(1)';
+        particle.style.opacity = '1';
+
+        // Calculate random end position
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 150 + 75; // travel 75-225px
+        const endX = Math.cos(angle) * distance;
+        const endY = Math.sin(angle) * distance;
+        const endRotation = Math.random() * 720 - 360;
+
+        // Use a small timeout to ensure the initial styles are applied before transitioning
+        setTimeout(() => {
+            particle.style.transform = `translate(calc(-50% + ${endX}px), calc(-50% + ${endY}px)) scale(0) rotate(${endRotation}deg)`;
+            particle.style.opacity = '0';
+        }, 10);
+
+        // Remove particle from the DOM after its animation is complete
+        particle.addEventListener('transitionend', () => {
+            particle.remove();
+        });
+    }
+}
+
+/**
  * Initializes the easter egg for the "Easter Eggs" menu button.
  */
 export function initMenuEasterEgg() {
@@ -201,6 +328,8 @@ export function initMenuEasterEgg() {
     easterEggsButton.addEventListener('click', (e) => {
         e.preventDefault();
 
+        markEggFound('menu-egg'); // Track: Clicked the menu button
+
         // If a bubble from this easter egg is already active, clear it out.
         if (currentBubble) {
             currentBubble.remove();
@@ -209,8 +338,19 @@ export function initMenuEasterEgg() {
             clearTimeout(removalTimeout);
         }
 
+        // Determine message based on completion status
+        let message;
+        if (foundEggs.size === totalEggs) {
+            message = "yay! you found them all!";
+            createParticleExplosion(easterEggsButton);
+        } else {
+            // Standard cycling messages.
+            // To add clues later, check !foundEggs.has('id') here and set message accordingly.
+            message = messages[messageIndex];
+            messageIndex = (messageIndex + 1) % messages.length;
+        }
+
         // Create a new bubble that we manage ourselves.
-        const message = messages[messageIndex];
         currentBubble = createSpeechBubble(easterEggsButton, message, false); // Pass false to disable auto-dismiss
 
         // Set a new timer to remove this bubble.
@@ -223,9 +363,6 @@ export function initMenuEasterEgg() {
                 }, { once: true });
             }
         }, 2500);
-
-        // Cycle to the next message for the next click.
-        messageIndex = (messageIndex + 1) % messages.length;
     });
 }
 

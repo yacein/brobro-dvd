@@ -6,7 +6,7 @@ export let mainMenuHeroTitle, mainMenuGlitchText, mainMenuSubtitle, specialFeatu
     telepathyButton, telepathyMessage, backToMainMenuFromScenes, backToMainMenuFromAbout, tapPrompt,
     backToMainMenuFromFeatures, backToMainMenuFromContact, sceneSelectionGrid, transitionOverlay,
     subtitleShowreelElement, loadingOverlay, displacementMap, dvdLogo, passwordScreen,
-    passwordForm, passcodeInput;
+    passwordForm, passcodeInput, eggCounter, eggCountElement, eggTotalElement, eggProgressFill;
 
 /**
  * Initializes all DOM element variables. This should be called after DOMContentLoaded.
@@ -47,5 +47,8 @@ export function initDom() {
     passwordForm = document.getElementById('passwordForm');
     passcodeInput = document.getElementById('passcodeInput');
     paginationControls = document.getElementById('paginationControls');
-
+    eggCounter = document.getElementById('eggCounter');
+    eggCountElement = document.getElementById('eggCount');
+    eggTotalElement = document.getElementById('eggTotal');
+    eggProgressFill = document.getElementById('eggProgressFill');
 }
