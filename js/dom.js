@@ -7,7 +7,7 @@ export let mainMenuHeroTitle, mainMenuGlitchText, mainMenuSubtitle, specialFeatu
     backToMainMenuFromFeatures, backToMainMenuFromContact, sceneSelectionGrid, transitionOverlay,
     subtitleShowreelElement, loadingOverlay, displacementMap, dvdLogo, passwordScreen,
     passwordForm, passcodeInput, eggCounter, eggCountElement, eggTotalElement, eggProgressFill,
-    videoInterstitial, interstitialPlayButton, interstitialProceedButton;
+    videoInterstitial, interstitialResumeButton, interstitialRestartButton;
 
 /**
  * Initializes all DOM element variables. This should be called after DOMContentLoaded.
@@ -53,6 +53,6 @@ export function initDom() {
     eggTotalElement = document.getElementById('eggTotal');
     eggProgressFill = document.getElementById('eggProgressFill');
     videoInterstitial = document.getElementById('videoInterstitial');
-    interstitialPlayButton = document.getElementById('interstitialPlayButton');
-    interstitialProceedButton = document.getElementById('interstitialProceedButton');
+    interstitialResumeButton = document.getElementById('interstitialResumeButton');
+    interstitialRestartButton = document.getElementById('interstitialRestartButton');
 }

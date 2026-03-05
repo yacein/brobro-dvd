@@ -352,11 +352,12 @@ export function closeVideoModal() {
  * Generic function to play a video in the modal with consistent behavior.
  * Handles the "Exit / Menu" button, progress tracking, and loader hiding.
  */
-export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, onFinish = null, showInterstitial = false } = {}) {
+export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, onFinish = null, showInterstitial = false, startTime = 0 } = {}) {
     currentOnFinishCallback = onFinish;
     const skipButton = document.getElementById('skipToMenu');
 
     // --- Interstitial Logic ---
+    /* ABANDONED: Interstitial Logic - Commented out for now
     if (showInterstitial && lastVideoProgress > 0) {
         dom.videoModal.classList.add('show-modal');
         dom.videoInterstitial.classList.remove('hidden');
@@ -368,29 +369,38 @@ export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, 
             closeVideoModal();
         };
 
-        const proceedToVideo = () => {
+        const proceedToVideo = (startFrom) => {
             dom.videoInterstitial.classList.add('hidden');
             // Recursively call playVideo without the interstitial flag to start playback
-            playVideo(vimeoId, { trackProgress, hideLoader, onFinish, showInterstitial: false });
+            playVideo(vimeoId, { trackProgress, hideLoader, onFinish, showInterstitial: false, startTime: startFrom });
         };
 
         // Use onclick to prevent stacking event listeners if opened multiple times
-        dom.interstitialPlayButton.onclick = (e) => {
+        dom.interstitialResumeButton.onclick = (e) => {
             e.preventDefault();
-            proceedToVideo();
+            proceedToVideo(lastVideoProgress);
         };
-        dom.interstitialProceedButton.onclick = (e) => {
+        dom.interstitialRestartButton.onclick = (e) => {
             e.preventDefault();
-            proceedToVideo();
+            proceedToVideo(0);
         };
         return; // Stop here and wait for user input
     }
+    */
 
-    if (trackProgress) {
+    if (trackProgress && startTime === 0) {
         lastVideoProgress = 0;
     }
 
-    dom.videoModalIframe.src = buildVimeoUrl(vimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
+    const params = 'autoplay=1&loop=0&autopause=1&muted=0';
+    let finalUrl = buildVimeoUrl(vimeoId, params);
+
+    if (startTime > 0) {
+        finalUrl += `#t=${startTime}s`;
+    }
+
+    dom.videoModalIframe.src = finalUrl;
+    
     dom.videoModal.classList.add('show-modal');
     skipButton.classList.add('visible');
 
@@ -414,7 +424,6 @@ export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, 
         if (trackProgress) {
             player.getCurrentTime().then((seconds) => {
                 lastVideoProgress = seconds;
-                console.log("Video progress recorded:", lastVideoProgress);
                 closeVideoModal();
             }).catch((error) => {
                 console.warn('Could not retrieve video time:', error);
