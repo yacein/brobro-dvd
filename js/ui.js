@@ -4,6 +4,16 @@ import { logEvent } from './analytics.js';
 import * as dom from './dom.js';
 
 /**
+ * Stores the progress (in seconds) of the intro reel when the user skips it.
+ */
+export let lastVideoProgress = 0;
+
+/**
+ * Callback to run when the video modal is closed.
+ */
+let currentOnFinishCallback = null;
+
+/**
  * Constructs a Vimeo player URL, correctly handling IDs with existing query parameters.
  * It supports IDs in the format 'VIDEO_ID', 'VIDEO_ID?h=HASH', or 'VIDEO_ID/HASH'.
  * @param {string} vimeoId The Vimeo video ID.
@@ -133,8 +143,7 @@ export function loadChapterVideos() {
         chapterItem.addEventListener('click', () => {
             const vimeoId = chapter.vimeoId || videoData.mainBackgroundVimeoId;
             logEvent('chapter_click', { title: chapter.title, vimeoId: vimeoId, versionId: getSiteVersionId() });
-            dom.videoModalIframe.src = buildVimeoUrl(vimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
-            dom.videoModal.classList.add('show-modal');
+            playVideo(vimeoId, { trackProgress: false });
         });
 
         dom.sceneSelectionGrid.appendChild(chapterItem);
@@ -325,55 +334,77 @@ export function goToScreen(screenName) {
 }
 
 /**
- * Plays the intro reel (Main Showreel) in the modal, shows the "Menu" button,
- * and automatically advances to the Main Menu when finished.
+ * Closes the video modal, cleans up the player, and triggers any finish callbacks.
  */
-export function playIntroReel(hideLoader = false) {
-    const skipButton = document.getElementById('skipToMenu');
-    
-    // 1. Open the modal with the main reel
-    dom.videoModalIframe.src = buildVimeoUrl(videoData.mainReelVimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
-    dom.videoModal.classList.add('show-modal');
+export function closeVideoModal() {
+    dom.videoModal.classList.remove('show-modal');
+    dom.videoModalIframe.src = '';
+    document.getElementById('skipToMenu').classList.remove('visible');
 
-    // 2. Show the "Menu" button
+    if (currentOnFinishCallback) {
+        currentOnFinishCallback();
+        currentOnFinishCallback = null;
+    }
+}
+
+/**
+ * Generic function to play a video in the modal with consistent behavior.
+ * Handles the "Exit / Menu" button, progress tracking, and loader hiding.
+ */
+export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, onFinish = null } = {}) {
+    currentOnFinishCallback = onFinish;
+    const skipButton = document.getElementById('skipToMenu');
+
+    if (trackProgress) {
+        lastVideoProgress = 0;
+    }
+
+    dom.videoModalIframe.src = buildVimeoUrl(vimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
+    dom.videoModal.classList.add('show-modal');
     skipButton.classList.add('visible');
 
-    // 3. Initialize Vimeo Player to listen for the 'ended' event
-    // We assume the Vimeo SDK script is loaded in index.html
     const player = new Vimeo.Player(dom.videoModalIframe);
 
     if (hideLoader) {
-        // Wait for the video to actually start playing before hiding the loader
         player.on('play', () => {
             dom.loadingOverlay.classList.add('hidden');
         });
-        // Safety fallback: if video doesn't play within 5s, hide loader anyway
         setTimeout(() => {
             dom.loadingOverlay.classList.add('hidden');
         }, 5000);
     }
 
-    const finishIntro = () => {
-        // Hide modal and clear source
-        dom.videoModal.classList.remove('show-modal');
-        dom.videoModalIframe.src = '';
-        
-        // Hide skip button
-        skipButton.classList.remove('visible');
-        
-        // Ensure we are on the main screen (should already be there behind the modal)
-        goToScreen('main');
-    };
-
     player.on('ended', () => {
-        finishIntro();
+        closeVideoModal();
     });
 
-    // 4. Handle the Skip/Menu button click
     skipButton.onclick = (e) => {
         e.preventDefault();
-        finishIntro();
+        if (trackProgress) {
+            player.getCurrentTime().then((seconds) => {
+                lastVideoProgress = seconds;
+                console.log("Video progress recorded:", lastVideoProgress);
+                closeVideoModal();
+            }).catch((error) => {
+                console.warn('Could not retrieve video time:', error);
+                closeVideoModal();
+            });
+        } else {
+            closeVideoModal();
+        }
     };
+}
+
+/**
+ * Plays the intro reel (Main Showreel) in the modal, shows the "Menu" button,
+ * and automatically advances to the Main Menu when finished.
+ */
+export function playIntroReel(hideLoader = false) {
+    playVideo(videoData.mainReelVimeoId, {
+        trackProgress: true,
+        hideLoader: hideLoader,
+        onFinish: () => goToScreen('main')
+    });
 }
 
 function resetTelepathyButton() {
@@ -386,19 +417,16 @@ export function initEventListeners() {
     dom.playReelButton.addEventListener('click', (e) => {
         e.preventDefault();
         logEvent('play_reel_click', { vimeoId: videoData.mainReelVimeoId, versionId: getSiteVersionId() });
-        dom.videoModalIframe.src = buildVimeoUrl(videoData.mainReelVimeoId, 'autoplay=1&loop=0&autopause=1&muted=0');
-        dom.videoModal.classList.add('show-modal');
+        playVideo(videoData.mainReelVimeoId, { trackProgress: true });
     });
 
     dom.closeModalButton.addEventListener('click', () => {
-        dom.videoModal.classList.remove('show-modal');
-        dom.videoModalIframe.src = '';
+        closeVideoModal();
     });
 
     dom.videoModal.addEventListener('click', (e) => {
         if (e.target === dom.videoModal) {
-            dom.videoModal.classList.remove('show-modal');
-            dom.videoModalIframe.src = '';
+            closeVideoModal();
         }
     });
 
