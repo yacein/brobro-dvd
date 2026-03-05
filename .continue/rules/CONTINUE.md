@@ -57,6 +57,17 @@ Visit `http://localhost:8000` in your browser.
 - **`log-event.php`**: Receives POST requests from the frontend to log analytics events.
 - **`view-analytics.php`**: A password-protected dashboard to view the generated analytics logs.
 
+### User Experience
+- visitor arrives either with or without a ?id in the url
+ - if they don't have one, the "password" screen is shown (where they enter their id to open the site)
+ - once the id is establish, by either method, this is used to populate site from the csv-based cms
+ - if the user hasn't entered their password, a 'insert vhs' screen is shown. they must click this to proceed (so video may autoplay)
+- after the 'password' screen or 'insert vhs' screen (as appropriate), the showreel plays full screen
+- at the end of the showreel OR when the use clicks the 'menu' button, the home menu screen is shown, and the user is now in the main minisite. they can navigate between minisite screens, or choose to watch the showreel again
+
+## easter eggs
+- the site has multiple easter eggs, and a counter that tracks how many have been found.
+
 ## 4. Development Workflow
 
 ### Coding Standards
