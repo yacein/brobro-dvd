@@ -340,6 +340,7 @@ export function closeVideoModal() {
     dom.videoModal.classList.remove('show-modal');
     dom.videoModalIframe.src = '';
     document.getElementById('skipToMenu').classList.remove('visible');
+    dom.videoInterstitial.classList.add('hidden'); // Ensure interstitial is hidden
 
     if (currentOnFinishCallback) {
         currentOnFinishCallback();
@@ -351,9 +352,39 @@ export function closeVideoModal() {
  * Generic function to play a video in the modal with consistent behavior.
  * Handles the "Exit / Menu" button, progress tracking, and loader hiding.
  */
-export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, onFinish = null } = {}) {
+export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, onFinish = null, showInterstitial = false } = {}) {
     currentOnFinishCallback = onFinish;
     const skipButton = document.getElementById('skipToMenu');
+
+    // --- Interstitial Logic ---
+    if (showInterstitial && lastVideoProgress > 0) {
+        dom.videoModal.classList.add('show-modal');
+        dom.videoInterstitial.classList.remove('hidden');
+
+        // Show the "Exit / Menu" button and handle its click
+        skipButton.classList.add('visible');
+        skipButton.onclick = (e) => {
+            e.preventDefault();
+            closeVideoModal();
+        };
+
+        const proceedToVideo = () => {
+            dom.videoInterstitial.classList.add('hidden');
+            // Recursively call playVideo without the interstitial flag to start playback
+            playVideo(vimeoId, { trackProgress, hideLoader, onFinish, showInterstitial: false });
+        };
+
+        // Use onclick to prevent stacking event listeners if opened multiple times
+        dom.interstitialPlayButton.onclick = (e) => {
+            e.preventDefault();
+            proceedToVideo();
+        };
+        dom.interstitialProceedButton.onclick = (e) => {
+            e.preventDefault();
+            proceedToVideo();
+        };
+        return; // Stop here and wait for user input
+    }
 
     if (trackProgress) {
         lastVideoProgress = 0;
@@ -417,7 +448,7 @@ export function initEventListeners() {
     dom.playReelButton.addEventListener('click', (e) => {
         e.preventDefault();
         logEvent('play_reel_click', { vimeoId: videoData.mainReelVimeoId, versionId: getSiteVersionId() });
-        playVideo(videoData.mainReelVimeoId, { trackProgress: true });
+        playVideo(videoData.mainReelVimeoId, { trackProgress: true, showInterstitial: true });
     });
 
     dom.closeModalButton.addEventListener('click', () => {

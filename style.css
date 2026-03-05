@@ -472,6 +472,46 @@ footer {
     transition: color 0.2s ease-in-out;
 }
 
+/* Video Interstitial (The "Play / Proceed" screen) */
+#videoInterstitial {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Dark background to hide video area */
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    z-index: 105; /* Above the iframe */
+}
+
+#videoInterstitial.hidden {
+    display: none;
+}
+
+/* Specific styling for Interstitial buttons to match the Exit button */
+#videoInterstitial .menu-button {
+    background-image: none; /* Remove gradient */
+    -webkit-background-clip: border-box; /* Reset clip */
+    background-clip: border-box;
+    color: var(--color-text-light); /* White text */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    border: 2px solid var(--color-text-light); /* White border */
+    font-size: 2rem;
+    padding: 10px 40px;
+    min-width: 200px;
+    justify-content: center;
+}
+
+#videoInterstitial .menu-button:hover {
+    background-color: var(--color-text-light);
+    color: var(--color-background-dark);
+    text-shadow: none;
+}
+
 .close-modal:hover {
     color: var(--color-accent-yellow);
 }
