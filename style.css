@@ -696,6 +696,28 @@ footer {
 
 /* --- 3D Transition Active State --- */
 
+/* Backdrop for About Us screen to dim background and block clicks */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent black */
+    z-index: 15; /* Between screenContainer (10) and aboutUsScreen (20) */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Allow clicks to pass through when hidden */
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+body.about-us-active::before {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto; /* Block clicks to underlying content */
+}
+
 /* When About Us is active, the background screen remains static and visible. */
 body.about-us-active #screenContainer {
     /* No changes needed, it stays as is. */
