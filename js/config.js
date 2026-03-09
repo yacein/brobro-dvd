@@ -26,7 +26,12 @@ export let videoData = {
         { text: 'Instagram',
           url: 'https://www.instagram.com/brobrofilm/', target: '_blank' },
         { text: 'Easter Eggs', url: '#' }
-    ]
+    ],
+    telepathyMessage: [
+        'A faint message echoes in your mind: "We hear you, mortal. Seek us in the void."',
+        'You will hear from the brothers in the next couple of days.',
+        "Assuming it's not a bank holiday or something because the void doesn't have access to a calendar."
+    ],
 };
 
 // We need a way to update the config from main.js after fetching data

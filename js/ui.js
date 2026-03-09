@@ -96,6 +96,12 @@ export function populateStaticData() {
         }
         dom.specialFeaturesButtonContainer.appendChild(button);
     });
+
+    // Populate the telepathy message from the config
+    if (dom.telepathyMessage && videoData.telepathyMessage && Array.isArray(videoData.telepathyMessage)) {
+        dom.telepathyMessage.innerHTML = videoData.telepathyMessage.map(p => `<p>${p}</p>`).join('<br>');
+    }
+
     attachInteractionSounds();
 }
 
@@ -488,6 +494,7 @@ export function initEventListeners() {
 
             dom.makeContactScreen.classList.add('wavy-active');
             const duration = 2000;
+            const messageDuration = 8000; // Time in ms to show the message
             const maxScale = 50;
             let startTime = null;
             function animateWave(currentTime) {
@@ -508,7 +515,7 @@ export function initEventListeners() {
                             document.body.classList.remove('contact-active');
                             resetTelepathyButton();
                         }, 500);
-                    }, 5000);
+                    }, messageDuration);
                 }
             }
             requestAnimationFrame(animateWave);
