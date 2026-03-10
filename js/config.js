@@ -8,21 +8,30 @@ export let videoData = {
     mainBackgroundVimeoId: '292109430',
     mainBackgroundOverlayColor: 'rgba(0, 0, 0, 0.5)',
     mainReelVimeoId: '1169812685/d5e26b828a',
-    specialFeaturesBackgroundImage: 'assets/ruth-window-bg.gif',
+    specialFeaturesBackgroundImage: 'assets/gifs/ruth-window-bg.gif',
     sceneBackgroundImage: 'assets/MakeItCount-bucket.jpg',
     chapters: [
         { title: 'SUMUP - Make it Count', vimeoId: '1017849814',
-          thumbnailUrl: 'assets/make-it-count-thumbnail.gif' },
+          thumbnailUrl: 'assets/gifs/make-it-count-thumbnail.gif' },
         { title: 'DATASNIPPERS - Sandcastles', vimeoId: '1105915041?h=7eb0001144',
-          thumbnailUrl: 'assets/datasnipper-thumbnail.gif' },
+          thumbnailUrl: 'assets/gifs/datasnipper-thumbnail.gif' },
         { title: 'PVCASE - What Would You Do', vimeoId: '1106051275/2656e0296f',
-          thumbnailUrl: 'assets/pvcase-thumbnail.gif' },
+          thumbnailUrl: 'assets/gifs/pvcase-thumbnail.gif' },
+        { title: 'TENABLE - Never Take It Off', vimeoId: '1169563007/ddf88646be',
+          thumbnailUrl: 'assets/gifs/NTIO_Runners.gif' },
         { title: 'SIEMENS - Smart Kitchen', vimeoId: '856359531',
-          thumbnailUrl: 'assets/siemens-thumbnail.gif' },
-        { title: 'Never Take It Off', vimeoId: '1169563007/ddf88646be',
-          thumbnailUrl: 'assets/NTIO_Runners.gif' }
+          thumbnailUrl: 'assets/gifs/siemens-thumbnail.gif' },
+        { title: 'RHP - Great Things Happen At Home', vimeoId: '364814788',
+          thumbnailUrl: 'assets/gifs/RHP_Great-Things-Happen-At-Home.gif' },
+        { title: 'JWMARRIOT - Global Luxury', vimeoId: '1165646364/fcfffa0960',
+          thumbnailUrl: 'assets/gifs/JW-Marriott-Agency-Cut-low.gif' },
+        { title: 'IC!BERLIN - Berlin Style', vimeoId: '638649165',
+          thumbnailUrl: 'assets/gifs/IC-Berlin_Style-Made-in-Germany-low.gif' }
     ],
-    pagination: [    ],
+    pagination: [  
+      { name: "Comedy & Tech" },
+      { name: "Fashion & Luxury" }
+    ],
     specialFeatures: [
         { text: 'Make Contact', type: 'internal', targetScreen: 'contact' },
         { text: 'About Us' },
