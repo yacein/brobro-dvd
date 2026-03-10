@@ -577,10 +577,11 @@ footer {
     justify-content: center;
     align-items: center;
     padding: 4px; /* Padding inside the border */
-    margin: 20px auto 10px auto; /* Top, horizontal auto, bottom */
-    width: fit-content; /* Fit the content */
+    margin: 20px auto; /* Centered margin */
+    max-width: 90vw; /* Prevent the container from exceeding the viewport width */
     border: 2px solid var(--color-text-light); /* White outline around the list */
     border-radius: 4px;
+    flex-wrap: wrap; /* Allow the buttons to wrap onto the next line */
 }
 
 .pagination-item {
@@ -1000,8 +1001,9 @@ body.contact-active #specialFeaturesClone {
     }
 
     #mainMenuScreen main {
+        align-items: flex-end;
         flex-grow: 1; /* Allow main to fill the space between header and footer */
-        padding-bottom: 30px; /* Create space above the footer, matching the side padding */
+        padding-bottom: 80px; /* Increased to make space for egg counter */
     }
 
     footer {
@@ -1028,6 +1030,24 @@ body.contact-active #specialFeaturesClone {
     #dvdLogo {
         bottom: 60px;
     }
+
+    /* On mobile, use the ID for higher specificity to override the general rule */
+    #eggCounter {
+        bottom: 80px;
+    }
+
+    /* On mobile, allow easter egg bubbles to wrap to prevent overflow */
+    .easter-egg-bubble {
+        white-space: normal; /* Allow text to wrap */
+        max-width: 60vw; /* Constrain width to 60% of the viewport width */
+        text-align: center; /* Center the wrapped text for a cleaner look */
+    }
+
+    /* Hide the egg counter on the scene selection screen to reduce crowding */
+    #screenContainer.slide-to-scene ~ #eggCounter {
+        display: none;
+    }
+
     /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
     .scene-selection-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1042,9 +1062,14 @@ body.contact-active #specialFeaturesClone {
         text-align: center;
     }
 
-    /* On mobile, right-align the main menu block */
-    #mainMenuScreen main {
-        align-items: flex-end;
+    /* Unwrap the images container to interleave images with text on mobile */
+    .about-us-images {
+        display: contents;
+    }
+
+    /* Move the first image to the top */
+    #yazAndHazImageWrapper {
+        order: -1;
     }
 
     /* On mobile, stack main menu buttons vertically and remove the background */
