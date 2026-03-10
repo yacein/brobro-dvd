@@ -2,7 +2,7 @@
 export let videoData = {
     siteTitle: 'Brother Brother | The Showreel',
     mainMenuTitle: 'YAZ & HAZ',
-    mainMenuGlitchText: 'YACEIN & HAROUN',
+    mainMenuGlitchText: 'DIRECTING DUO',
     mainMenuSubtitle: 'THE SHOWREEL',
     copyrightText: '© 1996 BROTHER BROTHER. ALL RIGHTS RESERVED.',
     mainBackgroundVimeoId: '292109430',
