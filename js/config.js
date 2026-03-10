@@ -6,6 +6,7 @@ export let videoData = {
     mainMenuSubtitle: 'THE SHOWREEL',
     copyrightText: '© 1996 BROTHER BROTHER. ALL RIGHTS RESERVED.',
     mainBackgroundVimeoId: '292109430',
+    mainBackgroundOverlayColor: 'rgba(0, 0, 0, 0.5)',
     mainReelVimeoId: '1169812685/d5e26b828a',
     specialFeaturesBackgroundImage: 'assets/ruth-window-bg.gif',
     sceneBackgroundImage: 'assets/MakeItCount-bucket.jpg',
@@ -17,7 +18,9 @@ export let videoData = {
         { title: 'PVCASE - What Would You Do', vimeoId: '1106051275/2656e0296f',
           thumbnailUrl: 'assets/pvcase-thumbnail.gif' },
         { title: 'SIEMENS - Smart Kitchen', vimeoId: '856359531',
-          thumbnailUrl: 'assets/siemens-thumbnail.gif' }
+          thumbnailUrl: 'assets/siemens-thumbnail.gif' },
+        { title: 'Never Take It Off', vimeoId: '1169563007/ddf88646be',
+          thumbnailUrl: 'assets/NTIO_Runners.gif' }
     ],
     pagination: [    ],
     specialFeatures: [

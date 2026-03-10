@@ -58,6 +58,12 @@ export function populateStaticData() {
     dom.mainMenuGlitchText.dataset.text = videoData.mainMenuGlitchText;
     dom.mainMenuSubtitle.dataset.text = videoData.mainMenuSubtitle;
 
+    // Apply overlay color from config
+    if (videoData.mainBackgroundOverlayColor) {
+        const overlay = document.querySelector('.overlay');
+        if (overlay) overlay.style.backgroundColor = videoData.mainBackgroundOverlayColor;
+    }
+
     document.querySelectorAll('.copyright-text').forEach(el => {
         el.innerHTML = videoData.copyrightText;
     });
