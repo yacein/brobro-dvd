@@ -159,8 +159,8 @@ export function initEasterEgg() {
         let vy = Math.sin(angle);
 
         bounceHandler = () => {
-            const timeToHitX = (vx > 0) ? (window.innerWidth - logoWidth - x) / (vx * speed) : -x / (vx * speed);
-            const timeToHitY = (vy > 0) ? (window.innerHeight - logoHeight - y) / (vy * speed) : -y / (vy * speed);
+            const timeToHitX = (vx > 0) ? (document.body.clientWidth - logoWidth - x) / (vx * speed) : -x / (vx * speed);
+            const timeToHitY = (vy > 0) ? (document.body.clientHeight - logoHeight - y) / (vy * speed) : -y / (vy * speed);
 
             const timeToCollision = Math.min(timeToHitX, timeToHitY);
 

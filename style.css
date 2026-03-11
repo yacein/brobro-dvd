@@ -70,7 +70,7 @@ body {
 /* Screen Container: Holds all main screens side-by-side for sliding */
 #screenContainer {
     display: flex; /* Arranges children (screens) horizontally */
-    width: 300vw; /* Three viewport widths wide (features + main + scene) */
+    width: 300%; /* Three viewport widths wide (relative to body) */
     height: 100dvh; /* Use dynamic viewport height */
     position: absolute; /* Crucial: Position absolutely from top-left of viewport */
     top: 0;
@@ -78,19 +78,19 @@ body {
     /* Changed transition duration to 1s */
     transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1), opacity 1.2s cubic-bezier(0.76, 0, 0.24, 1), filter 0.5s ease-out; /* Smooth transition for 3D effect and filter */
     z-index: 10; /* Position above the about us screen initially */
-    transform: translateX(-100vw); /* Start on the main menu by default (now the 2nd screen) */
+    transform: translateX(-33.3333%); /* Start on the main menu by default (now the 2nd screen) */
     transform-origin: center center; /* Set transform origin for rotation */
 }
 
 /* Classes to slide the screen container left to specific pages */
 #screenContainer.slide-to-special-features {
-    transform: translateX(0vw); /* Special Features is the first screen */
+    transform: translateX(0%); /* Special Features is the first screen */
 }
 #screenContainer.slide-to-main {
-    transform: translateX(-100vw); /* Main Menu is the second screen */
+    transform: translateX(-33.3333%); /* Main Menu is the second screen */
 }
 #screenContainer.slide-to-scene {
-    transform: translateX(-200vw); /* Scene Selection is the third screen */
+    transform: translateX(-66.6666%); /* Scene Selection is the third screen */
 }
 
 /* Base styling for all screen wrappers (main, scene, special features) */
@@ -100,7 +100,7 @@ body {
     justify-content: space-between; /* Pushes header to top, footer to bottom, main in between */
     align-items: center;
     height: 100dvh; /* Use dynamic viewport height */
-    width: 100vw; /* Each screen takes one full viewport width */
+    width: 33.3333%; /* Each screen takes one third of the container */
     flex-shrink: 0; /* Prevents shrinking */
     position: relative; /* For back button positioning */
     z-index: 1; /* Ensure its content is visible */
@@ -1141,7 +1141,7 @@ body.contact-active #specialFeaturesClone {
     left: 0;
     width: 100%;
     height: 100dvh;
-    background: #000 url('assets/The_Swing_car_away.gif') center center / cover no-repeat;
+    background: #000 url('assets/gifs/The_Swing_car_away.gif') center center / cover no-repeat;
     z-index: 500; /* High enough to cover content during transition */
     opacity: 0;
     visibility: hidden;
@@ -1387,4 +1387,49 @@ body.contact-active #specialFeaturesClone {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
     100% { opacity: 1; }
+}
+
+/* --- Mobile Landscape Fix (Zoom Out Strategy) --- */
+/* Target devices in landscape orientation with limited vertical height (phones) */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        /* Scale down the entire site to fit the desktop layout in short height */
+        transform: scale(0.65);
+        transform-origin: top left;
+        
+        /* Compensate dimensions so it still fills the screen when scaled down */
+        width: 153.85vw;  /* 100 / 0.65 */
+        height: 153.85dvh; /* 100 / 0.65 */
+        overflow: hidden;
+    }
+
+    /* Compensate fixed background video dimensions which use viewport units */
+    .video-background-iframe {
+        width: calc(177.77777778vh / 0.65);
+        height: calc(56.25vw / 0.65);
+    }
+
+    /* 
+       Force full-screen containers to inherit the expanded height from the body.
+       Originally they are set to 100dvh, which is too short in this scaled context.
+    */
+    #screenContainer,
+    .screen-wrapper,
+    #loadingOverlay,
+    #transitionOverlay,
+    #passwordScreen,
+    #insertVhsScreen,
+    #makeContactScreen,
+    .video-modal,
+    #videoInterstitial {
+        height: 100%;
+    }
+
+    /* Fix About Us screen size calculation in scaled context */
+    #aboutUsScreen {
+        width: 95%; /* Use percentage of the scaled body, not viewport units */
+        height: 90%; /* Maximize vertical space */
+        max-width: none; /* Remove desktop constraints */
+        max-height: none;
+    }
 }
