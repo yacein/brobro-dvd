@@ -218,7 +218,8 @@ async function main() {
 
         dom.passwordForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            let enteredId = dom.passcodeInput.value.trim();
+            const rawInput = dom.passcodeInput.value.trim();
+            let enteredId = rawInput;
 
             // Check for the analytics exclusion flag '-x' in the password input
             if (enteredId.endsWith('-x')) {
@@ -227,6 +228,10 @@ async function main() {
             }
 
             if (enteredId) {
+                // Update the URL to include the ID so it can be shared or refreshed
+                const newUrl = `${window.location.pathname}?${rawInput}`;
+                window.history.replaceState(null, '', newUrl);
+
                 // Fade out the password screen, revealing the loader underneath.
                 dom.passwordScreen.classList.add('hidden');
                 initializeApp(enteredId, 'password_entry', !skipIntro); // Play intro unless '&menu' is present
