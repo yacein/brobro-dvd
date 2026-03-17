@@ -1,7 +1,7 @@
 // --- DATA DEFINITION (DEFAULT VALUES) ---
 export let videoData = {
     siteTitle: 'Brother Brother | The Showreel',
-    mainMenuTitle: 'YAZ & HAZ',
+    mainMenuTitle: 'YAZ&HAZ',
     mainMenuGlitchText: 'DIRECTING DUO',
     mainMenuSubtitle: 'THE SHOWREEL',
     copyrightText: '© 1996 BROTHER BROTHER. ALL RIGHTS RESERVED.',

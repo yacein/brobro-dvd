@@ -18,7 +18,7 @@
 
     /* Fonts */
     --font-pixel: 'Press Start 2P', cursive;
-    --font-title: 'Rubik Dirt', sans-serif;
+    --font-title: 'Rubik 80s Fade', system-ui;
     --font-button: 'jersey 15', sans-serif;
     --font-typewriter: 'Special Elite', monospace;
 }
@@ -1392,7 +1392,7 @@ body.contact-active #specialFeaturesClone {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    z-index: 102; /* Above video modal (100) and close button (101) */
+    z-index: 10000; /* Increased to be above loading overlays (9999) */
     font-family: 'DSEG14-Classic', var(--font-pixel);
     font-style: italic;
     font-size: 2rem;

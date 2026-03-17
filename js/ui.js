@@ -155,7 +155,7 @@ export function loadChapterVideos() {
         chapterItem.addEventListener('click', () => {
             const vimeoId = chapter.vimeoId || videoData.mainBackgroundVimeoId;
             logEvent('chapter_click', { title: chapter.title, vimeoId: vimeoId, versionId: getSiteVersionId() });
-            playVideo(vimeoId, { trackProgress: false });
+            playVideo(vimeoId, { trackProgress: false, useDvdLoader: true });
         });
 
         dom.sceneSelectionGrid.appendChild(chapterItem);
@@ -354,6 +354,10 @@ export function closeVideoModal() {
     document.getElementById('skipToMenu').classList.remove('visible');
     dom.videoInterstitial.classList.add('hidden'); // Ensure interstitial is hidden
 
+    // Failsafe: ensure loaders are hidden if user exits before video plays
+    dom.vhsLoadingOverlay.classList.add('hidden');
+    dom.dvdLoadingOverlay.classList.add('hidden');
+
     if (currentOnFinishCallback) {
         currentOnFinishCallback();
         currentOnFinishCallback = null;
@@ -364,7 +368,7 @@ export function closeVideoModal() {
  * Generic function to play a video in the modal with consistent behavior.
  * Handles the "Exit / Menu" button, progress tracking, and loader hiding.
  */
-export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, onFinish = null, showInterstitial = false, startTime = 0 } = {}) {
+export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, useDvdLoader = false, onFinish = null, showInterstitial = false, startTime = 0 } = {}) {
     currentOnFinishCallback = onFinish;
     const skipButton = document.getElementById('skipToMenu');
 
@@ -416,15 +420,20 @@ export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, 
     dom.videoModal.classList.add('show-modal');
     skipButton.classList.add('visible');
 
+    if (useDvdLoader) {
+        dom.dvdLoadingOverlay.classList.remove('hidden');
+    }
+
     const player = new Vimeo.Player(dom.videoModalIframe);
 
-    if (hideLoader) {
-        player.on('play', () => {
-            dom.vhsLoadingOverlay.classList.add('hidden');
-        });
-        setTimeout(() => {
-            dom.vhsLoadingOverlay.classList.add('hidden');
-        }, 5000);
+    const hideCurrentLoader = () => {
+        if (hideLoader) dom.vhsLoadingOverlay.classList.add('hidden');
+        if (useDvdLoader) dom.dvdLoadingOverlay.classList.add('hidden');
+    };
+
+    if (hideLoader || useDvdLoader) {
+        player.on('play', hideCurrentLoader);
+        setTimeout(hideCurrentLoader, 5000); // 5 second failsafe
     }
 
     player.on('ended', () => {
@@ -476,7 +485,7 @@ export function initEventListeners() {
     dom.playReelButton.addEventListener('click', (e) => {
         e.preventDefault();
         logEvent('play_reel_click', { vimeoId: videoData.mainReelVimeoId, versionId: getSiteVersionId() });
-        playVideo(videoData.mainReelVimeoId, { trackProgress: true, showInterstitial: true });
+        playVideo(videoData.mainReelVimeoId, { trackProgress: true, showInterstitial: true, useDvdLoader: true });
     });
 
     dom.closeModalButton.addEventListener('click', () => {
