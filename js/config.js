@@ -29,8 +29,8 @@ export let videoData = {
           thumbnailUrl: 'assets/gifs/IC-Berlin_Style-Made-in-Germany-low.gif' }
     ],
     pagination: [  
-      { name: "Comedy & Tech" },
-      { name: "Fashion & Luxury" }
+      { name: "Comedy" },
+      { name: "Lifestyle" }
     ],
     specialFeatures: [
         { text: 'Make Contact', type: 'internal', targetScreen: 'contact' },
