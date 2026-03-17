@@ -177,8 +177,8 @@ async function main() {
         // The loading overlay remains visible underneath the password screen to prevent flashing.
         const promptLabel = dom.passwordForm.querySelector('label');
         const initialText = 'Hello...';
-        const restOfText = 'We\'re glad you found us.<br>Please type your passcode and press enter > ';
-        const typingSpeed = 80;
+        const restOfText = 'Please type your passcode and press enter > ';
+        const typingSpeed = 40;
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
         if (isTouchDevice) {
