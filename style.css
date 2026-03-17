@@ -917,7 +917,6 @@ body.contact-active #specialFeaturesClone {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
     opacity: 1;
     visibility: visible;
 }
@@ -926,6 +925,7 @@ body.contact-active #specialFeaturesClone {
     opacity: 0;
     visibility: hidden;
     pointer-events: none; /* Prevent interaction when hidden */
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
 
 .loader-content {
@@ -993,7 +993,6 @@ body.contact-active #specialFeaturesClone {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
     opacity: 1;
     visibility: visible;
 }
@@ -1002,6 +1001,7 @@ body.contact-active #specialFeaturesClone {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
 
 .vhs-loader-content {
