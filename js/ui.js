@@ -420,10 +420,10 @@ export function playVideo(vimeoId, { trackProgress = false, hideLoader = false, 
 
     if (hideLoader) {
         player.on('play', () => {
-            dom.loadingOverlay.classList.add('hidden');
+            dom.vhsLoadingOverlay.classList.add('hidden');
         });
         setTimeout(() => {
-            dom.loadingOverlay.classList.add('hidden');
+            dom.vhsLoadingOverlay.classList.add('hidden');
         }, 5000);
     }
 
@@ -455,7 +455,14 @@ export function playIntroReel(hideLoader = false) {
     playVideo(videoData.mainReelVimeoId, {
         trackProgress: true,
         hideLoader: hideLoader,
-        onFinish: () => goToScreen('main')
+        onFinish: () => {
+            // "Hollywood Magic" - Fake DVD spin-up before showing main menu
+            dom.dvdLoadingOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                dom.dvdLoadingOverlay.classList.add('hidden');
+                goToScreen('main');
+            }, 1500);
+        }
     });
 }
 

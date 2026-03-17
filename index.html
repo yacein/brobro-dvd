@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <!-- New Google Fonts for Title and Buttons (Bangers for title) -->
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <!-- DSEG Font for LCD displays -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
     <!-- Jersey 24 Font -->
     <link href="https://fonts.googleapis.com/css2?family=Jersey+15&display=swap" rel="stylesheet">
     <!-- Special Elite Font for typewriter effect -->
@@ -56,14 +58,43 @@
         </filter>
       </defs>
     </svg>
-    <!-- New: Loading Overlay -->
-    <div id="loadingOverlay">
+    <!-- DVD Loading Overlay (Hidden by default, used for menu transitions) -->
+    <div id="dvdLoadingOverlay" class="hidden">
         <div class="loader-content">
             <div class="disc-loader">
                 <div class="disc"></div>
                 <div class="slot"></div>
             </div>
             <p>LOADING...</p>
+        </div>
+    </div>
+
+    <!-- VHS Loading Overlay (Initial loader) -->
+    <div id="vhsLoadingOverlay">
+        <div class="vhs-loader-content">
+            <div class="lcd-spinner">
+                <!-- Digit 1 -->
+                <div class="lcd-digit">
+                    <div class="segment segment-x seg-a snake-d1-a"></div>
+                    <div class="segment segment-y seg-b"></div>
+                    <div class="segment segment-y seg-c"></div>
+                    <div class="segment segment-x seg-d snake-d1-d"></div>
+                    <div class="segment segment-y seg-e snake-d1-e"></div>
+                    <div class="segment segment-y seg-f snake-d1-f"></div>
+                    <div class="segment segment-x seg-g"></div>
+                </div>
+                <!-- Digit 2 -->
+                <div class="lcd-digit">
+                    <div class="segment segment-x seg-a snake-d2-a"></div>
+                    <div class="segment segment-y seg-b snake-d2-b"></div>
+                    <div class="segment segment-y seg-c snake-d2-c"></div>
+                    <div class="segment segment-x seg-d snake-d2-d"></div>
+                    <div class="segment segment-y seg-e"></div>
+                    <div class="segment segment-y seg-f"></div>
+                    <div class="segment segment-x seg-g"></div>
+                </div>
+            </div>
+            <p class="lcd-text">LOADING</p>
         </div>
     </div>
 

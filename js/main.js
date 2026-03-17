@@ -90,7 +90,7 @@ async function initializeApp(id, arrivalMethod, playIntro = false) {
     if (playIntro) {
         playIntroReel(true); // Pass true to indicate we should hide the loader when video starts
     } else {
-        dom.loadingOverlay.classList.add('hidden');
+        dom.vhsLoadingOverlay.classList.add('hidden');
     }
 
     // Animate subtitle on initial load

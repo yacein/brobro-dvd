@@ -5,7 +5,7 @@ export let mainMenuHeroTitle, mainMenuGlitchText, mainMenuSubtitle, specialFeatu
     mainMenuScreen, sceneSelectionScreen, specialFeaturesScreen, aboutUsScreen, makeContactScreen, paginationControls,
     telepathyButton, telepathyMessage, backToMainMenuFromScenes, backToMainMenuFromAbout, tapPrompt,
     backToMainMenuFromFeatures, backToMainMenuFromContact, sceneSelectionGrid, transitionOverlay,
-    subtitleShowreelElement, loadingOverlay, displacementMap, dvdLogo, passwordScreen,
+    subtitleShowreelElement, vhsLoadingOverlay, dvdLoadingOverlay, displacementMap, dvdLogo, passwordScreen,
     passwordForm, passcodeInput, eggCounter, eggCountElement, eggTotalElement, eggProgressFill,
     videoInterstitial, interstitialResumeButton, interstitialRestartButton;
 
@@ -41,7 +41,8 @@ export function initDom() {
     sceneSelectionGrid = document.getElementById('sceneSelectionGrid');
     transitionOverlay = document.getElementById('transitionOverlay');
     subtitleShowreelElement = document.querySelector('.subtitle-showreel');
-    loadingOverlay = document.getElementById('loadingOverlay');
+    vhsLoadingOverlay = document.getElementById('vhsLoadingOverlay');
+    dvdLoadingOverlay = document.getElementById('dvdLoadingOverlay');
     displacementMap = document.getElementById('displacementMap');
     dvdLogo = document.getElementById('dvdLogo');
     passwordScreen = document.getElementById('passwordScreen');
