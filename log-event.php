@@ -61,8 +61,14 @@ function get_company_map($url) {
         return []; // Not enough data (must have header + at least one row).
     }
 
-    $headers = str_getcsv(array_shift($lines));
-    $versionId_index = array_search('versionId', $headers);
+    // Trim the headers to remove any trailing whitespace or carriage returns (\r)
+    $headers = array_map('trim', str_getcsv(array_shift($lines)));
+    
+    // Look for 'rowId' (as defined in your JS) or 'versionId' as a fallback
+    $versionId_index = array_search('rowId', $headers);
+    if ($versionId_index === false) {
+        $versionId_index = array_search('versionId', $headers);
+    }
     $companyName_index = array_search('company_name', $headers);
 
     // If required columns aren't found, we can't build the map.
@@ -86,7 +92,7 @@ function get_company_map($url) {
 // --- Configuration ---
 $log_file = __DIR__ . '/analytics_log.txt';
 // The private Google Sheet CSV URL for company data enrichment.
-$company_data_csv_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnDZiD0zbEjdALbE4BPJrGUvnC3jK4mK4uebn2kLjajcgCbXQsE5xBG9a0R1wxn9WJo-ogpLC3p-X0/pub?gid=0&single=true&output=csv';
+$company_data_csv_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnDZiD0zbEjdALbE4BPJrGUvnC3jK4mK4uebn2kLjajcgCbXQsE5xBG9a0R1wxn9WJo-ogpLC3p-X0/pub?gid=1534684239&single=true&output=csv';
 $analytics_page_url = 'https://assets.brobro.film/dvd/view-analytics.php';
 
 // Email configuration (moved from notify.php)
@@ -157,9 +163,13 @@ if ($eventType === 'telepathic_contact') {
     // This event should also trigger an email notification.
     if (isset($eventData['versionId']) && !empty($eventData['versionId'])) {
         $versionId = htmlspecialchars(strip_tags(trim($eventData['versionId'])));
+        
+        $company_map = get_company_map($company_data_csv_url);
+        $companyName = htmlspecialchars($company_map[$versionId] ?? 'Unknown Company');
 
-        $subject = "$email_subject_prefix New contact from site version: $versionId";
+        $subject = "$email_subject_prefix New contact from $companyName ($versionId)";
         $email_message = "You have received a new telepathic contact.\n\n"
+                 . "Company: " . $companyName . "\n"
                  . "Site Version ID: " . $versionId . "\n"
                  . "Timestamp: " . date('Y-m-d H:i:s') . " (UTC)\n"
                  . "User IP Address: " . $_SERVER['REMOTE_ADDR'] . "\n\n"
@@ -200,7 +210,8 @@ if ($eventType === 'site_load') {
         if ($isFirstVisit) {
             // This is the first time, send an email notification.
             $company_map = get_company_map($company_data_csv_url);
-            $companyName = htmlspecialchars($company_map[$versionId] ?? 'Unknown Company');
+            // Add trim() here to ensure no invisible spaces break the array lookup
+            $companyName = htmlspecialchars($company_map[trim($versionId)] ?? 'Unknown Company');
             $arrivalMethod = htmlspecialchars($eventData['method'] ?? 'N/A');
             $versionIdSafe = htmlspecialchars($versionId);
 

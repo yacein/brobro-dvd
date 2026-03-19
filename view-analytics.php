@@ -6,7 +6,7 @@ session_start();
 $password = 'wakeupneo';
 $log_file = __DIR__ . '/analytics_log.txt';
 // The private Google Sheet CSV URL for company data enrichment.
-$company_data_csv_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnDZiD0zbEjdALbE4BPJrGUvnC3jK4mK4uebn2kLjajcgCbXQsE5xBG9a0R1wxn9WJo-ogpLC3p-X0/pub?gid=0&single=true&output=csv';
+$company_data_csv_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnDZiD0zbEjdALbE4BPJrGUvnC3jK4mK4uebn2kLjajcgCbXQsE5xBG9a0R1wxn9WJo-ogpLC3p-X0/pub?gid=1534684239&single=true&output=csv';
 
 // --- LOGIC ---
 
@@ -31,8 +31,14 @@ function get_company_map($url) {
         return []; // Not enough data (must have header + at least one row).
     }
 
-    $headers = str_getcsv(array_shift($lines));
-    $versionId_index = array_search('versionId', $headers);
+    // Trim the headers to remove any trailing whitespace or carriage returns (\r)
+    $headers = array_map('trim', str_getcsv(array_shift($lines)));
+    
+    // Look for 'rowId' (as defined in your JS) or 'versionId' as a fallback
+    $versionId_index = array_search('rowId', $headers);
+    if ($versionId_index === false) {
+        $versionId_index = array_search('versionId', $headers);
+    }
     $companyName_index = array_search('company_name', $headers);
 
     // If required columns aren't found, we can't build the map.
