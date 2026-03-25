@@ -107,8 +107,12 @@ $email_subject_prefix = '[Telepathy Contact]';
 // IMPORTANT: For security, specify the exact origin of your website.
 $allowed_origins = [
     'https://dvd.brobro.local', // Local development
-    'https://fastidious-cocada-e6cae6.netlify.app', // Netlify testing URL
-    '.brobro.film' // Wildcard for any subdomain of brobro.film
+    'https://yazandhaz.netlify.app', // Netlify testing URL
+    '.brobro.film', // Wildcard for any subdomain of brobro.film
+    '.yazhaz.co',
+    '.yazandhaz.com',
+    'https://yazhaz.co',
+    'https://yazandhaz.com'
 ];
 
 // --- Security & Validation ---
