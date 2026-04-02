@@ -122,7 +122,10 @@ export function loadChapterVideos() {
     dom.paginationControls.style.display = 'none'; // Hide the container by default
 
     const totalChapters = videoData.chapters.length;
-    if (totalChapters === 0) return; // Nothing to display
+    if (totalChapters === 0) {
+        updateNavigationArrows(0); // Clear arrows if no chapters
+        return; // Nothing to display
+    }
 
     const totalPages = Math.ceil(totalChapters / chaptersPerPage);
 
@@ -166,6 +169,8 @@ export function loadChapterVideos() {
         dom.paginationControls.style.display = 'flex'; // Make the container visible again
         renderPaginationControls(totalPages);
     }
+
+    updateNavigationArrows(totalPages);
 }
 
 function renderPaginationControls(totalPages) {
@@ -199,6 +204,30 @@ function renderPaginationControls(totalPages) {
         });
 
         dom.paginationControls.appendChild(pageItem);
+    }
+}
+
+function updateNavigationArrows(totalPages) {
+    const leftArrow = document.getElementById('chapterNavLeft');
+    const rightArrow = document.getElementById('chapterNavRight');
+    if (!leftArrow || !rightArrow) return;
+
+    if (totalPages <= 1) {
+        leftArrow.classList.remove('visible');
+        rightArrow.classList.remove('visible');
+        return;
+    }
+
+    if (currentChapterPage > 1) {
+        leftArrow.classList.add('visible');
+    } else {
+        leftArrow.classList.remove('visible');
+    }
+
+    if (currentChapterPage < totalPages) {
+        rightArrow.classList.add('visible');
+    } else {
+        rightArrow.classList.remove('visible');
     }
 }
 
@@ -551,4 +580,31 @@ export function initEventListeners() {
     dom.backToMainMenuFromAbout.addEventListener('click', (e) => { e.preventDefault(); document.body.classList.remove('about-us-active'); });
     dom.backToMainMenuFromContact.addEventListener('click', (e) => { e.preventDefault(); document.body.classList.remove('contact-active'); resetTelepathyButton(); });
     dom.backToMainMenuFromFeatures.addEventListener('click', (e) => { e.preventDefault(); goToScreen('main'); });
+
+    // Add event listeners for chapter navigation arrows
+    const leftArrow = document.getElementById('chapterNavLeft');
+    const rightArrow = document.getElementById('chapterNavRight');
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const hoverEvent = isTouchDevice ? 'click' : 'mouseenter';
+    
+    if (leftArrow) {
+        leftArrow.addEventListener('click', () => { 
+            if (currentChapterPage > 1) { 
+                currentChapterPage--; 
+                loadChapterVideos(); 
+            } 
+        });
+        leftArrow.addEventListener(hoverEvent, playBloopSound);
+    }
+    
+    if (rightArrow) {
+        rightArrow.addEventListener('click', () => { 
+            const totalPages = Math.ceil(videoData.chapters.length / chaptersPerPage); 
+            if (currentChapterPage < totalPages) { 
+                currentChapterPage++; 
+                loadChapterVideos(); 
+            } 
+        });
+        rightArrow.addEventListener(hoverEvent, playBloopSound);
+    }
 }

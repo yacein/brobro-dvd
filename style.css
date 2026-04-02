@@ -516,6 +516,42 @@ footer {
     color: var(--color-accent-yellow);
 }
 
+/* Scene Selection Layout Container */
+.scene-selection-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Chapter Navigation Arrows */
+.chapter-nav-arrow {
+    font-family: var(--font-pixel);
+    font-size: clamp(2rem, 5vw, 4rem);
+    color: var(--color-text-light);
+    cursor: pointer;
+    z-index: 10;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s;
+    user-select: none;
+    padding: 10px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.chapter-nav-arrow.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.chapter-nav-arrow:hover {
+    color: var(--color-accent-yellow);
+    transform: scale(1.2);
+}
+
 /* Scene Selection specific styling */
 .scene-selection-grid {
     display: grid;
@@ -524,8 +560,6 @@ footer {
     padding: 20px;
     max-width: 1200px;
     width: 100%;
-    margin: auto;
-    flex-grow: 1;
     align-items: center;
     justify-content: center;
 }
@@ -1118,6 +1152,15 @@ body.contact-active #specialFeaturesClone {
     /* Hide the egg counter on the scene selection screen to reduce crowding */
     #screenContainer.slide-to-scene ~ #eggCounter {
         display: none;
+    }
+
+    /* Adjust Chapter Navigation Arrows for Mobile */
+    .chapter-nav-arrow.prev-arrow {
+        padding-left: 5px;
+    }
+
+    .chapter-nav-arrow.next-arrow {
+        padding-right: 5px;
     }
 
     /* Force 2 columns on screens up to 768px wide (tablets and larger phones) */
