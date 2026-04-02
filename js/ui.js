@@ -607,4 +607,43 @@ export function initEventListeners() {
         });
         rightArrow.addEventListener(hoverEvent, playBloopSound);
     }
+
+    // --- Swipe Gesture Logic for Chapter Selection on Mobile ---
+    const sceneSelectionScreen = dom.sceneSelectionScreen;
+    if (sceneSelectionScreen) {
+        let touchStartX = 0;
+        const swipeThreshold = 50; // Minimum distance in pixels for a swipe
+
+        sceneSelectionScreen.addEventListener('touchstart', (e) => {
+            // Only track single-finger touches, and only if we are on the scene selection screen
+            if (e.touches.length === 1 && dom.screenContainer.classList.contains('slide-to-scene')) {
+                touchStartX = e.touches[0].clientX;
+            }
+        }, { passive: true });
+
+        sceneSelectionScreen.addEventListener('touchend', (e) => {
+            // Ignore if not a valid swipe start on the correct screen
+            if (touchStartX === 0 || e.changedTouches.length !== 1 || !dom.screenContainer.classList.contains('slide-to-scene')) {
+                touchStartX = 0; // Reset in case we swiped off screen
+                return;
+            }
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const swipeDistance = touchEndX - touchStartX;
+            const totalPages = Math.ceil(videoData.chapters.length / chaptersPerPage);
+
+            if (Math.abs(swipeDistance) > swipeThreshold) {
+                if (swipeDistance < 0 && currentChapterPage < totalPages) { // Swiped left (next page)
+                    currentChapterPage++;
+                    loadChapterVideos();
+                    playBloopSound();
+                } else if (swipeDistance > 0 && currentChapterPage > 1) { // Swiped right (previous page)
+                    currentChapterPage--;
+                    loadChapterVideos();
+                    playBloopSound();
+                }
+            }
+            touchStartX = 0; // Reset for the next swipe
+        });
+    }
 }
