@@ -117,12 +117,7 @@ $allowed_origins = [
 
 // --- Security & Validation ---
 
-// Only allow POST requests.
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    log_validation_error_and_exit($log_file, 405, 'Method Not Allowed', 'Expected POST, received ' . $_SERVER['REQUEST_METHOD']);
-}
-
-// Check the origin of the request against the allowed list.
+// 1. Check the origin of the request against the allowed list.
 $origin_is_allowed = false;
 if (isset($_SERVER['HTTP_ORIGIN'])) {
     $request_origin = $_SERVER['HTTP_ORIGIN'];
@@ -131,11 +126,31 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
         if ($request_origin === $allowed || ($allowed[0] === '.' && str_ends_with($request_origin, $allowed))) {
             $origin_is_allowed = true;
             header("Access-Control-Allow-Origin: " . $request_origin);
+            header("Access-Control-Allow-Methods: POST, OPTIONS");
+            header("Access-Control-Allow-Headers: Content-Type");
             break;
         }
     }
 }
 
+// 2. Handle CORS Preflight (OPTIONS) requests safely
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code($origin_is_allowed ? 200 : 403);
+    exit;
+}
+
+// 3. Filter out bots and direct browser visits without spamming the log
+if ($_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'HEAD') {
+    http_response_code(405);
+    exit('Method Not Allowed');
+}
+
+// 4. Only allow POST requests for actual logging.
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    log_validation_error_and_exit($log_file, 405, 'Method Not Allowed', 'Expected POST, received ' . $_SERVER['REQUEST_METHOD']);
+}
+
+// 5. Enforce Origin rules
 if (!$origin_is_allowed) {
     log_validation_error_and_exit($log_file, 403, 'Origin Not Allowed', 'Origin: ' . ($_SERVER['HTTP_ORIGIN'] ?? 'Not set'));
 }
