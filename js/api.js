@@ -62,20 +62,60 @@ function mergeDefaults(target, source) {
  * @returns {Array<object>} An array of parsed data objects, one for each row.
  */
 function parseCsv(csvString) {
-    const lines = csvString.trim().split('\n');
-    if (lines.length < 2) { // Need at least a header and one data row
+    const rows = [];
+    let currentRow = [];
+    let currentValue = '';
+    let insideQuotes = false;
+
+    for (let i = 0; i < csvString.length; i++) {
+        const char = csvString[i];
+        const nextChar = csvString[i + 1];
+
+        if (char === '"') {
+            if (insideQuotes && nextChar === '"') {
+                currentValue += '"'; // Handle escaped double quotes ("")
+                i++; // Skip the next quote
+            } else {
+                insideQuotes = !insideQuotes; // Toggle quote state
+            }
+        } else if (char === ',' && !insideQuotes) {
+            currentRow.push(currentValue.trim());
+            currentValue = '';
+        } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+            if (char === '\r' && nextChar === '\n') {
+                i++; // Handle Windows CRLF
+            }
+            currentRow.push(currentValue.trim());
+            rows.push(currentRow);
+            currentRow = [];
+            currentValue = '';
+        } else {
+            currentValue += char;
+        }
+    }
+    
+    // Add the final value/row if the string doesn't end with a newline
+    if (currentValue !== '' || currentRow.length > 0) {
+        currentRow.push(currentValue.trim());
+        rows.push(currentRow);
+    }
+
+    // Filter out completely empty rows (like a trailing newline)
+    const validRows = rows.filter(row => row.length > 1 || (row.length === 1 && row[0] !== ''));
+
+    if (validRows.length < 2) { // Need at least a header and one data row
         console.warn("CSV is empty or only contains headers.");
         return [];
     }
 
-    const headers = lines[0].split(',').map(header => header.trim());
+    const headers = validRows[0];
     // console.log("CSV Headers:", headers); // DEBUG: Log headers
 
     const parsedDataRows = [];
 
     // Start from the first data row (index 1)
-    for (let i = 1; i < lines.length; i++) {
-        const dataRowValues = lines[i].split(',').map(value => value.trim());
+    for (let i = 1; i < validRows.length; i++) {
+        const dataRowValues = validRows[i];
         const rowObject = {};
         // Initialize chapters and specialFeatures arrays to ensure they are always present
         rowObject.chapters = [];
@@ -83,7 +123,7 @@ function parseCsv(csvString) {
         rowObject.pagination = [];
 
         headers.forEach((header, index) => {
-            const value = dataRowValues[index];
+            const value = dataRowValues[index] !== undefined ? dataRowValues[index] : '';
 
             // Check for chapterX.property pattern
             const chapterMatch = header.match(/^chapter(\d+)\.(.+)$/);

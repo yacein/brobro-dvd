@@ -3,7 +3,15 @@ import { logEvent } from './analytics.js';
 import { getSiteVersionId } from './config.js';
 
 // --- Easter Egg Tracking Logic ---
-const totalEggs = 5;
+const easterEggClues = {
+    'dvd-start': "that logo in the corner looks like it wants to move...",
+    'dvd-catch': "if you set it loose, you have to catch it.",
+    'about-photo-1': "who defaced our photo in the about section?",
+    'about-photo-8': "okay enough of the graffiti already!",
+    'menu-egg': "you're looking right at one of them" // They likely won't see this clue as clicking the button reveals it
+};
+
+const totalEggs = Object.keys(easterEggClues).length;
 const foundEggs = new Set();
 
 /**
@@ -317,18 +325,15 @@ export function initMenuEasterEgg() {
         return;
     }
 
-    const messages = [
-        "no, we're not telling you where they are...",
-        "just click on stuff, you'll find them"
-    ];
-    let messageIndex = 0;
     let currentBubble = null;
     let removalTimeout = null;
+    let clickCount = 0;
 
     easterEggsButton.addEventListener('click', (e) => {
         e.preventDefault();
 
         markEggFound('menu-egg'); // Track: Clicked the menu button
+        clickCount++;
 
         // If a bubble from this easter egg is already active, clear it out.
         if (currentBubble) {
@@ -344,10 +349,20 @@ export function initMenuEasterEgg() {
             message = "yay! you found them all!";
             createParticleExplosion(easterEggsButton);
         } else {
-            // Standard cycling messages.
-            // To add clues later, check !foundEggs.has('id') here and set message accordingly.
-            message = messages[messageIndex];
-            messageIndex = (messageIndex + 1) % messages.length;
+            if (clickCount === 1) {
+                message = "click around and you'll find them... or keep clicking here for clues if you're *really* stuck";
+            } else if (clickCount === 2) {
+                message = "are you sure you want the clues?";
+            } else {
+                // Filter out found eggs and pick a random clue
+                const unfoundEggIds = Object.keys(easterEggClues).filter(id => !foundEggs.has(id));
+                if (unfoundEggIds.length > 0) {
+                    const randomId = unfoundEggIds[Math.floor(Math.random() * unfoundEggIds.length)];
+                    message = easterEggClues[randomId];
+                } else {
+                    message = "keep looking!";
+                }
+            }
         }
 
         // Create a new bubble that we manage ourselves.
