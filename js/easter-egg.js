@@ -23,6 +23,14 @@ function markEggFound(eggId) {
         foundEggs.add(eggId);
         updateEggCounterUI();
         // Optional: Play a small sound or visual cue here
+        
+        // Log that an egg was found
+        logEvent('easter_egg_found', { eggId: eggId, versionId: getSiteVersionId() });
+        
+        // If this was the last egg, log a completion event
+        if (foundEggs.size === totalEggs) {
+            logEvent('all_easter_eggs_found', { versionId: getSiteVersionId() });
+        }
     }
 }
 
