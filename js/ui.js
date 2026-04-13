@@ -150,14 +150,16 @@ export function loadChapterVideos() {
 
         const chapterTitle = document.createElement('div');
         chapterTitle.classList.add('chapter-title');
-        chapterTitle.textContent = chapter.title || 'Untitled Chapter';
+        chapterTitle.innerHTML = chapter.title || 'Untitled Chapter';
 
         chapterItem.appendChild(videoThumbnail);
         chapterItem.appendChild(chapterTitle);
 
         chapterItem.addEventListener('click', () => {
             const vimeoId = chapter.vimeoId || videoData.mainBackgroundVimeoId;
-            logEvent('chapter_click', { title: chapter.title, vimeoId: vimeoId, versionId: getSiteVersionId() });
+            // Clean up HTML tags for analytics logging
+            const cleanTitle = (chapter.title || 'Untitled Chapter').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>?/gm, '').trim();
+            logEvent('chapter_click', { title: cleanTitle, vimeoId: vimeoId, versionId: getSiteVersionId() });
             playVideo(vimeoId, { trackProgress: false, useDvdLoader: true });
         });
 

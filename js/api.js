@@ -135,7 +135,18 @@ function parseCsv(csvString) {
                 if (!rowObject.chapters[chapterIndex]) {
                     rowObject.chapters[chapterIndex] = {};
                 }
-                rowObject.chapters[chapterIndex][propName] = value;
+                
+                let finalValue = value;
+                if (propName === 'title' && value) {
+                    const lines = value.split(/\r\n|\n|\r/);
+                    if (lines.length > 1) {
+                        const firstLine = lines.shift();
+                        const rest = lines.join('<br>');
+                        finalValue = `${firstLine}<br><span style="font-size: 75%;">${rest}</span>`;
+                    }
+                }
+
+                rowObject.chapters[chapterIndex][propName] = finalValue;
                 return; // Move to next header
             }
 
